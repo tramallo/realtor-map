@@ -10,7 +10,7 @@ export default function Map() {
   const defaultZoom = 12;
 
   const eventHandlerMap: LeafletEventHandlerFnMap = {
-    tileload: (e: TileEvent) => console.log(e),
+    //tileload: (e: TileEvent) => console.log(e),
   };
 
   return (
@@ -25,6 +25,7 @@ export default function Map() {
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           detectRetina={true}
+          eventHandlers={{ tileload: (e: TileEvent) => console.log(e) }}
         />
 
         <MapEventHandler eventMap={eventHandlerMap} />
