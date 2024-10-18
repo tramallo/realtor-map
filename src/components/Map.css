@@ -5,7 +5,7 @@
 
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 0.5fr 9.5fr 1em;
+  grid-template-rows: 1fr 9fr 1em;
   grid-template-areas: 
     "attribution-area"
     "map-area"
@@ -18,4 +18,8 @@
 }
 .map > .attribution > a {
   text-decoration: none;
+}
+
+.map img {
+  border: 1px solid magenta;
 }

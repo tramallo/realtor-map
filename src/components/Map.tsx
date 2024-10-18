@@ -1,21 +1,39 @@
-import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { LatLng, LeafletEventHandlerFnMap, TileEvent } from "leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { LatLng, TileEvent } from "leaflet";
 
 import "./Map.css";
-import MapEventHandler from "./MapEventHandler";
+import { useEffect, useRef, useState } from "react";
 
-export default function Map() {
-  const defaultPosition = new LatLng(-31.39, -57.95);
-  const defaultZoom = 12;
+export interface MapProps {
+  defaultPosition: LatLng;
+  defaultZoom: number;
+}
 
-  const eventHandlerMap: LeafletEventHandlerFnMap = {
-    //tileload: (e: TileEvent) => console.log(e),
+export default function Map({ defaultPosition, defaultZoom }: MapProps) {
+  const infoRef = useRef<HTMLDivElement | null>(null);
+
+  const [loadedTiles, setLoadedTiles] = useState([] as string[]);
+
+  const handleTileLoad = (e: TileEvent) => {
+    const tileUrl = e.tile.src;
+
+    console.log(`load: ${tileUrl}`);
+    setLoadedTiles((prevLoadedTiles) => [...prevLoadedTiles, tileUrl]);
   };
+
+  useEffect(() => {
+    if (!infoRef.current) {
+      return;
+    }
+
+    const infoDiv = infoRef.current!;
+    infoDiv.innerText = `loaded tiles count: ${loadedTiles.length}`;
+  }, [infoRef, loadedTiles]);
 
   return (
     <div className="map">
-      <div>info info info</div>
+      <div ref={infoRef}>info info info</div>
       <MapContainer
         center={defaultPosition}
         zoom={defaultZoom}
@@ -25,10 +43,8 @@ export default function Map() {
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           detectRetina={true}
-          eventHandlers={{ tileload: (e: TileEvent) => console.log(e) }}
+          eventHandlers={{ tileload: handleTileLoad }}
         />
-
-        <MapEventHandler eventMap={eventHandlerMap} />
       </MapContainer>
       <label className="attribution">
         🇺🇦 <a href="https://leafletjs.com">Leaftlet</a> | &copy;{" "}
