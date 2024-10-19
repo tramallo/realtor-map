@@ -5,12 +5,18 @@ import {
   LatLngExpression,
   TileEvent,
 } from "leaflet";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 import "./Map.css";
 import { useEffect, useRef, useState } from "react";
 
+export interface MarkerData {
+  text: string;
+  position: LatLngExpression;
+}
+
 export interface MapProps {
+  markers: MarkerData[];
   position?: LatLngExpression;
   zoom?: number;
   minZoom?: number;
@@ -26,6 +32,7 @@ const defaults = {
 };
 
 export default function Map({
+  markers,
   position = defaults.position,
   zoom = defaults.zoom,
   minZoom = defaults.minZoom,
@@ -71,6 +78,12 @@ export default function Map({
           bounds={maxBounds}
           eventHandlers={{ tileload: handleTileLoad }}
         />
+
+        {markers.map((markerData, index) => (
+          <Marker key={index} position={markerData.position}>
+            <Popup>{markerData.text}</Popup>
+          </Marker>
+        ))}
       </MapContainer>
       <label className="attribution">
         🇺🇦 <a href="https://leafletjs.com">Leaftlet</a> | &copy;{" "}

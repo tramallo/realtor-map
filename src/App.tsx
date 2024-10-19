@@ -1,18 +1,25 @@
+import { useState } from "react";
+
 import "./App.css";
-import Map from "./components/Map";
 import SearchBar from "./components/SearchBar";
+import Map, { MarkerData } from "./components/Map";
 
 export default function App() {
-  const handleSearch = (searchValue: string) => {
-    const markerPosition = { lat: -31.39, lng: -57.95 };
+  const [markers, setMakers] = useState([] as MarkerData[]);
 
-    console.log(searchValue);
+  const handleSearch = (searchValue: string) => {
+    const newMarker: MarkerData = {
+      text: searchValue,
+      position: { lat: -31.39, lng: -57.95 },
+    };
+
+    setMakers((prevMarkers) => [...prevMarkers, newMarker]);
   };
 
   return (
     <div id="app">
       <SearchBar onSearch={handleSearch} />
-      <Map />
+      <Map markers={markers} />
     </div>
   );
 }
