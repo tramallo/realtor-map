@@ -20,6 +20,6 @@
   text-decoration: none;
 }
 
-.map img {
+.map img.leaflet-tile {
   border: 1px dashed gray;
 }
