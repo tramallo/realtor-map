@@ -12,5 +12,12 @@ body {
   width: 100dvw;
   height: 100dvh;
 
-  border: 2px solid red;
+  border: 2px solid cyan;
+
+  display: grid;
+  grid-template-rows: 1fr 9fr;
+  grid-template-columns: 1fr;
+  grid-template-areas: 
+    "search-area"
+    "map-area";
 }
