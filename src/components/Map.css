@@ -21,5 +21,5 @@
 }
 
 .map img {
-  border: 1px solid magenta;
+  border: 1px dashed gray;
 }
