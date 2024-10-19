@@ -39,7 +39,6 @@ export default function Map({
   const handleTileLoad = (e: TileEvent) => {
     const tileUrl = e.tile.src;
 
-    console.log(`load: ${tileUrl}`);
     setLoadedTiles((prevLoadedTiles) => [...prevLoadedTiles, tileUrl]);
   };
 
