@@ -20,6 +20,7 @@ export interface MapProps {
 const defaults = {
   position: { lat: -31.39, lng: -57.95 },
   zoom: 12,
+  minZoom: 11,
   maxZoom: 16,
   maxBounds: new LatLngBounds([-31.46, -58.01], [-31.34, -57.85]),
 };
@@ -27,7 +28,7 @@ const defaults = {
 export default function Map({
   position = defaults.position,
   zoom = defaults.zoom,
-  minZoom = defaults.zoom,
+  minZoom = defaults.minZoom,
   maxZoom = defaults.maxZoom,
   maxBounds = defaults.maxBounds,
 }: MapProps) {
@@ -61,7 +62,7 @@ export default function Map({
         minZoom={minZoom}
         maxZoom={maxZoom}
         maxBounds={maxBounds}
-        maxBoundsViscosity={1}
+        maxBoundsViscosity={0.5}
         attributionControl={false}
         style={{ width: "100%", height: "100%" }}
       >
