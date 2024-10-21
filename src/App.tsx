@@ -3,17 +3,22 @@ import { useState } from "react";
 import "./App.css";
 import SearchBar from "./components/SearchBar";
 import Map, { MarkerData } from "./components/Map";
+import { requestAddressInfo } from "./utils/nominatimApi";
 
 export default function App() {
-  const [markers, setMakers] = useState([] as MarkerData[]);
+  const [markers, setMarkers] = useState([] as MarkerData[]);
 
-  const handleSearch = (searchValue: string) => {
-    const newMarker: MarkerData = {
-      text: searchValue,
-      position: { lat: -31.39, lng: -57.95 },
-    };
+  const handleSearch = async (searchValue: string) => {
+    const addresInfo = await requestAddressInfo(searchValue);
 
-    setMakers((prevMarkers) => [...prevMarkers, newMarker]);
+    addresInfo.forEach((address) => {
+      const newMarker: MarkerData = {
+        text: address.display_name,
+        position: { lat: address.lat, lng: address.lon },
+      };
+
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+    });
   };
 
   return (
