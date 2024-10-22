@@ -21,11 +21,7 @@ export default function SearchBar({
     setSearchValue(inputField.value);
   };
 
-  const handleInputEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key != "Enter") {
-      return;
-    }
-
+  const fireSearchEvent = () => {
     if (!searchValue && !allowEmptySearch) {
       return;
     }
@@ -33,13 +29,26 @@ export default function SearchBar({
     onSearch(searchValue);
   };
 
+  const handleInputEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key != "Enter") {
+      return;
+    }
+
+    fireSearchEvent();
+  };
+
   return (
-    <input
-      className="search-bar"
-      type="text"
-      value={searchValue}
-      onChange={handleInputChange}
-      onKeyDown={handleInputEnter}
-    />
+    <div className="search-pane">
+      <label className="attribution">Search powered by Google</label>
+      <div className="search-bar">
+        <input
+          type="text"
+          value={searchValue}
+          onChange={handleInputChange}
+          onKeyDown={handleInputEnter}
+        />
+        <button onClick={fireSearchEvent}>Search</button>
+      </div>
+    </div>
   );
 }
