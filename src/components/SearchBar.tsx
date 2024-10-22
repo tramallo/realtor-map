@@ -38,17 +38,14 @@ export default function SearchBar({
   };
 
   return (
-    <div className="search-pane">
-      <label className="attribution">Search powered by Google</label>
-      <div className="search-bar">
-        <input
-          type="text"
-          value={searchValue}
-          onChange={handleInputChange}
-          onKeyDown={handleInputEnter}
-        />
-        <button onClick={fireSearchEvent}>Search</button>
-      </div>
+    <div className="search-bar">
+      <input
+        type="text"
+        value={searchValue}
+        onChange={handleInputChange}
+        onKeyDown={handleInputEnter}
+      />
+      <button onClick={fireSearchEvent}>Search</button>
     </div>
   );
 }

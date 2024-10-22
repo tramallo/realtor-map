@@ -10,7 +10,11 @@ export const googleGeocodingService: GeocodingProvider<GoogleAddressSchema> = {
             lat: searchResult.geometry.location.lat,
             lng: searchResult.geometry.location.lng
         }
-    })
+    }),
+    attribute: {
+        text: "Search results powered by Google",
+        url: "https://maps.google.com"
+    }
 }
 
 export const nominatimGeocodingService: GeocodingProvider<NominatimAddressSchema> = {
@@ -21,5 +25,9 @@ export const nominatimGeocodingService: GeocodingProvider<NominatimAddressSchema
             lat: searchResult.lat,
             lng: searchResult.lon
         }
-    })
+    }),
+    attribute: {
+        text: "Search results powered by Nominatim",
+        url: "https://nominatim.org"
+    }
 }

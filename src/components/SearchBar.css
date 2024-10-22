@@ -1,29 +1,13 @@
-.search-pane {
+.search-bar {
     border: 2px solid red;
 
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1em 1fr;
-    grid-template-areas: 
-        "attribution-area"
-        "search-bar-area";
-}
-
-.search-pane > .attribution {
-    font-size: 10px;
-    text-align: right;
-}
-.search-pane > .attribution > a {
-    text-decoration: none;
-}
-
-.search-pane > .search-bar {
     display: flex;
     justify-content: space-between;
 }
-.search-pane > .search-bar > input {
+
+.search-bar > input {
     width: 80%;
 }
-.search-pane > .search-bar > button {
+.search-bar > button {
     width: 20%;
 }

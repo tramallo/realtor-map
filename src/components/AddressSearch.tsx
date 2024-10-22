@@ -1,3 +1,4 @@
+import "./AddressSearch.css";
 import SearchBar from "./SearchBar";
 
 export interface AddressData {
@@ -7,6 +8,10 @@ export interface AddressData {
 export interface GeocodingProvider<R> {
   searchAddress: (address: string) => Promise<R[]>;
   resultToAddressData: (searchResult: R) => AddressData;
+  attribute: {
+    text: string;
+    url: string;
+  };
 }
 export interface AddressSearchProps<T> {
   onAddressFound: (address: AddressData) => void;
@@ -41,5 +46,14 @@ export default function AddressSearch<T>({
     console.log("no address found, please check your search parameter");
   };
 
-  return <SearchBar onSearch={handleOnSearch} />;
+  return (
+    <div className="address-search">
+      <span>
+        <a href={geocodingService.attribute.url} target="_blank">
+          {geocodingService.attribute.text}
+        </a>
+      </span>
+      <SearchBar onSearch={handleOnSearch} />
+    </div>
+  );
 }
