@@ -1,4 +1,4 @@
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
 
 export interface GoogleAddressComponentSchema {
