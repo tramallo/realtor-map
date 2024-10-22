@@ -1,7 +1,7 @@
 const apiUrl = "https://nominatim.openstreetmap.org/search";
 
 // not all values will be present, that depends on the request
-export interface AddressSchema {
+export interface NominatimAddressSchema {
     place_id: number, 
     licence: string,
     osm_type: string,
@@ -37,7 +37,7 @@ export interface AddressSchema {
     }
 }
 
-export const requestAddressInfo = async (address: string): Promise<AddressSchema[]> => {
+export const requestAddressInfo = async (address: string): Promise<NominatimAddressSchema[]> => {
     const searchParams = new URLSearchParams({
         q: address,
         format: "json"
@@ -57,7 +57,7 @@ export const requestAddressInfo = async (address: string): Promise<AddressSchema
             throw new Error(`Content type not supported - ${JSON.stringify(response)}`);
         }
 
-        const responseBody = await response.json() as AddressSchema[];
+        const responseBody = await response.json() as NominatimAddressSchema[];
         return responseBody;
 
     } catch (error) {
