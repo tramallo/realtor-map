@@ -23,7 +23,7 @@ interface GoogleSearchResultSchema {
     results: GoogleAddressSchema[],
 }
 
-export const requestAddressInfo = async (address: string): Promise<GoogleAddressSchema[]> => {
+export const searchAddress = async (address: string): Promise<GoogleAddressSchema[]> => {
 
     const searchParams = new URLSearchParams({
         address: address,

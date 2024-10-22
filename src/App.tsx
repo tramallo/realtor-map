@@ -1,32 +1,28 @@
 import { useState } from "react";
 
 import "./App.css";
-import SearchBar from "./components/SearchBar";
 import Map, { MarkerData } from "./components/Map";
-import { requestAddressInfo } from "./utils/googleApi";
+import AddressSearch, { AddressData } from "./components/AddressSearch";
+import { googleGeocodingService } from "./utils/geocodingProviders";
 
 export default function App() {
   const [markers, setMarkers] = useState([] as MarkerData[]);
 
-  const handleSearch = async (searchValue: string) => {
-    const addressInfo = await requestAddressInfo(searchValue);
+  const handleAddressFound = async (addressData: AddressData) => {
+    const markerFromAddress: MarkerData = {
+      text: addressData.text,
+      position: addressData.position,
+    };
 
-    addressInfo.forEach((address) => {
-      const newMarker: MarkerData = {
-        text: address.formatted_address,
-        position: {
-          lat: address.geometry.location.lat,
-          lng: address.geometry.location.lng,
-        },
-      };
-
-      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-    });
+    setMarkers((prevMarkers) => [...prevMarkers, markerFromAddress]);
   };
 
   return (
     <div id="app">
-      <SearchBar onSearch={handleSearch} />
+      <AddressSearch
+        geocodingService={googleGeocodingService}
+        onAddressFound={handleAddressFound}
+      />
       <Map markers={markers} />
     </div>
   );

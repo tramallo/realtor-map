@@ -37,7 +37,7 @@ export interface NominatimAddressSchema {
     }
 }
 
-export const requestAddressInfo = async (address: string): Promise<NominatimAddressSchema[]> => {
+export const searchAddress = async (address: string): Promise<NominatimAddressSchema[]> => {
     const searchParams = new URLSearchParams({
         q: address,
         format: "json"
