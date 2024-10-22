@@ -9,5 +9,9 @@
     width: 80%;
 }
 .search-bar > button {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+
     width: 20%;
 }
