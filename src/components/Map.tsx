@@ -3,12 +3,10 @@ import {
   LatLngBounds,
   LatLngBoundsExpression,
   LatLngExpression,
-  TileEvent,
 } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 import "./Map.css";
-import { useEffect, useRef, useState } from "react";
 
 export interface MarkerData {
   text: string;
@@ -39,29 +37,8 @@ export default function Map({
   maxZoom = defaults.maxZoom,
   maxBounds = defaults.maxBounds,
 }: MapProps) {
-  const infoRef = useRef<HTMLDivElement | null>(null);
-
-  const [loadedTiles, setLoadedTiles] = useState([] as string[]);
-
-  const handleTileLoad = (e: TileEvent) => {
-    const tileUrl = e.tile.src;
-
-    setLoadedTiles((prevLoadedTiles) => [...prevLoadedTiles, tileUrl]);
-  };
-
-  // show loaded tiles count on info div
-  useEffect(() => {
-    if (!infoRef.current) {
-      return;
-    }
-
-    const infoDiv = infoRef.current!;
-    infoDiv.innerText = `Loaded tiles count: ${loadedTiles.length}`;
-  }, [infoRef, loadedTiles]);
-
   return (
     <div className="map">
-      <div ref={infoRef}>info info info</div>
       <MapContainer
         center={position}
         zoom={zoom}
@@ -76,7 +53,6 @@ export default function Map({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           detectRetina={true}
           bounds={maxBounds}
-          eventHandlers={{ tileload: handleTileLoad }}
         />
 
         {markers.map((markerData, index) => (
@@ -85,9 +61,15 @@ export default function Map({
           </Marker>
         ))}
       </MapContainer>
-      <label className="attribution">
-        🇺🇦 <a href="https://leafletjs.com">Leaftlet</a> | &copy;{" "}
-        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>{" "}
+      <label>
+        🇺🇦{" "}
+        <a href="https://leafletjs.com" target="_blank">
+          Leaftlet
+        </a>{" "}
+        | &copy;{" "}
+        <a href="https://www.openstreetmap.org/copyright" target="_blank">
+          OpenStreetMap
+        </a>{" "}
         contributors
       </label>
     </div>
