@@ -67,3 +67,7 @@ export const searchAddress = async (address: string): Promise<NominatimAddressSc
     // return empty if there was an error
     return [];
 }
+
+export const getMapTilesUrl = () => {
+    return `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`;
+}

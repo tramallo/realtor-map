@@ -1,5 +1,6 @@
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
+// GEOCODING
+const geocodingApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const geocodingApiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
 
 export interface GoogleAddressComponentSchema {
     long_name: string,
@@ -24,13 +25,12 @@ interface GoogleSearchResultSchema {
 }
 
 export const searchAddress = async (address: string): Promise<GoogleAddressSchema[]> => {
-
     const searchParams = new URLSearchParams({
         address: address,
-        key: apiKey
+        key: geocodingApiKey
     })
 
-    const searchUrl = `${apiUrl}?${searchParams}`;
+    const searchUrl = `${geocodingApiUrl}?${searchParams}`;
 
     try {
         const response = await fetch(searchUrl);
@@ -40,7 +40,6 @@ export const searchAddress = async (address: string): Promise<GoogleAddressSchem
 
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
-            console.log(response);
             throw new Error(`Content type not supported - ${JSON.stringify(response)}`);
         }
 
@@ -54,4 +53,88 @@ export const searchAddress = async (address: string): Promise<GoogleAddressSchem
 
     // return empty if there was an error
     return [];
+}
+
+// MAP TILES
+const mapTilesApiKey = import.meta.env.VITE_GOOGLE_MAPS_TILES_API_KEY;
+
+// session token
+const createMapTilesSessionUrl = `https://tile.googleapis.com/v1/createSession?key=${mapTilesApiKey}`;
+const mapTilesSessionTokenName = 'mapTilesSessionToken';
+interface MapTilesSessionToken {
+    expiration: number,
+    value: string
+}
+const storeMapTilesSessionToken = (newToken: MapTilesSessionToken) => {
+    localStorage.setItem(mapTilesSessionTokenName, JSON.stringify(newToken));
+}
+const retrieveMapTilesSessionToken = (): MapTilesSessionToken | undefined => {
+    const tokenString = localStorage.getItem(mapTilesSessionTokenName);
+
+    if (!tokenString) {
+        return undefined;
+    }
+    const token = JSON.parse(tokenString);
+    return token;
+}
+const isMapTilesSessionTokenValid = (): boolean => {
+    const token = retrieveMapTilesSessionToken();
+    if (!token) {
+        return false;
+    }
+
+    const isValid = Date.now() < token.expiration;
+    return isValid;
+}
+interface CreateMapTilesSessionResponseBody {
+    expiry: number; // expiration time of the token (seconds since epoch)
+    session: string; //token value
+    tileHeight: number;
+    tileWidth: number;
+    imageFormat: string // tile image format ex: "png"
+}
+const createMapTilesSession = async () => {
+    try {
+        const response = await fetch(createMapTilesSessionUrl, { 
+            method: "POST",
+            headers: {
+                'Content-Type': "application/json"
+            },
+            body: JSON.stringify({
+                mapType: "roadmap",
+                language: "en-US",
+                region: "US"
+            })
+        })
+    
+        if (!response.ok) {
+            throw new Error(`Reponse status non-2XX - ${JSON.stringify(response)}`)    
+        }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error(`Content type not supported - ${JSON.stringify(response)}`);
+        }
+
+        const responseBody = await response.json() as CreateMapTilesSessionResponseBody;
+        
+        const token: MapTilesSessionToken = {
+            expiration: responseBody.expiry,
+            value: responseBody.session
+        }
+        storeMapTilesSessionToken(token);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// --
+export const getMapTilesUrl = async (): Promise<string> => {
+    if (!isMapTilesSessionTokenValid()) {
+        await createMapTilesSession();
+    }
+
+    const sessionToken = retrieveMapTilesSessionToken()!;
+    return `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${sessionToken.value}&key=${mapTilesApiKey}`;
 }

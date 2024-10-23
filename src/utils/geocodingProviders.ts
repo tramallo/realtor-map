@@ -1,6 +1,6 @@
 import { GeocodingProvider } from "../components/AddressSearch";
 import { GoogleAddressSchema, searchAddress as googleSearchAddress } from "./googleApi";
-import { NominatimAddressSchema, searchAddress as nominatimSearchAddress } from "./nominatimApi";
+import { NominatimAddressSchema, searchAddress as nominatimSearchAddress } from "./nominatimOSMApi";
 
 export const googleGeocodingService: GeocodingProvider<GoogleAddressSchema> = {
     searchAddress: googleSearchAddress,

@@ -7,6 +7,8 @@ import {
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 import "./Map.css";
+import { useEffect, useState } from "react";
+import { getMapTilesUrl } from "../utils/googleApi";
 
 export interface MarkerData {
   text: string;
@@ -37,6 +39,18 @@ export default function Map({
   maxZoom = defaults.maxZoom,
   maxBounds = defaults.maxBounds,
 }: MapProps) {
+  const [mapTilesUrl, setMapTilesUrl] = useState("");
+
+  useEffect(() => {
+    getMapTilesUrl()
+      .then((url) => {
+        setMapTilesUrl(url);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <div className="map">
       <MapContainer
@@ -50,9 +64,10 @@ export default function Map({
         style={{ width: "100%", height: "100%" }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url={mapTilesUrl}
           detectRetina={true}
           bounds={maxBounds}
+          crossOrigin={true}
         />
 
         {markers.map((markerData, index) => (
