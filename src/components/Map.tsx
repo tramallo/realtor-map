@@ -8,7 +8,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 import "./Map.css";
 import { useEffect, useState } from "react";
-import { getMapTilesUrl } from "../utils/googleApi";
+import { MapTilesService } from "../utils/mapServicesSchemas";
 
 export interface MarkerData {
   text: string;
@@ -16,6 +16,7 @@ export interface MarkerData {
 }
 
 export interface MapProps {
+  mapTilesService: MapTilesService;
   markers: MarkerData[];
   position?: LatLngExpression;
   zoom?: number;
@@ -32,6 +33,7 @@ const defaults = {
 };
 
 export default function Map({
+  mapTilesService,
   markers,
   position = defaults.position,
   zoom = defaults.zoom,
@@ -42,14 +44,11 @@ export default function Map({
   const [mapTilesUrl, setMapTilesUrl] = useState("");
 
   useEffect(() => {
-    getMapTilesUrl()
-      .then((url) => {
-        setMapTilesUrl(url);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    mapTilesService
+      .getMapTilesUrl()
+      .then((url) => setMapTilesUrl(url))
+      .catch((error) => console.log(error));
+  }, [mapTilesService]);
 
   return (
     <div className="map">
@@ -60,7 +59,6 @@ export default function Map({
         maxZoom={maxZoom}
         maxBounds={maxBounds}
         maxBoundsViscosity={0.5}
-        attributionControl={false}
         style={{ width: "100%", height: "100%" }}
       >
         <TileLayer
@@ -68,6 +66,7 @@ export default function Map({
           detectRetina={true}
           bounds={maxBounds}
           crossOrigin={true}
+          attribution={mapTilesService.attribution}
         />
 
         {markers.map((markerData, index) => (
@@ -76,17 +75,6 @@ export default function Map({
           </Marker>
         ))}
       </MapContainer>
-      <label>
-        🇺🇦{" "}
-        <a href="https://leafletjs.com" target="_blank">
-          Leaftlet
-        </a>{" "}
-        | &copy;{" "}
-        <a href="https://www.openstreetmap.org/copyright" target="_blank">
-          OpenStreetMap
-        </a>{" "}
-        contributors
-      </label>
     </div>
   );
 }

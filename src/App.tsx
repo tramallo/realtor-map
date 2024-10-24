@@ -2,8 +2,10 @@ import { useState } from "react";
 
 import "./App.css";
 import Map, { MarkerData } from "./components/Map";
-import AddressSearch, { AddressData } from "./components/AddressSearch";
-import { googleGeocodingService } from "./utils/geocodingProviders";
+import AddressSearch from "./components/AddressSearch";
+import { AddressData } from "./utils/mapServicesSchemas";
+import { googleGeocodingService } from "./utils/googleApi";
+import { osmMapTilesService } from "./utils/nominatimOSMApi";
 
 export default function App() {
   const [markers, setMarkers] = useState([] as MarkerData[]);
@@ -23,7 +25,7 @@ export default function App() {
         geocodingService={googleGeocodingService}
         onAddressFound={handleAddressFound}
       />
-      <Map markers={markers} />
+      <Map mapTilesService={osmMapTilesService} markers={markers} />
     </div>
   );
 }

@@ -3,19 +3,9 @@
 
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1em;
+  grid-template-rows: 1fr;
   grid-template-areas: 
     "map-area"
-    "attribution-area";
-}
-
-.map > label {
-  overflow: hidden;
-  font-size: 10px;
-  text-align: right;
-}
-.map > label > a {
-  text-decoration: none;
 }
 
 .map img.leaflet-tile {
