@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import {
   AddressData,
   GeocodingService,
@@ -164,11 +165,11 @@ const getMapTilesUrl = async (): Promise<string> => {
 // EXPORTS
 export const googleGeocodingService: GeocodingService = {
   searchAddress: searchAddress,
-  attribution: (
-    <span>
-      Search results powered by{" "}
-      <a href="https://policies.google.com/terms">Google</a>
-    </span>
+  attribution: createElement(
+    "span",
+    null,
+    "Search results powered by ",
+    createElement("a", { href: "https://policies.google.com/terms" }, "Google")
   ),
 };
 

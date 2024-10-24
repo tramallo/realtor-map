@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import {
   AddressData,
   GeocodingService,
@@ -95,10 +96,11 @@ const getMapTilesUrl = async () => {
 // EXPORTS
 export const nominatimGeocodingService: GeocodingService = {
   searchAddress: searchAddress,
-  attribution: (
-    <span>
-      Search results powered by <a href="https://nominatim.org">Nominatim</a>
-    </span>
+  attribution: createElement(
+    "span",
+    null,
+    "Search results powered by ",
+    createElement("a", { href: "https://nominatim.org" }, "Nominatim")
   ),
 };
 
