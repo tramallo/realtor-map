@@ -1,23 +1,18 @@
+import { ReactNode, useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import {
   LatLngBounds,
   LatLngBoundsExpression,
   LatLngExpression,
 } from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 
 import "./Map.css";
-import { useEffect, useState } from "react";
 import { MapTilesService } from "../utils/mapServicesSchemas";
 
-export interface MarkerData {
-  text: string;
-  position: LatLngExpression;
-}
-
 export interface MapProps {
+  children: ReactNode;
   mapTilesService: MapTilesService;
-  markers: MarkerData[];
   position?: LatLngExpression;
   zoom?: number;
   minZoom?: number;
@@ -33,8 +28,8 @@ const defaults = {
 };
 
 export default function Map({
+  children,
   mapTilesService,
-  markers,
   position = defaults.position,
   zoom = defaults.zoom,
   minZoom = defaults.minZoom,
@@ -68,12 +63,7 @@ export default function Map({
           crossOrigin={true}
           attribution={mapTilesService.attribution}
         />
-
-        {markers.map((markerData, index) => (
-          <Marker key={index} position={markerData.position}>
-            <Popup>{markerData.text}</Popup>
-          </Marker>
-        ))}
+        {children}
       </MapContainer>
     </div>
   );

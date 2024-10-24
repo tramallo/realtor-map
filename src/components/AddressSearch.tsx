@@ -1,43 +1,51 @@
+import { ReactNode, useState } from "react";
+import {
+  AddressData,
+  GeocodingService,
+  MapTilesService,
+} from "../utils/mapServicesSchemas";
+import { Marker, Popup } from "react-leaflet";
+
 import "./AddressSearch.css";
 import SearchBar from "./SearchBar";
-import { AddressData, GeocodingService } from "../utils/mapServicesSchemas";
+import Map from "./Map";
 
 export interface AddressSearchProps {
-  onAddressFound: (address: AddressData) => void;
   geocodingService: GeocodingService;
+  mapTilesService: MapTilesService;
+  children?: ReactNode;
 }
 
 export default function AddressSearch({
+  mapTilesService,
   geocodingService,
-  onAddressFound,
+  children,
 }: AddressSearchProps) {
+  const [searchAddresses, setSearchAddresses] = useState([] as AddressData[]);
+
   const handleOnSearch = async (searchValue: string) => {
     const addresses = await geocodingService.searchAddress(searchValue);
 
-    // return first address when just 1 is found
-    if (addresses.length == 1) {
-      onAddressFound(addresses[0]);
+    if (!addresses.length) {
+      console.log("no address found, please check your search word");
       return;
     }
 
-    // let user select the address of interest when more than 1 is found
-    if (addresses.length) {
-      // select value code
-      console.log(
-        "multiple addresses match your search, select the one you looking for"
-      );
-      console.log(addresses);
-      return;
-    }
-
-    // show no results for search
-    console.log("no address found, please check your search parameter");
+    setSearchAddresses(addresses);
   };
 
   return (
     <div className="address-search">
       <span>{geocodingService.attribution}</span>
       <SearchBar onSearch={handleOnSearch} />
+      <Map mapTilesService={mapTilesService}>
+        {children}
+        {searchAddresses.map((address, index) => (
+          <Marker key={index} position={address.position}>
+            <Popup>{address.text}</Popup>
+          </Marker>
+        ))}
+      </Map>
     </div>
   );
 }

@@ -3,18 +3,20 @@
 
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1em 1fr;
+    grid-template-rows: 1em 2em 1fr;
     grid-template-areas:
         "attribution-area"
-        "search-area";
+        "search-area"
+        "map-area";
 }
 
 .address-search > span {
     display: flex;
     justify-content: end;
-    font-size: 10px;
+    font-size: 12px;
+    padding-inline: 5px;
 }
 
-.address-search > span > a {
+.address-search > span a {
     text-decoration: none;
 }

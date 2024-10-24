@@ -1,45 +1,33 @@
-import { useEffect, useState } from "react";
+import { Marker, Popup } from "react-leaflet";
 
 import "./App.css";
-import Map, { MarkerData } from "./components/Map";
 import AddressSearch from "./components/AddressSearch";
-import { AddressData } from "./utils/mapServicesSchemas";
 import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { useDomainData } from "./components/DomainDataContext";
-import { Property } from "./utils/domainSchemas";
+import { useEffect } from "react";
+import { testProperties } from "./utils/testData";
 
 export default function App() {
-  const [markers, setMarkers] = useState([] as MarkerData[]);
   const { properties, setProperties } = useDomainData();
 
-  const handleAddressFound = async (addressData: AddressData) => {
-    /* const markerFromAddress: MarkerData = {
-      text: addressData.text,
-      position: addressData.position,
-    };
-
-    setMarkers((prevMarkers) => [...prevMarkers, markerFromAddress]); */
-    const newProperty: Property = {
-      address: addressData.text,
-      type: "house",
-      coordinates: addressData.position,
-    };
-
-    setProperties((prevProperties) => [...prevProperties, newProperty]);
-  };
-
   useEffect(() => {
-    console.log(properties);
-  }, [properties]);
+    setProperties(testProperties);
+  }, [setProperties]);
 
   return (
     <div id="app">
+      <span>controls area</span>
       <AddressSearch
         geocodingService={googleGeocodingService}
-        onAddressFound={handleAddressFound}
-      />
-      <Map mapTilesService={osmMapTilesService} markers={markers} />
+        mapTilesService={osmMapTilesService}
+      >
+        {properties.map((property, index) => (
+          <Marker key={index} position={property.coordinates}>
+            <Popup>{property.address}</Popup>
+          </Marker>
+        ))}
+      </AddressSearch>
     </div>
   );
 }
