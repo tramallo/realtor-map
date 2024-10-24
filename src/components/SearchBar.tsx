@@ -1,9 +1,10 @@
 import { useState } from "react";
 
 import "./SearchBar.css";
+import SimpleSpinner from "./SimpleSpinner";
 
 export interface SearchBarProps {
-  onSearch: (searchValue: string) => void;
+  onSearch: (searchValue: string) => Promise<void>;
   allowEmptySearch?: boolean;
 }
 const defaults = {
@@ -15,6 +16,7 @@ export default function SearchBar({
   allowEmptySearch = defaults.allowEmptySearch,
 }: SearchBarProps) {
   const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputField = e.target;
@@ -26,7 +28,8 @@ export default function SearchBar({
       return;
     }
 
-    onSearch(searchValue);
+    setIsSearching(true);
+    onSearch(searchValue).finally(() => setIsSearching(false));
   };
 
   const handleInputEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -45,7 +48,9 @@ export default function SearchBar({
         onChange={handleInputChange}
         onKeyDown={handleInputEnter}
       />
-      <button onClick={fireSearchEvent}>Search</button>
+      <button onClick={fireSearchEvent}>
+        {isSearching ? <SimpleSpinner /> : "Search"}
+      </button>
     </div>
   );
 }

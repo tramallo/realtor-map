@@ -1,0 +1,29 @@
+.simple-spinner {
+    height: 100%;
+    aspect-ratio: 1;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.simple-spinner > div {
+    height: 100%;
+    aspect-ratio: 1;
+
+    border: 5px solid lightgray;
+    border-top-color: dimgray;
+    border-radius: 50%;
+
+    animation: simple-spinner-spin 1s linear infinite;
+}
+
+@keyframes simple-spinner-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
