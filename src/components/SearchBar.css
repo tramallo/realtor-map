@@ -4,7 +4,7 @@
 }
 
 .search-bar > input {
-    width: 80%;
+    width: 90%;
 }
 .search-bar > button {
     display: flex;
@@ -12,5 +12,5 @@
     align-items: center;
     overflow: hidden;
 
-    width: 20%;
+    width: 10%;
 }
