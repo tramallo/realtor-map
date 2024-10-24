@@ -1,7 +1,7 @@
 import { Marker, Popup } from "react-leaflet";
 
 import "./App.css";
-import AddressSearch from "./components/AddressSearch";
+import SearchMap from "./components/SearchMap";
 import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { useDomainData } from "./components/DomainDataContext";
@@ -18,7 +18,7 @@ export default function App() {
   return (
     <div id="app">
       <span>controls area</span>
-      <AddressSearch
+      <SearchMap
         geocodingService={googleGeocodingService}
         mapTilesService={osmMapTilesService}
       >
@@ -27,7 +27,7 @@ export default function App() {
             <Popup>{property.address}</Popup>
           </Marker>
         ))}
-      </AddressSearch>
+      </SearchMap>
     </div>
   );
 }

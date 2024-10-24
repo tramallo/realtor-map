@@ -1,4 +1,4 @@
-.address-search {
+.search-map {
     border: 2px solid red;
 
     display: grid;
@@ -10,13 +10,13 @@
         "map-area";
 }
 
-.address-search > span {
+.search-map > span {
     display: flex;
     justify-content: end;
     font-size: 12px;
     padding-inline: 5px;
 }
 
-.address-search > span a {
+.search-map > span a {
     text-decoration: none;
 }

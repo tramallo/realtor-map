@@ -6,21 +6,21 @@ import {
 } from "../utils/mapServicesSchemas";
 import { Marker, Popup } from "react-leaflet";
 
-import "./AddressSearch.css";
+import "./SearchMap.css";
 import SearchBar from "./SearchBar";
 import Map from "./Map";
 
-export interface AddressSearchProps {
+export interface SearchMapProps {
   geocodingService: GeocodingService;
   mapTilesService: MapTilesService;
   children?: ReactNode;
 }
 
-export default function AddressSearch({
+export default function SearchMap({
   mapTilesService,
   geocodingService,
   children,
-}: AddressSearchProps) {
+}: SearchMapProps) {
   const [searchAddresses, setSearchAddresses] = useState([] as AddressData[]);
 
   const handleOnSearch = async (searchValue: string) => {
@@ -35,7 +35,7 @@ export default function AddressSearch({
   };
 
   return (
-    <div className="address-search">
+    <div className="search-map">
       <span>{geocodingService.attribution}</span>
       <SearchBar onSearch={handleOnSearch} />
       <Map mapTilesService={mapTilesService}>
