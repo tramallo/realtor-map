@@ -9,6 +9,7 @@ import { Marker, Popup } from "react-leaflet";
 import "./SearchMap.css";
 import SearchBar from "./SearchBar";
 import Map from "./Map";
+import { searchMarkerIcon } from "../utils/mapMarkerIcons";
 
 export interface SearchMapProps {
   geocodingService: GeocodingService;
@@ -41,7 +42,11 @@ export default function SearchMap({
       <Map mapTilesService={mapTilesService}>
         {children}
         {searchAddresses.map((address, index) => (
-          <Marker key={index} position={address.position}>
+          <Marker
+            key={index}
+            position={address.position}
+            icon={searchMarkerIcon}
+          >
             <Popup>{address.text}</Popup>
           </Marker>
         ))}

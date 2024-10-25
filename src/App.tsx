@@ -7,6 +7,7 @@ import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { useDomainData } from "./components/DomainDataContext";
 import { useEffect } from "react";
 import { testProperties } from "./utils/testData";
+import { getIconForProperty } from "./utils/mapMarkerIcons";
 
 export default function App() {
   const { properties, setProperties } = useDomainData();
@@ -23,7 +24,11 @@ export default function App() {
         mapTilesService={osmMapTilesService}
       >
         {properties.map((property, index) => (
-          <Marker key={index} position={property.coordinates}>
+          <Marker
+            key={index}
+            position={property.coordinates}
+            icon={getIconForProperty(property)}
+          >
             <Popup>{property.address}</Popup>
           </Marker>
         ))}
