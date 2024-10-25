@@ -24,7 +24,7 @@ export default function SearchMap({
 }: SearchMapProps) {
   const [searchAddresses, setSearchAddresses] = useState([] as AddressData[]);
 
-  const handleOnSearch = async (searchValue: string) => {
+  const handleSearchBarOnSearch = async (searchValue: string) => {
     const addresses = await geocodingService.searchAddress(searchValue);
 
     if (!addresses.length) {
@@ -38,7 +38,7 @@ export default function SearchMap({
   return (
     <div className="search-map">
       <span>{geocodingService.attribution}</span>
-      <SearchBar onSearch={handleOnSearch} />
+      <SearchBar onSearch={handleSearchBarOnSearch} />
       <Map mapTilesService={mapTilesService}>
         {children}
         {searchAddresses.map((address, index) => (
