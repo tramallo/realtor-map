@@ -1,24 +1,34 @@
 import { Marker, Popup } from "react-leaflet";
+import { useState } from "react";
 
 import "./App.css";
 import SearchMap from "./components/SearchMap";
+import Modal from "./components/Modal";
 import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { useDomainData } from "./components/DomainDataContext";
-import { useEffect } from "react";
-import { testProperties } from "./utils/testData";
 import { getIconForProperty } from "./utils/mapMarkerIcons";
+import PropertyForm from "./components/PropertyForm";
+import { Property } from "./utils/domainSchemas";
 
 export default function App() {
-  const { properties, setProperties } = useDomainData();
+  const { properties } = useDomainData();
+  const [showNewPropertyModal, setShowNewPropertyModal] = useState(false);
 
-  useEffect(() => {
-    setProperties(testProperties);
-  }, [setProperties]);
+  const toggleNewPropertyModal = () => {
+    setShowNewPropertyModal(!showNewPropertyModal);
+  };
+
+  const handleNewPropertySubmit = (property: Property) => {
+    console.log(property);
+  };
 
   return (
     <div id="app">
-      <span>controls area</span>
+      <span>
+        controls area{" "}
+        <button onClick={toggleNewPropertyModal}>new property</button>
+      </span>
       <SearchMap
         geocodingService={googleGeocodingService}
         mapTilesService={osmMapTilesService}
@@ -33,6 +43,14 @@ export default function App() {
           </Marker>
         ))}
       </SearchMap>
+      {showNewPropertyModal && (
+        <Modal title="New property">
+          <PropertyForm
+            onSubmit={handleNewPropertySubmit}
+            onCancel={toggleNewPropertyModal}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

@@ -1,0 +1,23 @@
+.property-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 3em;
+    grid-template-areas:
+        "fields-area"
+        "controls-area";
+
+    height: 100%;
+}
+
+.property-form > .property-form-fields {
+    display: flex;
+    flex-direction: column;
+    grid-area: fields-area;
+}
+
+.property-form > .property-form-controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    grid-area: controls-area;
+}

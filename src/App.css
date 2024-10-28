@@ -13,6 +13,7 @@ body {
   height: 100dvh;
 
   border: 2px solid cyan;
+  position: relative;
 
   display: grid;
   grid-template-rows: 1fr 9fr;

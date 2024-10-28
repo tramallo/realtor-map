@@ -4,9 +4,12 @@ import {
   ReactNode,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
+
 import { Property, ShowingAppointment } from "../utils/domainSchemas";
+import { testProperties } from "../utils/testData";
 
 const DomainDataContext = createContext({
   properties: [] as Property[],
@@ -33,6 +36,10 @@ export default function DomainDataProvider({
   const [showingAppointments, setShowingAppointments] = useState(
     [] as ShowingAppointment[]
   );
+
+  useEffect(() => {
+    setProperties(testProperties);
+  }, [setProperties]);
 
   return (
     <DomainDataContext.Provider
