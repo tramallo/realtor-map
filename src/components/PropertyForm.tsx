@@ -57,9 +57,9 @@ export default function PropertyForm({
         </select>
         {errors.state && <span>select a state</span>}
         <label>Owner</label>
-        <input {...register("owner.name")} />
-        <input {...register("owner.mobile")} />
-        <input {...register("owner.email")} />
+        <input {...register("owner.name")} placeholder="name" />
+        <input {...register("owner.mobile")} placeholder="mobile" />
+        <input {...register("owner.email")} placeholder="email" />
         {errors.owner && <span>enter valid owner data</span>}
         <label>Description</label>
         <input {...register("description")} />
