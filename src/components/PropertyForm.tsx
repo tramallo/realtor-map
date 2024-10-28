@@ -3,26 +3,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import "./PropertyForm.css";
 import {
-  Property,
-  propertySchema,
+  CreateProperty,
+  createPropertySchema,
   propertyStates,
   propertyTypes,
 } from "../utils/domainSchemas";
 
 export interface PropertyFormProps {
-  onSubmit: (property: Property) => void;
+  onSubmit: (property: CreateProperty) => void;
   onCancel: () => void;
+  prefillData?: Partial<CreateProperty>;
 }
 
 export default function PropertyForm({
   onSubmit,
   onCancel,
+  prefillData,
 }: PropertyFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Property>({ resolver: zodResolver(propertySchema) });
+  } = useForm<CreateProperty>({
+    resolver: zodResolver(createPropertySchema),
+    defaultValues: prefillData,
+  });
 
   return (
     <form className="property-form">
@@ -64,6 +69,16 @@ export default function PropertyForm({
         <label>Description</label>
         <input {...register("description")} />
         {errors.description && <span>{errors.description.message}</span>}
+        <label>Created by</label>
+        <input value={"Albert Einstein"} {...register("createdBy")} readOnly />
+        {errors.createdBy && <span>{errors.createdBy.message}</span>}
+        <label>Created at</label>
+        <input
+          value={new Date().toISOString()}
+          {...register("createdAt")}
+          readOnly
+        />
+        {errors.createdAt && <span>{errors.createdAt.message}</span>}
       </div>
 
       <div className="property-form-controls">

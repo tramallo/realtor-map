@@ -6,51 +6,77 @@ import SearchMap from "./components/SearchMap";
 import Modal from "./components/Modal";
 import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
-import { useDomainData } from "./components/DomainDataContext";
 import { getIconForProperty } from "./utils/mapMarkerIcons";
 import PropertyForm from "./components/PropertyForm";
-import { Property } from "./utils/domainSchemas";
+import { CreateProperty } from "./utils/domainSchemas";
+import { usePropertyStore } from "./utils/domainDataStore";
+import { AddressData } from "./utils/mapServicesSchemas";
 
 export default function App() {
-  const { properties } = useDomainData();
-  const [showNewPropertyModal, setShowNewPropertyModal] = useState(false);
+  const properties = usePropertyStore((store) => store.properties);
+  const createProperty = usePropertyStore((store) => store.createProperty);
 
-  const toggleNewPropertyModal = () => {
-    setShowNewPropertyModal(!showNewPropertyModal);
+  const [modal, setModal] = useState<JSX.Element | undefined>(undefined);
+
+  const closeModal = () => {
+    setModal(undefined);
   };
 
-  const handleNewPropertySubmit = (property: Property) => {
-    console.log(property);
+  const handleNewPropertySubmit = (property: CreateProperty) => {
+    const error = createProperty(property);
+
+    if (!error) {
+      closeModal();
+      return;
+    }
+
+    //show error on ui
+    console.log(error);
+  };
+
+  const openCreatePropertyModal = (address: AddressData) => {
+    const prefillAddress: Partial<CreateProperty> = {
+      address: address.text,
+      coordinates: { lat: address.position.lat, lng: address.position.lng },
+    };
+
+    const createPropertyModal = (
+      <Modal title="New property">
+        <PropertyForm
+          onSubmit={handleNewPropertySubmit}
+          onCancel={closeModal}
+          prefillData={prefillAddress}
+        />
+      </Modal>
+    );
+
+    setModal(createPropertyModal);
   };
 
   return (
     <div id="app">
       <span>
         controls area{" "}
-        <button onClick={toggleNewPropertyModal}>new property</button>
+        <button onClick={() => console.log("lcick")}>new property</button>
       </span>
       <SearchMap
         geocodingService={googleGeocodingService}
         mapTilesService={osmMapTilesService}
+        onAddressClick={openCreatePropertyModal}
       >
-        {properties.map((property, index) => (
+        {properties.map((property) => (
           <Marker
-            key={index}
+            key={property.id}
             position={property.coordinates}
             icon={getIconForProperty(property)}
           >
-            <Popup>{property.address}</Popup>
+            <Popup>
+              {property.id}: {property.address}
+            </Popup>
           </Marker>
         ))}
       </SearchMap>
-      {showNewPropertyModal && (
-        <Modal title="New property">
-          <PropertyForm
-            onSubmit={handleNewPropertySubmit}
-            onCancel={toggleNewPropertyModal}
-          />
-        </Modal>
-      )}
+      {modal && modal}
     </div>
   );
 }

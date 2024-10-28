@@ -29,14 +29,22 @@ export const emptyToUndefined = <T>(value: T | T[]): T | T[] | undefined => {
 };
 //--
 
-// SCHEMAS
-export const personSchema = z.object({
+// BASE SCHEMAS
+export const dataSchema = z.object({
+    id: z.string(),
+    createdBy: z.string(),
+    createdAt: z.string(),
+    updatedBy: z.string().optional(),
+    updatedAt: z.string().optional()
+})
+
+export const personSchema = dataSchema.extend({
     name: z.preprocess(emptyToUndefined, z.string()),
     mobile: z.preprocess(emptyToUndefined, z.string().optional()),
     email: z.preprocess(emptyToUndefined, z.string().email().optional())
 })
 
-export const realtorSchema = z.object({
+export const realtorSchema = dataSchema.extend({
     name: z.preprocess(emptyToUndefined, z.string())
 })
 
@@ -48,7 +56,7 @@ export const coordinatesSchema = z.object({
 export const propertyTypes = ['house', 'apartment'] as const;
 export const propertyStates = ['rented', 'available', 'reserved'] as const
 
-export const propertySchema = z.object({
+export const propertySchema = dataSchema.extend({
     address: z.preprocess(emptyToUndefined, z.string()),
     coordinates: z.preprocess(emptyToUndefined, coordinatesSchema),
     type: z.preprocess(emptyToUndefined, z.enum(propertyTypes)),
@@ -59,7 +67,7 @@ export const propertySchema = z.object({
     description: z.preprocess(emptyToUndefined, z.string().optional()),
 })
 
-export const showingAppointmentSchema = z.object({
+export const showingAppointmentSchema = dataSchema.extend({
     property: z.preprocess(emptyToUndefined, propertySchema),
     agent: z.preprocess(emptyToUndefined, personSchema),
     client: z.preprocess(emptyToUndefined, personSchema),
@@ -72,3 +80,15 @@ export type Realtor = z.infer<typeof realtorSchema>;
 export type Coordinates = z.infer<typeof coordinatesSchema>;
 export type Property = z.infer<typeof propertySchema>;
 export type ShowingAppointment = z.infer<typeof showingAppointmentSchema>;
+
+// VARIATION SCHEMAS
+export const createPropertySchema = propertySchema.omit({
+    id: true
+})
+
+export const updatePropertySchema = propertySchema.omit({
+    id: true
+}).partial()
+
+export type CreateProperty = z.infer<typeof createPropertySchema>;
+export type UpdateProperty = z.infer<typeof updatePropertySchema>;
