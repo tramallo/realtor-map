@@ -7,7 +7,7 @@ import Modal from "./components/Modal";
 import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { getIconForProperty } from "./utils/mapMarkerIcons";
-import PropertyForm from "./components/PropertyForm";
+import CreatePropertyForm from "./components/CreatePropertyForm";
 import { CreateProperty } from "./utils/domainSchemas";
 import { usePropertyStore } from "./utils/domainDataStore";
 import { AddressData } from "./utils/mapServicesSchemas";
@@ -42,7 +42,7 @@ export default function App() {
 
     const createPropertyModal = (
       <Modal title="New property">
-        <PropertyForm
+        <CreatePropertyForm
           onSubmit={handleNewPropertySubmit}
           onCancel={closeModal}
           prefillData={prefillAddress}

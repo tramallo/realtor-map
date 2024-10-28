@@ -1,4 +1,4 @@
-.property-form {
+.create-property-form {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 3em;
@@ -9,13 +9,13 @@
     height: 100%;
 }
 
-.property-form > .property-form-fields {
+.create-property-form > .create-property-form-fields {
     display: flex;
     flex-direction: column;
     grid-area: fields-area;
 }
 
-.property-form > .property-form-controls {
+.create-property-form > .create-property-form-controls {
     display: flex;
     justify-content: space-around;
     align-items: center;

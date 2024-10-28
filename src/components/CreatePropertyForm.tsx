@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import "./PropertyForm.css";
+import "./CreatePropertyForm.css";
 import {
   CreateProperty,
   createPropertySchema,
@@ -9,17 +9,17 @@ import {
   propertyTypes,
 } from "../utils/domainSchemas";
 
-export interface PropertyFormProps {
+export interface CreatePropertyFormProps {
   onSubmit: (property: CreateProperty) => void;
   onCancel: () => void;
   prefillData?: Partial<CreateProperty>;
 }
 
-export default function PropertyForm({
+export default function CreatePropertyForm({
   onSubmit,
   onCancel,
   prefillData,
-}: PropertyFormProps) {
+}: CreatePropertyFormProps) {
   const {
     register,
     handleSubmit,
@@ -30,14 +30,22 @@ export default function PropertyForm({
   });
 
   return (
-    <form className="property-form">
-      <div className="property-form-fields">
+    <form className="create-property-form">
+      <div className="create-property-form-fields">
         <label>Address*</label>
         <input {...register("address")} />
         {errors.address && <span>enter an address</span>}
         <label>Coordinates*</label>
-        <input {...register("coordinates.lat")} placeholder="latitude" />
-        <input {...register("coordinates.lng")} placeholder="longitude" />
+        <input
+          {...register("coordinates.lat")}
+          placeholder="latitude"
+          readOnly
+        />
+        <input
+          {...register("coordinates.lng")}
+          placeholder="longitude"
+          readOnly
+        />
         {errors.coordinates && (
           <span>enter latitude & logitude number coordinates</span>
         )}
@@ -81,7 +89,7 @@ export default function PropertyForm({
         {errors.createdAt && <span>{errors.createdAt.message}</span>}
       </div>
 
-      <div className="property-form-controls">
+      <div className="create-property-form-controls">
         <button type="button" onClick={onCancel}>
           Cancel
         </button>
