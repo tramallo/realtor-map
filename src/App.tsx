@@ -31,7 +31,11 @@ export default function App() {
 
     const createPropertyModal = (
       <Modal title="New property">
-        <CreatePropertyForm onClose={closeModal} prefillData={prefillAddress} />
+        <CreatePropertyForm
+          onCreate={closeModal}
+          onClose={closeModal}
+          prefillData={prefillAddress}
+        />
       </Modal>
     );
 
@@ -41,7 +45,11 @@ export default function App() {
   const openUpdatePropertyModal = (propertyId: Property["id"]) => {
     const updatePropertyModal = (
       <Modal title="Update property">
-        <UpdatePropertyForm propertyId={propertyId} onClose={closeModal} />
+        <UpdatePropertyForm
+          propertyId={propertyId}
+          onUpdate={openViewPropertyModal}
+          onClose={closeModal}
+        />
       </Modal>
     );
 

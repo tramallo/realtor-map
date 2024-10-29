@@ -5,17 +5,20 @@ import {
   CreateProperty,
   createPropertySchema,
   customResolver,
+  Property,
   propertyStates,
   propertyTypes,
 } from "../utils/domainSchemas";
 import { usePropertyStore } from "../utils/domainDataStore";
 
 export interface CreatePropertyFormProps {
+  onCreate: (newPropertyId: Property["id"]) => void;
   onClose: () => void;
   prefillData?: Partial<CreateProperty>;
 }
 
 export default function CreatePropertyForm({
+  onCreate,
   onClose,
   prefillData,
 }: CreatePropertyFormProps) {
@@ -31,14 +34,14 @@ export default function CreatePropertyForm({
   });
 
   const onSubmit = async (newPropertyData: CreateProperty) => {
-    const error = await createProperty(newPropertyData);
+    const { error, data: propertyId } = await createProperty(newPropertyData);
     if (error) {
       //TODO: show error on ui
       console.log(error);
       return;
     }
 
-    onClose();
+    onCreate(propertyId);
   };
 
   return (
@@ -106,7 +109,7 @@ export default function CreatePropertyForm({
           Cancel
         </button>
         <button type="button" onClick={handleSubmit(onSubmit)}>
-          Submit
+          Create
         </button>
       </div>
     </form>

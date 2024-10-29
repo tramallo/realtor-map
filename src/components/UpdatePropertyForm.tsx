@@ -13,11 +13,13 @@ import { usePropertyStore } from "../utils/domainDataStore";
 
 export interface UpdatePropertyFormProps {
   propertyId: Property["id"];
+  onUpdate: (updatedPropertyId: Property["id"]) => void;
   onClose: () => void;
 }
 
 export default function UpdatePropertyForm({
   propertyId,
+  onUpdate,
   onClose,
 }: UpdatePropertyFormProps) {
   const updateProperty = usePropertyStore((store) => store.updateProperty);
@@ -36,14 +38,14 @@ export default function UpdatePropertyForm({
   });
 
   const onSubmit = async (updatePropertyData: UpdateProperty) => {
-    const error = await updateProperty(propertyId, updatePropertyData);
+    const { error } = await updateProperty(propertyId, updatePropertyData);
     if (error) {
       //TODO: show error on ui
       console.log(error);
       return;
     }
 
-    onClose();
+    onUpdate(propertyId);
   };
 
   return (
