@@ -34,14 +34,16 @@ export default function CreatePropertyForm({
   });
 
   const onSubmit = async (newPropertyData: CreateProperty) => {
-    const { error, data: propertyId } = await createProperty(newPropertyData);
+    const { error, data: newPropertyId } = await createProperty(
+      newPropertyData
+    );
     if (error) {
       //TODO: show error on ui
       console.log(error);
       return;
     }
 
-    onCreate(propertyId);
+    onCreate(newPropertyId);
   };
 
   return (
