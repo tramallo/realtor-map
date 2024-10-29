@@ -1,31 +1,47 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FieldValues, ResolverOptions } from "react-hook-form";
 import { z } from "zod";
 
 // custom transformation & validation functions
+const stripEmptyAttributes = <T extends Record<string, unknown>>(input: T): T => {
+    if (typeof input !== 'object' || input === null) {
+        return input;
+    }
 
-/* emptyToUndefined() accepts any input value, returns undefined if the value is 'empty', otherwise returns the value
-* 
-* the following values are considered 'empty'
-* empty array = []
-* empty string = "" | "  " (spaces count as empty)
-* empty object = {} | { key: undefined } (objects with undefined keys are empty)
-* null
-*/
-export const emptyToUndefined = <T>(value: T | T[]): T | T[] | undefined => {
-    if (value === null) {
-        return undefined;
-    } 
-    if (Array.isArray(value)) {
-        return value.length === 0 ? undefined : value;
+    const result: Record<string, unknown> = {};
+
+    for (const key of Object.keys(input)) {
+        const value = input[key];
+        if (value !== undefined && value !== "") {
+            // Recursively strip empty attributes for nested objects
+            if (typeof value === 'object' && value !== null) {
+                const strippedValue = stripEmptyAttributes(value as Record<string, unknown>);
+                if (Object.keys(strippedValue).length > 0) {
+                    result[key] = strippedValue;
+                }
+            } else {
+                result[key] = value;
+            }
+        }
     }
-    if (typeof value === 'string') {
-        return value.trim() === '' ? undefined : value;
-    } 
-    if (typeof value === 'object') {
-        // object { key: undefined } or { key: "" } are considered empty, so returns undefined
-        const someKeyNotEmpty = Object.values(value).some(val => val !== undefined && val != "");
-        return someKeyNotEmpty ? value : undefined;
-    }
-    return value
+
+    return result as T;
+}
+
+export const customResolver = <TInput = unknown>(
+    schema: z.ZodType<TInput>
+) => {
+    const zResolve = zodResolver(schema);
+  
+    return async <TFieldValues extends FieldValues>(
+        data: TFieldValues,
+        context: unknown,
+        options: ResolverOptions<TFieldValues>
+    ) => {
+        const strippedData = stripEmptyAttributes(data);
+        const result = await zResolve(strippedData, context, options);
+        return result;
+    };
 };
 //--
 
@@ -36,43 +52,43 @@ export const dataSchema = z.object({
     createdAt: z.string(),
     updatedBy: z.string().optional(),
     updatedAt: z.string().optional()
-})
+}) 
 
-export const personSchema = dataSchema.extend({
-    name: z.preprocess(emptyToUndefined, z.string()),
-    mobile: z.preprocess(emptyToUndefined, z.string().optional()),
-    email: z.preprocess(emptyToUndefined, z.string().email().optional())
+export const personSchema = z.object({
+    name: z.string(),
+    mobile: z.string().optional(),
+    email: z.string().email().optional()
 })
 
 export const realtorSchema = dataSchema.extend({
-    name: z.preprocess(emptyToUndefined, z.string())
+    name: z.string()
 })
 
 export const coordinatesSchema = z.object({
-    lat: z.preprocess(emptyToUndefined, z.coerce.number().finite().safe()),
-    lng: z.preprocess(emptyToUndefined, z.coerce.number().finite().safe())
+    lat: z.coerce.number().finite().safe(),
+    lng: z.coerce.number().finite().safe()
 })
 
 export const propertyTypes = ['house', 'apartment'] as const;
 export const propertyStates = ['rented', 'available', 'reserved'] as const
 
 export const propertySchema = dataSchema.extend({
-    address: z.preprocess(emptyToUndefined, z.string()),
-    coordinates: z.preprocess(emptyToUndefined, coordinatesSchema),
-    type: z.preprocess(emptyToUndefined, z.enum(propertyTypes)),
-    state: z.preprocess(emptyToUndefined, z.enum(propertyStates).optional()),
-    owner: z.preprocess(emptyToUndefined, personSchema.optional()),
-    realtors: z.preprocess(emptyToUndefined, realtorSchema.array().optional()),
-    exclusive: z.preprocess(emptyToUndefined, realtorSchema.optional()),
-    description: z.preprocess(emptyToUndefined, z.string().optional()),
+    address: z.string(),
+    coordinates: coordinatesSchema,
+    type: z.enum(propertyTypes),
+    state: z.enum(propertyStates).optional(),
+    owner: personSchema.optional(),
+    realtors: realtorSchema.array().optional(),
+    exclusive: realtorSchema.optional(),
+    description: z.string().optional(),
 })
 
 export const showingAppointmentSchema = dataSchema.extend({
-    property: z.preprocess(emptyToUndefined, propertySchema),
-    agent: z.preprocess(emptyToUndefined, personSchema),
-    client: z.preprocess(emptyToUndefined, personSchema),
-    date: z.preprocess(emptyToUndefined, z.string()),
-    time: z.preprocess(emptyToUndefined, z.string())
+    property: propertySchema,
+    agent: personSchema,
+    client: personSchema,
+    date: z.string(),
+    time: z.string()
 })
 
 export type Person = z.infer<typeof personSchema>;

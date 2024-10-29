@@ -1,33 +1,45 @@
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import "./CreatePropertyForm.css";
 import {
   CreateProperty,
   createPropertySchema,
+  customResolver,
   propertyStates,
   propertyTypes,
 } from "../utils/domainSchemas";
+import { usePropertyStore } from "../utils/domainDataStore";
 
 export interface CreatePropertyFormProps {
-  onSubmit: (property: CreateProperty) => void;
-  onCancel: () => void;
+  onClose: () => void;
   prefillData?: Partial<CreateProperty>;
 }
 
 export default function CreatePropertyForm({
-  onSubmit,
-  onCancel,
+  onClose,
   prefillData,
 }: CreatePropertyFormProps) {
+  const createProperty = usePropertyStore((store) => store.createProperty);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<CreateProperty>({
-    resolver: zodResolver(createPropertySchema),
+    resolver: customResolver(createPropertySchema),
     defaultValues: prefillData,
   });
+
+  const onSubmit = async (newPropertyData: CreateProperty) => {
+    const error = await createProperty(newPropertyData);
+    if (error) {
+      //TODO: show error on ui
+      console.log(error);
+      return;
+    }
+
+    onClose();
+  };
 
   return (
     <form className="create-property-form">
@@ -73,7 +85,7 @@ export default function CreatePropertyForm({
         <input {...register("owner.name")} placeholder="name" />
         <input {...register("owner.mobile")} placeholder="mobile" />
         <input {...register("owner.email")} placeholder="email" />
-        {errors.owner && <span>enter valid owner data</span>}
+        {errors.owner && <span>{errors.owner.name?.message}</span>}
         <label>Description</label>
         <input {...register("description")} />
         {errors.description && <span>{errors.description.message}</span>}
@@ -90,7 +102,7 @@ export default function CreatePropertyForm({
       </div>
 
       <div className="create-property-form-controls">
-        <button type="button" onClick={onCancel}>
+        <button type="button" onClick={onClose}>
           Cancel
         </button>
         <button type="button" onClick={handleSubmit(onSubmit)}>

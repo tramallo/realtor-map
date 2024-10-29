@@ -8,30 +8,19 @@ import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { getIconForProperty } from "./utils/mapMarkerIcons";
 import CreatePropertyForm from "./components/CreatePropertyForm";
-import { CreateProperty } from "./utils/domainSchemas";
+import { CreateProperty, Property } from "./utils/domainSchemas";
 import { usePropertyStore } from "./utils/domainDataStore";
 import { AddressData } from "./utils/mapServicesSchemas";
+import ViewProperty from "./components/ViewProperty";
+import UpdatePropertyForm from "./components/UpdatePropertyForm";
 
 export default function App() {
   const properties = usePropertyStore((store) => store.properties);
-  const createProperty = usePropertyStore((store) => store.createProperty);
 
   const [modal, setModal] = useState<JSX.Element | undefined>(undefined);
 
   const closeModal = () => {
     setModal(undefined);
-  };
-
-  const handleNewPropertySubmit = (property: CreateProperty) => {
-    const error = createProperty(property);
-
-    if (!error) {
-      closeModal();
-      return;
-    }
-
-    //show error on ui
-    console.log(error);
   };
 
   const openCreatePropertyModal = (address: AddressData) => {
@@ -42,15 +31,35 @@ export default function App() {
 
     const createPropertyModal = (
       <Modal title="New property">
-        <CreatePropertyForm
-          onSubmit={handleNewPropertySubmit}
-          onCancel={closeModal}
-          prefillData={prefillAddress}
-        />
+        <CreatePropertyForm onClose={closeModal} prefillData={prefillAddress} />
       </Modal>
     );
 
     setModal(createPropertyModal);
+  };
+
+  const openUpdatePropertyModal = (propertyId: Property["id"]) => {
+    const updatePropertyModal = (
+      <Modal title="Update property">
+        <UpdatePropertyForm propertyId={propertyId} onClose={closeModal} />
+      </Modal>
+    );
+
+    setModal(updatePropertyModal);
+  };
+
+  const openViewPropertyModal = (propertyId: Property["id"]) => {
+    const viewPropertyModal = (
+      <Modal title="View property">
+        <ViewProperty
+          propertyId={propertyId}
+          onClose={closeModal}
+          onClickUpdate={openUpdatePropertyModal}
+        />
+      </Modal>
+    );
+
+    setModal(viewPropertyModal);
   };
 
   return (
@@ -72,6 +81,12 @@ export default function App() {
           >
             <Popup>
               {property.id}: {property.address}
+              <button
+                type="button"
+                onClick={() => openViewPropertyModal(property.id)}
+              >
+                Open details
+              </button>
             </Popup>
           </Marker>
         ))}

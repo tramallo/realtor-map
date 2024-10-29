@@ -1,9 +1,9 @@
 import { Person, Property, Realtor } from "./domainSchemas";
 
 export const testPersons: Person[] = [
-    { id: 'juan-id', name: "Juan", createdBy: 'albert', createdAt: 'sometime' },
-    { id: 'pedro-id', name: "Pedro", mobile: "091234567", createdBy: 'albert', createdAt: 'sometime' },
-    { id: 'maria-id', name: "Maria", email: "maria@mail.com", createdBy: 'albert', createdAt: 'sometime' }
+    { name: "Juan", },
+    { name: "Pedro", mobile: "091234567"},
+    { name: "Maria", email: "maria@mail.com" }
 ]
 
 export const testRealtors: Realtor[] = [
