@@ -1,7 +1,6 @@
+import "./ViewProperty.css";
 import { usePropertyStore } from "../utils/domainDataStore";
 import { Property } from "../utils/domainSchemas";
-
-import "./ViewProperty.css";
 
 export interface ViewPropertyProps {
   propertyId: Property["id"];
@@ -14,8 +13,21 @@ export default function ViewProperty({
   onClose,
   onClickUpdate,
 }: ViewPropertyProps) {
+  const removeProperty = usePropertyStore((store) => store.removeProperty);
   const properties = usePropertyStore((store) => store.properties);
   const property = properties.find((property) => property.id == propertyId);
+
+  const handleDeleteButtonClick = async () => {
+    const { error } = await removeProperty(propertyId);
+
+    if (error) {
+      //TODO: show error on ui
+      console.log(error);
+      return;
+    }
+
+    onClose();
+  };
 
   return (
     <div className="view-property">
@@ -61,6 +73,9 @@ export default function ViewProperty({
       <div className="view-property-controls">
         <button type="button" onClick={onClose}>
           Back
+        </button>
+        <button type="button" onClick={handleDeleteButtonClick}>
+          Delete property
         </button>
         <button type="button" onClick={() => onClickUpdate(propertyId)}>
           Update property
