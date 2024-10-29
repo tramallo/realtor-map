@@ -32,7 +32,7 @@ export default function App() {
     const createPropertyModal = (
       <Modal title="New property">
         <CreatePropertyForm
-          onCreate={closeModal}
+          onCreate={openViewPropertyModal}
           onClose={closeModal}
           prefillData={prefillAddress}
         />
