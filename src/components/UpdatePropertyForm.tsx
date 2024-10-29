@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 
 import "./UpdatePropertyForm.css";
 import {
-  customResolver,
+  getStripAndZodResolver,
   Property,
   propertyStates,
   propertyTypes,
@@ -33,7 +33,7 @@ export default function UpdatePropertyForm({
     handleSubmit,
     formState: { errors },
   } = useForm<UpdateProperty>({
-    resolver: customResolver(updatePropertySchema),
+    resolver: getStripAndZodResolver(updatePropertySchema),
     defaultValues: propertyToUpdate,
   });
 

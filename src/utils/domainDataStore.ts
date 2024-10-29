@@ -1,8 +1,17 @@
+/** This file exposes stores that manages the data of the system
+ * 
+ * It has methods to perform CRUD operations & local copies of the info for quick access
+ */
 import { create } from "zustand";
 
 import { CreateProperty, Property, UpdateProperty } from "./domainSchemas";
 import { testProperties } from "./testData";
 
+
+/** Describes the response returned by the operations on the store
+ * 
+ * Errors are not thrown, they are returned to be handled by consumer
+ */
 interface DataResponse<T> {
     data: T;
     error?: undefined;
@@ -13,6 +22,8 @@ interface ErrorResponse {
 }
 type StoreResponse<T = undefined> = DataResponse<T> | ErrorResponse
 
+/** Describes a store for properties
+ */
 interface PropertyStore {
     properties: Property[],
     createProperty: (newPropertyData: CreateProperty) => Promise<StoreResponse<Property['id']>>,

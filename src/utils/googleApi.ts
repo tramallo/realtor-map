@@ -1,14 +1,21 @@
+/** This file exposes a Geocoding & a MapTiles services provided by google cloud
+ * 
+ * google MapTiles api requires a session to request tiles, so if there's no session,
+ * a new session must be created when consumers require the mapTilesUrl
+ */
 import { createElement } from "react";
+
 import {
   AddressData,
   GeocodingService,
   MapTilesService,
 } from "./mapServicesSchemas";
 
-// GEOCODING SERVCE
 const geocodingApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const geocodingApiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
 
+/** Following interfaces describes google geocoding responses
+ */
 interface GoogleAddressComponent {
   long_name: string;
   short_name: string;
@@ -31,6 +38,11 @@ interface GoogleAddressSearchResponse {
   results: GoogleAddress[];
 }
 
+/** Converts address object returned by google api to a local type AddressData
+ * 
+ * @param googleAddress: address object returned by google
+ * @returns: AddressData object
+ */
 const googleAddressToAddressData = (
   googleAddress: GoogleAddress
 ): AddressData => {
@@ -43,6 +55,11 @@ const googleAddressToAddressData = (
   } as AddressData;
 };
 
+/** Performs a geocoding request to google geocoding service and returns the results mapped to AddressData
+ * 
+ * @param address: address to geocode
+ * @returns: an array containing all addresses related to the seach parameter
+ */
 const searchAddress = async (address: string): Promise<AddressData[]> => {
   const searchParams = new URLSearchParams({
     address: address,
@@ -77,19 +94,29 @@ const searchAddress = async (address: string): Promise<AddressData[]> => {
   return [];
 };
 
-// MAP TILES SERVICE
 const mapTilesApiKey = import.meta.env.VITE_GOOGLE_MAPS_TILES_API_KEY;
 
-// session token
 const createMapTilesSessionUrl = `https://tile.googleapis.com/v1/createSession?key=${mapTilesApiKey}`;
 const mapTilesSessionTokenName = "mapTilesSessionToken";
+
+/** Describes the info saved on local storage for the session token 
+ */
 interface MapTilesSessionToken {
   expiration: number;
   value: string;
 }
+
+/** Saves a session token on local storage
+ * 
+ * @param newToken: Token value & expiration date to save
+ */
 const storeMapTilesSessionToken = (newToken: MapTilesSessionToken) => {
   localStorage.setItem(mapTilesSessionTokenName, JSON.stringify(newToken));
 };
+/** Retrieves the session token saved on local storage
+ * 
+ * @returns: the token value & expiration date
+ */
 const retrieveMapTilesSessionToken = (): MapTilesSessionToken | undefined => {
   const tokenString = localStorage.getItem(mapTilesSessionTokenName);
 
@@ -99,6 +126,11 @@ const retrieveMapTilesSessionToken = (): MapTilesSessionToken | undefined => {
   const token = JSON.parse(tokenString);
   return token;
 };
+
+/** Retrieves the saved session token and evaluates expiration date to check validity
+ * 
+ * @returns true if session still valid
+ */
 const isMapTilesSessionTokenValid = (): boolean => {
   const token = retrieveMapTilesSessionToken();
   if (!token) {
@@ -108,6 +140,9 @@ const isMapTilesSessionTokenValid = (): boolean => {
   const isValid = Date.now() < token.expiration;
   return isValid;
 };
+
+/** Describes the response from google api when a MapTiles service session is requested
+ */
 interface CreateMapTilesSessionResponse {
   expiry: number; // expiration time of the token (seconds since epoch)
   session: string; //token value
@@ -115,6 +150,10 @@ interface CreateMapTilesSessionResponse {
   tileWidth: number;
   imageFormat: string; // tile image format ex: "png"
 }
+
+/** Performs a request to google MapTiles api to create a new session
+ * and stores the session token on local storage
+ */
 const createMapTilesSession = async () => {
   try {
     const response = await fetch(createMapTilesSessionUrl, {
@@ -153,6 +192,10 @@ const createMapTilesSession = async () => {
   }
 };
 
+/** Returns the google MapTiles api url, creates a new session for the api when there's no valid session already
+ * 
+ * @returns: url string
+ */
 const getMapTilesUrl = async (): Promise<string> => {
   if (!isMapTilesSessionTokenValid()) {
     await createMapTilesSession();
@@ -162,7 +205,7 @@ const getMapTilesUrl = async (): Promise<string> => {
   return `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${sessionToken.value}&key=${mapTilesApiKey}`;
 };
 
-// EXPORTS
+// export services
 export const googleGeocodingService: GeocodingService = {
   searchAddress: searchAddress,
   attribution: createElement(

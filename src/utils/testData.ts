@@ -1,3 +1,5 @@
+/** This file provides mock data for testing purposes
+ */
 import { Person, Property, Realtor } from "./domainSchemas";
 
 export const testPersons: Person[] = [

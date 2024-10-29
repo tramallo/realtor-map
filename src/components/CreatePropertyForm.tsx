@@ -4,7 +4,7 @@ import "./CreatePropertyForm.css";
 import {
   CreateProperty,
   createPropertySchema,
-  customResolver,
+  getStripAndZodResolver,
   Property,
   propertyStates,
   propertyTypes,
@@ -29,7 +29,7 @@ export default function CreatePropertyForm({
     handleSubmit,
     formState: { errors },
   } = useForm<CreateProperty>({
-    resolver: customResolver(createPropertySchema),
+    resolver: getStripAndZodResolver(createPropertySchema),
     defaultValues: prefillData,
   });
 

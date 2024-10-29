@@ -1,3 +1,5 @@
+/** This file exposes a GeocodingService and a MapTilesService that are provided by Nominatim & OpenStreetMaps respectively
+ */
 import { createElement } from "react";
 import {
   AddressData,
@@ -5,11 +7,10 @@ import {
   MapTilesService,
 } from "./mapServicesSchemas";
 
-// GEOCODING SERVICE (provided by Nominatim)
-const apiUrl = "https://nominatim.openstreetmap.org/search";
+const nominatimApiUrl = "https://nominatim.openstreetmap.org/search";
 
-// not all values will be present, that depends on the request
 interface NominatimAddress {
+  // not all values will be present, that depends on the request
   place_id: number;
   licence: string;
   osm_type: string;
@@ -45,6 +46,11 @@ interface NominatimAddress {
   };
 }
 
+/** Converts an address object returned by nominatim api to a local address type (AddressData) 
+ * 
+ * @param nominatimAddress: address returned by nominatim NominatimAddress
+ * @returns: local address type AddressData
+ */
 const nominatimAddressToAddressData = (
   nominatimAddress: NominatimAddress
 ): AddressData => {
@@ -54,13 +60,18 @@ const nominatimAddressToAddressData = (
   } as AddressData;
 };
 
+/** Peforms a geocode request to nominatim api and returns the results mapped to AddressData
+ * 
+ * @param address: address to geocode
+ * @returns: an array containing all addresses related to the seach parameter
+ */
 const searchAddress = async (address: string): Promise<AddressData[]> => {
   const searchParams = new URLSearchParams({
     q: address,
     format: "json",
   }).toString();
 
-  const searchUrl = `${apiUrl}?${searchParams}`;
+  const searchUrl = `${nominatimApiUrl}?${searchParams}`;
 
   try {
     const response = await fetch(searchUrl);
@@ -88,12 +99,15 @@ const searchAddress = async (address: string): Promise<AddressData[]> => {
   return [];
 };
 
-// MAP TILES SERVICE (provided by OSM)
+/** Returns the url for opensteetmaps tiles api
+ * 
+ * @returns string url
+ */
 const getMapTilesUrl = async () => {
   return `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`;
 };
 
-// EXPORTS
+// export services
 export const nominatimGeocodingService: GeocodingService = {
   searchAddress: searchAddress,
   attribution: createElement(
