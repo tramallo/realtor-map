@@ -1,50 +1,49 @@
-# React + TypeScript + Vite
+# RealtorMap
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project aims to ease a realtor company manage their data & allow to visualize it on a map.  
 
-Currently, two official plugins are available:
+Expected functionalities are:
+- Visualize properties on a map
+- Perform CRUD operations to manage the available data
+- Schedule property showings & manage showing appointments
+- Visualize properties as list
+- Filter visualized properties by their attributes
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Setup development environment
+- Clone the repository
+```bash
+git clone https://github.com/tramallo/maps-test.git
+```
+- Instal dependencies
+```bash
+npm install
+```
+- Create **.env** file on the root of the poject and add the required key
+```bash
+echo VITE_GOOGLE_MAPS_API_KEY=your-api-key > .env
+```
+> [!IMPORTANT]  
+> You need a google cloud project and Maps Platform service with Geocoding API enabled, which is the one used by this app.  
+> See more about this on [Maps-Geocoding-API].
+- Run the project
+```bash
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Project characteristics
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+It consists on a map that shows markers, some markers represent properties, and others represent address searches
+When user interacts with the markers, he can perform the CRUD operations on the properties
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- To render the maps, its using [React-Leaflet]
+- To geocode the addresses, its using Google Maps Platform Geocoding API [Maps-Geocoding-API]
+- The map tiles are provided by [OpenStreetMap]
+- To handle input data & validation it's using [React-Hook-Form] & [Zod]
+- To manage local data storage, [Zustand]
+
+[React-Leaflet]:https://react-leaflet.js.org
+[Maps-Geocoding-API]: https://developers.google.com/maps/documentation/geocoding
+[OpenStreetMap]: https://www.openstreetmap.org
+[React-Hook-Form]: https://www.react-hook-form.com
+[Zod]: https://zod.dev
+[Zustand]: https://zustand-demo.pmnd.rs
