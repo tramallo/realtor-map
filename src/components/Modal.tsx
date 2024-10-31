@@ -12,7 +12,7 @@ export default function Modal({ title, children }: ModalProps) {
     <div className="modal">
       <div className="modal-pane">
         <label>{title}</label>
-        <div className="modal-content">{children}</div>
+        <div className="modal-pane-content">{children}</div>
       </div>
     </div>
   );

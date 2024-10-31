@@ -10,14 +10,12 @@
 }
 
 .update-property-form > .update-property-form-fields {
-    display: flex;
-    flex-direction: column;
-    grid-area: fields-area;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .update-property-form > .update-property-form-controls {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    grid-area: controls-area;
 }

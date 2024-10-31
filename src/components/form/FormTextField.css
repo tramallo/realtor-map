@@ -1,0 +1,16 @@
+.form-text-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-text-field > label {
+    text-transform: capitalize;
+}
+
+.form-text-field > input:read-only {
+    background-color: gray;
+}
+
+.form-text-field > span {
+    color: red;
+}

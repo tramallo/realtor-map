@@ -25,3 +25,11 @@
         "title-area"
         "content-area"
 }
+
+.modal > .modal-pane > label {
+    text-align: center;
+}
+
+.modal > .modal-pane > .modal-pane-content {
+    overflow: hidden;
+}

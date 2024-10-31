@@ -38,23 +38,19 @@ export default function ViewProperty({
             Address: <span>{property.address}</span>
           </label>
           <label>
-            Type: <span>{property.type}</span>
-          </label>
-          <label>
             Coordinates:{" "}
             <span>
               lat {property.coordinates.lat} lng {property.coordinates.lng}
             </span>
           </label>
           <label>
+            Type: <span>{property.type}</span>
+          </label>
+          <label>
             State: <span>{property.state}</span>
           </label>
           <label>
-            Owner:{" "}
-            <span>
-              {property.owner?.name} ; {property.owner?.mobile} ;{" "}
-              {property.owner?.email}
-            </span>
+            Owner id: <span>{property.ownerId}</span>
           </label>
           <label>
             Realtors:{" "}
@@ -72,7 +68,7 @@ export default function ViewProperty({
       )}
       <div className="view-property-controls">
         <button type="button" onClick={onClose}>
-          Back
+          Close
         </button>
         <button type="button" onClick={handleDeleteButtonClick}>
           Delete property

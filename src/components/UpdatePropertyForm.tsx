@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import "./UpdatePropertyForm.css";
 import {
@@ -9,7 +9,11 @@ import {
   UpdateProperty,
   updatePropertySchema,
 } from "../utils/domainSchemas";
-import { usePropertyStore } from "../utils/domainDataStore";
+import { usePersonStore, usePropertyStore } from "../utils/domainDataStore";
+import FormTextField from "./form/FormTextField";
+import FormSelectField from "./form/FormSelectField";
+import FormTextArea from "./form/FormTextArea";
+import FormDateField from "./form/FormDateField";
 
 export interface UpdatePropertyFormProps {
   propertyId: Property["id"];
@@ -22,17 +26,15 @@ export default function UpdatePropertyForm({
   onUpdate,
   onClose,
 }: UpdatePropertyFormProps) {
+  const persons = usePersonStore((store) => store.persons);
+
   const updateProperty = usePropertyStore((store) => store.updateProperty);
   const properties = usePropertyStore((store) => store.properties);
   const propertyToUpdate = properties.find(
     (property) => property.id == propertyId
   );
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UpdateProperty>({
+  const formMethods = useForm<UpdateProperty>({
     resolver: getStripAndZodResolver(updatePropertySchema),
     defaultValues: propertyToUpdate,
   });
@@ -49,74 +51,54 @@ export default function UpdatePropertyForm({
   };
 
   return (
-    <form className="update-property-form">
-      {!propertyToUpdate && <span>Property not found</span>}
-      {propertyToUpdate && (
-        <div className="update-property-form-fields">
-          <label>Address*</label>
-          <input {...register("address")} />
-          {errors.address && <span>enter an address</span>}
-          <label>Coordinates*</label>
-          <input
-            {...register("coordinates.lat")}
-            placeholder="latitude"
-            readOnly
-          />
-          <input
-            {...register("coordinates.lng")}
-            placeholder="longitude"
-            readOnly
-          />
-          {errors.coordinates && (
-            <span>enter latitude & logitude number coordinates</span>
-          )}
-          <label>Type*</label>
-          <select {...register("type")}>
-            <option value="">select a type...</option>
-            {propertyTypes.map((propertyType, index) => (
-              <option key={`propertyType-${index}`} value={propertyType}>
-                {propertyType}
-              </option>
-            ))}
-          </select>
-          {errors.type && <span>select a type</span>}
-          <label>State</label>
-          <select {...register("state")}>
-            <option value="">select a state...</option>
-            {propertyStates.map((propertyState, index) => (
-              <option key={`propertyState-${index}`} value={propertyState}>
-                {propertyState}
-              </option>
-            ))}
-          </select>
-          {errors.state && <span>select a state</span>}
-          <label>Owner</label>
-          <input {...register("owner.name")} placeholder="name" />
-          <input {...register("owner.mobile")} placeholder="mobile" />
-          <input {...register("owner.email")} placeholder="email" />
-          {errors.owner && <span>{errors.owner?.message}</span>}
-          {errors.owner?.name && <span>{errors.owner?.name.message}</span>}
-          {errors.owner?.mobile && <span>{errors.owner?.mobile.message}</span>}
-          {errors.owner?.email && <span>{errors.owner?.email.message}</span>}
-          <label>Description</label>
-          <input {...register("description")} />
-          {errors.description && <span>{errors.description.message}</span>}
-          <label>Created by</label>
-          <input {...register("createdBy")} readOnly />
-          {errors.createdBy && <span>{errors.createdBy.message}</span>}
-          <label>Created at</label>
-          <input {...register("createdAt")} readOnly />
-          {errors.createdAt && <span>{errors.createdAt.message}</span>}
+    <FormProvider {...formMethods}>
+      <form className="update-property-form">
+        {!propertyToUpdate && <span>Property not found</span>}
+        {propertyToUpdate && (
+          <div className="update-property-form-fields">
+            <FormTextField fieldName="address" />
+            <FormTextField fieldName="coordinates.lat" label="Latitude" />
+            <FormTextField fieldName="coordinates.lng" label="Longitude" />
+            <FormSelectField
+              fieldName="type"
+              options={propertyTypes}
+              addEmptyOption
+            />
+            <FormSelectField
+              fieldName="state"
+              options={propertyStates}
+              addEmptyOption
+            />
+            <FormSelectField
+              fieldName="ownerId"
+              label="Owner id"
+              options={persons.map((person) => person.id)}
+              addEmptyOption
+            />
+            <FormTextArea fieldName="description" />
+            <FormTextField
+              fieldName="updatedBy"
+              label="Updated by"
+              value="pedriño"
+              readOnly
+            />
+            <FormDateField
+              fieldName="updatedAt"
+              label="Updated at"
+              value={new Date()}
+              readOnly
+            />
+          </div>
+        )}
+        <div className="update-property-form-controls">
+          <button type="button" onClick={onClose}>
+            Close
+          </button>
+          <button type="button" onClick={formMethods.handleSubmit(onSubmit)}>
+            Update
+          </button>
         </div>
-      )}
-      <div className="update-property-form-controls">
-        <button type="button" onClick={onClose}>
-          Cancel
-        </button>
-        <button type="button" onClick={handleSubmit(onSubmit)}>
-          Submit
-        </button>
-      </div>
-    </form>
+      </form>
+    </FormProvider>
   );
 }

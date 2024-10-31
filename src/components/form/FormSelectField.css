@@ -1,0 +1,16 @@
+.form-select-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-select-field > label {
+    text-transform: capitalize;
+}
+
+.form-select-field > select.read-only {
+    background-color: gray;
+}
+
+.form-select-field > span {
+    color: red;
+}

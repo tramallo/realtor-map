@@ -70,15 +70,17 @@ export const getStripAndZodResolver = <TInput = unknown>(
 
 /** Base schemas, describes base data used by the system "as saved in database"
  */
+const idSchema = z.string();
+
 export const dataSchema = z.object({
-    id: z.string(),
+    id: idSchema,
     createdBy: z.string(),
     createdAt: z.string(),
     updatedBy: z.string().optional(),
     updatedAt: z.string().optional()
 }) 
 
-export const personSchema = z.object({
+export const personSchema = dataSchema.extend({
     name: z.string(),
     mobile: z.string().optional(),
     email: z.string().email().optional()
@@ -101,7 +103,7 @@ export const propertySchema = dataSchema.extend({
     coordinates: coordinatesSchema,
     type: z.enum(propertyTypes),
     state: z.enum(propertyStates).optional(),
-    owner: personSchema.optional(),
+    ownerId: idSchema.optional(),
     realtors: realtorSchema.array().optional(),
     exclusive: realtorSchema.optional(),
     description: z.string().optional(),
@@ -127,12 +129,24 @@ export type ShowingAppointment = z.infer<typeof showingAppointmentSchema>;
  * so this shcemas are used on that scenarios 
  */
 export const createPropertySchema = propertySchema.omit({
-    id: true
+    id: true,
+    updatedBy: true,
+    updatedAt: true,
 })
 
 export const updatePropertySchema = propertySchema.omit({
-    id: true
+    id: true,
+    createdBy: true,
+    createdAt: true
 }).partial()
 
 export type CreateProperty = z.infer<typeof createPropertySchema>;
 export type UpdateProperty = z.infer<typeof updatePropertySchema>;
+
+export const createPersonSchema = personSchema.omit({
+    id: true,
+    updatedBy: true,
+    updatedAt: true,
+})
+
+export type CreatePerson = z.infer<typeof createPersonSchema>;

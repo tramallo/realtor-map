@@ -10,14 +10,12 @@
 }
 
 .create-property-form > .create-property-form-fields {
-    display: flex;
-    flex-direction: column;
-    grid-area: fields-area;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .create-property-form > .create-property-form-controls {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    grid-area: controls-area;
 }
