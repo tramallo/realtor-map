@@ -1,30 +1,25 @@
-import { FieldError, useFormContext } from "react-hook-form";
+import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 import "./FormTextArea.css";
 
 export interface FormTextAreaProps {
-  fieldName: string;
+  registration: UseFormRegisterReturn<string>;
+  validationError: FieldError | undefined;
   label?: string;
   readOnly?: boolean;
 }
 
 export default function FormTextArea({
-  fieldName,
+  registration,
+  validationError,
   label,
   readOnly,
 }: FormTextAreaProps) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const error = errors[fieldName] as FieldError | undefined;
-
   return (
     <div className="form-text-area">
-      <label>{label ?? fieldName}</label>
-      <textarea {...register(fieldName)} readOnly={readOnly} />
-      {error && <span>{error.message}</span>}
+      <label>{label ?? registration.name}</label>
+      <textarea {...registration} readOnly={readOnly} />
+      {validationError && <span>{validationError.message}</span>}
     </div>
   );
 }

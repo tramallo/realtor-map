@@ -1,10 +1,16 @@
-import { FieldError, useFormContext } from "react-hook-form";
+import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 import "./FormSelectField.css";
 
+export interface Option {
+  label: string;
+  value: string;
+}
+
 export interface FormSelectFieldProps {
-  fieldName: string;
-  options: readonly string[];
+  registration: UseFormRegisterReturn<string>;
+  validationError: FieldError | undefined;
+  options: Option[];
   label?: string;
   defaultOption?: string;
   addEmptyOption?: boolean;
@@ -12,26 +18,20 @@ export interface FormSelectFieldProps {
 }
 
 export default function FormSelectField({
-  fieldName,
+  registration,
+  validationError,
   options,
   label,
   defaultOption,
   addEmptyOption,
   readOnly,
 }: FormSelectFieldProps) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const error = errors[fieldName] as FieldError | undefined;
-
   return (
     <div className="form-select-field">
-      <label>{label ?? fieldName}</label>
+      <label>{label ?? registration.name}</label>
       <select
         className={readOnly ? "read-only" : ""}
-        {...register(fieldName)}
+        {...registration}
         defaultValue={defaultOption}
       >
         {addEmptyOption && (
@@ -41,15 +41,15 @@ export default function FormSelectField({
         )}
         {options.map((option, index) => (
           <option
-            key={`${fieldName}-${index}`}
-            value={option}
+            key={`${registration.name}-${index}`}
+            value={option.value}
             disabled={readOnly}
           >
-            {option}
+            {option.label}
           </option>
         ))}
       </select>
-      {error && <span>{error.message}</span>}
+      {validationError && <span>{validationError.message}</span>}
     </div>
   );
 }

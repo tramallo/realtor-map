@@ -1,4 +1,4 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import "./CreatePropertyForm.css";
 import {
@@ -30,7 +30,11 @@ export default function CreatePropertyForm({
 
   const createProperty = usePropertyStore((store) => store.createProperty);
 
-  const formMethods = useForm<CreateProperty>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<CreateProperty>({
     resolver: getStripAndZodResolver(createPropertySchema),
     defaultValues: prefillData,
   });
@@ -49,56 +53,86 @@ export default function CreatePropertyForm({
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <form
-        className="create-property-form"
-        onSubmit={formMethods.handleSubmit(onSubmit)}
-      >
-        <div className="create-property-form-fields">
-          <FormTextField fieldName="address" />
-          <FormTextField fieldName="coordinates.lat" label="Latitude" />
-          <FormTextField fieldName="coordinates.lng" label="Longitude" />
-          <FormSelectField
-            fieldName="type"
-            options={propertyTypes}
-            addEmptyOption
-          />
-          <FormSelectField
-            fieldName="state"
-            options={propertyStates}
-            addEmptyOption
-          />
-          <FormSelectField
-            fieldName="ownerId"
-            label="Owner id"
-            options={persons.map((person) => person.id)}
-            addEmptyOption
-          />
-          <FormTextArea fieldName="description" />
-          <FormSelectField
-            fieldName="createdBy"
-            label="Created by"
-            options={persons.map((person) => person.id)}
-            defaultOption="maria-id"
-            readOnly
-          />
-          <FormDateField
-            fieldName="createdAt"
-            label="Created at"
-            value={new Date()}
-            readOnly
-          />
-        </div>
+    <form className="create-property-form">
+      <div className="create-property-form-fields">
+        <FormTextField
+          registration={register("address")}
+          validationError={errors.address}
+        />
+        <FormTextField
+          registration={register("coordinates.lat")}
+          validationError={errors.coordinates?.lat}
+          label="Latitude"
+        />
+        <FormTextField
+          registration={register("coordinates.lng")}
+          validationError={errors.coordinates?.lng}
+          label="Longitude"
+        />
+        <FormSelectField
+          registration={register("type")}
+          validationError={errors.type}
+          options={propertyTypes.map((propertyType) => ({
+            label: propertyType,
+            value: propertyType,
+          }))}
+          addEmptyOption
+        />
+        <FormSelectField
+          registration={register("state")}
+          validationError={errors.state}
+          options={propertyStates.map((propertyState) => ({
+            label: propertyState,
+            value: propertyState,
+          }))}
+          addEmptyOption
+        />
+        <FormSelectField
+          registration={register("ownerId")}
+          validationError={errors.ownerId}
+          label="Owner id"
+          options={persons.map((person) => ({
+            label: `${person.name} - ${person.mobile ?? ""} - ${
+              person.email ?? ""
+            }`,
+            value: person.id,
+          }))}
+          addEmptyOption
+        />
+        <FormTextArea
+          registration={register("description")}
+          validationError={errors.description}
+        />
+        <FormSelectField
+          registration={register("createdBy")}
+          validationError={errors.createdBy}
+          label="Created by"
+          options={persons.map((person) => ({
+            label: `${person.name} - ${person.mobile ?? ""} - ${
+              person.email ?? ""
+            }`,
+            value: person.id,
+          }))}
+          defaultOption="maria-id"
+          readOnly
+        />
+        <FormDateField
+          registration={register("createdAt")}
+          validationError={errors.createdAt}
+          label="Created at"
+          value={new Date()}
+          readOnly
+        />
+      </div>
 
-        <div className="create-property-form-controls">
-          <button type="button" onClick={onClose}>
-            Close
-          </button>
-          <button type="button" onClick={formMethods.handleSubmit(onSubmit)}>
-            Create
-          </button>
-        </div>
-      </form>
-    </FormProvider>
+      <div className="create-property-form-controls">
+        <button type="button" onClick={onClose}>
+          Close
+        </button>
+        <button type="button" onClick={handleSubmit(onSubmit)}>
+          Create
+        </button>
+      </div>
+    </form>
   );
 }

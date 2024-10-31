@@ -1,38 +1,33 @@
-import { FieldError, useFormContext } from "react-hook-form";
-
-import "./FormDateField.css";
+import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 import { format as formatDate } from "date-fns";
 
+import "./FormDateField.css";
+
 export interface FormDateFieldProps {
-  fieldName: string;
+  registration: UseFormRegisterReturn<string>;
+  validationError: FieldError | undefined;
   label?: string;
   value?: Date;
   readOnly?: boolean;
 }
 
 export default function FormDateField({
-  fieldName,
+  registration,
+  validationError,
   label,
   value,
   readOnly,
 }: FormDateFieldProps) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const error = errors[fieldName] as FieldError | undefined;
-
   return (
     <div className="form-date-field">
-      <label>{label ?? fieldName}</label>
+      <label>{label ?? registration.name}</label>
       <input
         type="date"
-        {...register(fieldName)}
+        {...registration}
         value={value && formatDate(value, "yyyy-MM-dd")}
         readOnly={readOnly}
       />
-      {error && <span>{error.message}</span>}
+      {validationError && <span>{validationError.message}</span>}
     </div>
   );
 }

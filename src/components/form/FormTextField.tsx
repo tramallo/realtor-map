@@ -1,9 +1,10 @@
-import { FieldError, useFormContext } from "react-hook-form";
+import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 import "./FormTextField.css";
 
 export interface FormTextFieldProps {
-  fieldName: string;
+  registration: UseFormRegisterReturn<string>;
+  validationError: FieldError | undefined;
   label?: string;
   value?: string;
   placeholder?: string;
@@ -11,30 +12,24 @@ export interface FormTextFieldProps {
 }
 
 export default function FormTextField({
-  fieldName,
+  registration,
+  validationError,
   label,
   value,
   placeholder,
   readOnly,
 }: FormTextFieldProps) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const error = errors[fieldName] as FieldError | undefined;
-
   return (
     <div className="form-text-field">
-      <label>{label ?? fieldName}</label>
+      <label>{label ?? registration.name}</label>
       <input
         type="text"
-        {...register(fieldName)}
+        {...registration}
         value={value}
         placeholder={placeholder}
         readOnly={readOnly}
       />
-      {error && <span>{error.message}</span>}
+      {validationError && <span>{validationError.message}</span>}
     </div>
   );
 }

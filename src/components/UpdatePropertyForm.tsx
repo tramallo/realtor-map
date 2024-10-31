@@ -1,4 +1,4 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import "./UpdatePropertyForm.css";
 import {
@@ -34,7 +34,11 @@ export default function UpdatePropertyForm({
     (property) => property.id == propertyId
   );
 
-  const formMethods = useForm<UpdateProperty>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UpdateProperty>({
     resolver: getStripAndZodResolver(updatePropertySchema),
     defaultValues: propertyToUpdate,
   });
@@ -51,54 +55,82 @@ export default function UpdatePropertyForm({
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <form className="update-property-form">
-        {!propertyToUpdate && <span>Property not found</span>}
-        {propertyToUpdate && (
-          <div className="update-property-form-fields">
-            <FormTextField fieldName="address" />
-            <FormTextField fieldName="coordinates.lat" label="Latitude" />
-            <FormTextField fieldName="coordinates.lng" label="Longitude" />
-            <FormSelectField
-              fieldName="type"
-              options={propertyTypes}
-              addEmptyOption
-            />
-            <FormSelectField
-              fieldName="state"
-              options={propertyStates}
-              addEmptyOption
-            />
-            <FormSelectField
-              fieldName="ownerId"
-              label="Owner id"
-              options={persons.map((person) => person.id)}
-              addEmptyOption
-            />
-            <FormTextArea fieldName="description" />
-            <FormTextField
-              fieldName="updatedBy"
-              label="Updated by"
-              value="pedriño"
-              readOnly
-            />
-            <FormDateField
-              fieldName="updatedAt"
-              label="Updated at"
-              value={new Date()}
-              readOnly
-            />
-          </div>
-        )}
-        <div className="update-property-form-controls">
-          <button type="button" onClick={onClose}>
-            Close
-          </button>
-          <button type="button" onClick={formMethods.handleSubmit(onSubmit)}>
-            Update
-          </button>
+    <form className="update-property-form">
+      {!propertyToUpdate && <span>Property not found</span>}
+      {propertyToUpdate && (
+        <div className="update-property-form-fields">
+          <FormTextField
+            registration={register("address")}
+            validationError={errors.address}
+          />
+          <FormTextField
+            registration={register("coordinates.lat")}
+            validationError={errors.coordinates?.lat}
+            label="Latitude"
+          />
+          <FormTextField
+            registration={register("coordinates.lng")}
+            validationError={errors.coordinates?.lng}
+            label="Longitude"
+          />
+          <FormSelectField
+            registration={register("type")}
+            validationError={errors.type}
+            options={propertyTypes.map((propertyType) => ({
+              label: propertyType,
+              value: propertyType,
+            }))}
+            addEmptyOption
+          />
+          <FormSelectField
+            registration={register("state")}
+            validationError={errors.state}
+            options={propertyStates.map((propertyState) => ({
+              label: propertyState,
+              value: propertyState,
+            }))}
+            addEmptyOption
+          />
+          <FormSelectField
+            registration={register("ownerId")}
+            validationError={errors.ownerId}
+            label="Owner id"
+            options={persons.map((person) => ({
+              label: `${person.name} - ${person.mobile ?? ""} - ${
+                person.email ?? ""
+              }`,
+              value: person.id,
+            }))}
+            addEmptyOption
+          />
+          <FormTextArea
+            registration={register("description")}
+            validationError={errors.description}
+          />
+          <FormTextField
+            registration={register("updatedBy")}
+            validationError={errors.updatedBy}
+            label="Updated by"
+            value="pedriño"
+            readOnly
+          />
+          <FormDateField
+            registration={register("updatedAt")}
+            validationError={errors.updatedAt}
+            label="Updated at"
+            value={new Date()}
+            readOnly
+          />
         </div>
-      </form>
-    </FormProvider>
+      )}
+      <div className="update-property-form-controls">
+        <button type="button" onClick={onClose}>
+          Close
+        </button>
+        <button type="button" onClick={handleSubmit(onSubmit)}>
+          Update
+        </button>
+      </div>
+    </form>
   );
 }
