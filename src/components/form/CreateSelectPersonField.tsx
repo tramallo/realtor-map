@@ -6,17 +6,17 @@ import {
   FieldValues,
 } from "react-hook-form";
 
-import "./FormCreateSelectPerson.css";
+import "./CreateSelectPersonField.css";
 import { usePersonStore } from "../../utils/domainDataStore";
-import { Person } from "../../utils/domainSchemas";
-import CreatePersonForm from "../CreatePersonForm";
+import { PersonSchema } from "../../utils/domainSchemas";
+import CreatePerson from "../CreatePerson";
 import Modal from "../Modal";
 import { useModalContext } from "../ModalContext";
 
-const personToString = (person: Person) =>
+const personToString = (person: PersonSchema) =>
   `${person.name} - ${person.mobile ?? ""} - ${person.email ?? ""}`;
 
-export interface FormCreateSelectPersonProps<
+export interface CreateSelectPersonFieldProps<
   Schema extends FieldValues,
   SchemaField extends FieldPath<Schema>
 > {
@@ -28,7 +28,7 @@ export interface FormCreateSelectPersonProps<
   emptyValueLabel?: string;
 }
 
-export default function FormCreateSelectPerson<
+export default function CreateSelectPersonField<
   Schema extends FieldValues,
   SchemaField extends FieldPath<Schema>
 >({
@@ -38,19 +38,19 @@ export default function FormCreateSelectPerson<
   validationError,
   label,
   emptyValueLabel,
-}: FormCreateSelectPersonProps<Schema, SchemaField>) {
+}: CreateSelectPersonFieldProps<Schema, SchemaField>) {
   const { pushModal } = useModalContext();
 
   const persons = usePersonStore((store) => store.persons);
 
-  const handleNewPerson = (newPersonId: Person["id"]) => {
+  const handleNewPerson = (newPersonId: PersonSchema["id"]) => {
     setValue(fieldName, newPersonId);
   };
 
   const openCreatePersonModal = () => {
     const createPersonModal = (
       <Modal title="Create person">
-        <CreatePersonForm onCreate={handleNewPerson} />
+        <CreatePerson onCreate={handleNewPerson} />
       </Modal>
     );
 
@@ -58,7 +58,7 @@ export default function FormCreateSelectPerson<
   };
 
   return (
-    <div className="form-create-select-person">
+    <div className="create-select-person-field">
       <label>{label ?? fieldName}</label>
       <Controller
         name={fieldName}

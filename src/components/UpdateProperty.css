@@ -1,4 +1,4 @@
-.create-person-form {
+.update-property {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 3em;
@@ -9,9 +9,13 @@
     height: 100%;
 }
 
-.create-person-form > .create-person-form-controls {
+.update-property > .update-property-fields {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.update-property > .update-property-controls {
     display: flex;
-    flex-direction: row;
     justify-content: space-around;
     align-items: center;
 }

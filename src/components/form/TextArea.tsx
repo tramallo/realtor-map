@@ -1,22 +1,22 @@
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
-import "./FormTextArea.css";
+import "./TextArea.css";
 
-export interface FormTextAreaProps {
+export interface TextAreaProps {
   registration: UseFormRegisterReturn<string>;
   validationError: FieldError | undefined;
   label?: string;
   readOnly?: boolean;
 }
 
-export default function FormTextArea({
+export default function TextArea({
   registration,
   validationError,
   label,
   readOnly,
-}: FormTextAreaProps) {
+}: TextAreaProps) {
   return (
-    <div className="form-text-area">
+    <div className="text-area">
       <label>{label ?? registration.name}</label>
       <textarea {...registration} readOnly={readOnly} />
       {validationError && <span>{validationError.message}</span>}

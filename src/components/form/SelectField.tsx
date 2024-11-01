@@ -1,13 +1,13 @@
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
-import "./FormSelectField.css";
+import "./SelectField.css";
 
 export interface Option {
   label: string;
   value: string;
 }
 
-export interface FormSelectFieldProps {
+export interface SelectFieldProps {
   registration: UseFormRegisterReturn<string>;
   validationError: FieldError | undefined;
   options: Option[];
@@ -17,7 +17,7 @@ export interface FormSelectFieldProps {
   readOnly?: boolean;
 }
 
-export default function FormSelectField({
+export default function SelectField({
   registration,
   validationError,
   options,
@@ -25,9 +25,9 @@ export default function FormSelectField({
   defaultOption,
   addEmptyOption,
   readOnly,
-}: FormSelectFieldProps) {
+}: SelectFieldProps) {
   return (
-    <div className="form-select-field">
+    <div className="select-field">
       <label>{label ?? registration.name}</label>
       <select
         className={readOnly ? "read-only" : ""}

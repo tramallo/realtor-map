@@ -6,12 +6,12 @@ import Modal from "./components/Modal";
 import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { getIconForProperty } from "./utils/mapMarkerIcons";
-import CreatePropertyForm from "./components/CreatePropertyForm";
-import { CreateProperty, Property } from "./utils/domainSchemas";
+import CreateProperty from "./components/CreateProperty";
+import { CreatePropertySchema, PropertySchema } from "./utils/domainSchemas";
 import { usePropertyStore } from "./utils/domainDataStore";
 import { AddressData } from "./utils/mapServicesSchemas";
 import ViewProperty from "./components/ViewProperty";
-import CreatePersonForm from "./components/CreatePersonForm";
+import CreatePerson from "./components/CreatePerson";
 import { useModalContext } from "./components/ModalContext";
 
 export default function App() {
@@ -19,14 +19,14 @@ export default function App() {
   const properties = usePropertyStore((store) => store.properties);
 
   const openCreatePropertyModal = (address: AddressData) => {
-    const prefillAddress: Partial<CreateProperty> = {
+    const prefillAddress: Partial<CreatePropertySchema> = {
       address: address.text,
       coordinates: { lat: address.position.lat, lng: address.position.lng },
     };
 
     const createPropertyModal = (
       <Modal title="New property">
-        <CreatePropertyForm
+        <CreateProperty
           onCreate={openViewPropertyModal}
           prefillData={prefillAddress}
         />
@@ -36,7 +36,7 @@ export default function App() {
     pushModal(createPropertyModal);
   };
 
-  const openViewPropertyModal = (propertyId: Property["id"]) => {
+  const openViewPropertyModal = (propertyId: PropertySchema["id"]) => {
     const viewPropertyModal = (
       <Modal title="View property">
         <ViewProperty propertyId={propertyId} />
@@ -49,7 +49,7 @@ export default function App() {
   const openTestModal = () => {
     const testModal = (
       <Modal title="Test">
-        <CreatePersonForm onCreate={(personId) => console.log(personId)} />
+        <CreatePerson onCreate={(personId) => console.log(personId)} />
       </Modal>
     );
 

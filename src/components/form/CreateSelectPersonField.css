@@ -1,4 +1,4 @@
-.form-create-select-person {
+.create-select-person-field {
     display: grid;
     grid-template-columns: 4fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -7,14 +7,14 @@
         "selector-area button-area" ;
 }
 
-.form-create-select-person > label {
+.create-select-person-field > label {
     grid-area: label-area;
 }
 
-.form-create-select-person > select {
+.create-select-person-field > select {
     grid-area: selector-area;
 }
 
-.form-create-select-person > button {
+.create-select-person-field > button {
     grid-area: button-area;
 }

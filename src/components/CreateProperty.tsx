@@ -1,33 +1,33 @@
 import { useForm } from "react-hook-form";
 
-import "./CreatePropertyForm.css";
+import "./CreateProperty.css";
 import {
-  CreateProperty,
+  CreatePropertySchema,
   createPropertySchema,
   getStripAndZodResolver,
-  Property,
+  PropertySchema,
   propertyStates,
   propertyTypes,
 } from "../utils/domainSchemas";
 import { usePersonStore, usePropertyStore } from "../utils/domainDataStore";
-import FormTextField from "./form/FormTextField";
-import FormSelectField from "./form/FormSelectField";
-import FormTextArea from "./form/FormTextArea";
-import FormDateField from "./form/FormDateField";
+import TextField from "./form/TextField";
+import SelectField from "./form/SelectField";
+import TextArea from "./form/TextArea";
+import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
-import FormCreateSelectPerson from "./form/FormCreateSelectPerson";
+import CreateSelectPersonField from "./form/CreateSelectPersonField";
 
-export interface CreatePropertyFormProps {
-  onCreate?: (newPropertyId: Property["id"]) => void;
+export interface CreatePropertyProps {
+  onCreate?: (newPropertyId: PropertySchema["id"]) => void;
   onClose?: () => void;
-  prefillData?: Partial<CreateProperty>;
+  prefillData?: Partial<CreatePropertySchema>;
 }
 
-export default function CreatePropertyForm({
+export default function CreateProperty({
   onCreate,
   onClose,
   prefillData,
-}: CreatePropertyFormProps) {
+}: CreatePropertyProps) {
   const { popModal } = useModalContext();
 
   const persons = usePersonStore((store) => store.persons);
@@ -39,12 +39,12 @@ export default function CreatePropertyForm({
     formState: { errors },
     control,
     setValue,
-  } = useForm<CreateProperty>({
+  } = useForm<CreatePropertySchema>({
     resolver: getStripAndZodResolver(createPropertySchema),
     defaultValues: prefillData,
   });
 
-  const onSubmit = async (newPropertyData: CreateProperty) => {
+  const onSubmit = async (newPropertyData: CreatePropertySchema) => {
     const { error, data: newPropertyId } = await createProperty(
       newPropertyData
     );
@@ -68,23 +68,23 @@ export default function CreatePropertyForm({
   };
 
   return (
-    <form className="create-property-form">
-      <div className="create-property-form-fields">
-        <FormTextField
+    <form className="create-property">
+      <div className="create-property-fields">
+        <TextField
           registration={register("address")}
           validationError={errors.address}
         />
-        <FormTextField
+        <TextField
           registration={register("coordinates.lat")}
           validationError={errors.coordinates?.lat}
           label="Latitude"
         />
-        <FormTextField
+        <TextField
           registration={register("coordinates.lng")}
           validationError={errors.coordinates?.lng}
           label="Longitude"
         />
-        <FormSelectField
+        <SelectField
           registration={register("type")}
           validationError={errors.type}
           options={propertyTypes.map((propertyType) => ({
@@ -93,7 +93,7 @@ export default function CreatePropertyForm({
           }))}
           addEmptyOption
         />
-        <FormSelectField
+        <SelectField
           registration={register("state")}
           validationError={errors.state}
           options={propertyStates.map((propertyState) => ({
@@ -102,7 +102,7 @@ export default function CreatePropertyForm({
           }))}
           addEmptyOption
         />
-        <FormCreateSelectPerson
+        <CreateSelectPersonField
           control={control}
           fieldName="ownerId"
           setValue={setValue}
@@ -110,11 +110,11 @@ export default function CreatePropertyForm({
           label="Owner"
           emptyValueLabel="..."
         />
-        <FormTextArea
+        <TextArea
           registration={register("description")}
           validationError={errors.description}
         />
-        <FormSelectField
+        <SelectField
           registration={register("createdBy")}
           validationError={errors.createdBy}
           label="Created by"
@@ -127,7 +127,7 @@ export default function CreatePropertyForm({
           defaultOption="maria-id"
           readOnly
         />
-        <FormDateField
+        <DateField
           registration={register("createdAt")}
           validationError={errors.createdAt}
           label="Created at"
@@ -136,7 +136,7 @@ export default function CreatePropertyForm({
         />
       </div>
 
-      <div className="create-property-form-controls">
+      <div className="create-property-controls">
         <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>

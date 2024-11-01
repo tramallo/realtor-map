@@ -3,7 +3,7 @@
  */
 import { BaseIconOptions, Icon } from "leaflet";
 
-import { Property } from "./domainSchemas";
+import { PropertySchema } from "./domainSchemas";
 
 const defaultIconSizes = {
     iconSize: [25, 41],
@@ -16,7 +16,7 @@ const defaultIconSizes = {
  * @param property: Property object for which to get the corresponding icon
  * @returns: An Icon based on the property type, or the blank icon if property type is not registered
  */
-export const getIconForProperty = (property: Property): Icon => {
+export const getIconForProperty = (property: PropertySchema): Icon => {
     if (property.type == 'house') {
         return houseMarkerIcon;
     }

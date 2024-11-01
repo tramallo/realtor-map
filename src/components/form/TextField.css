@@ -1,16 +1,16 @@
-.form-date-field {
+.text-field {
     display: flex;
     flex-direction: column;
 }
 
-.form-date-field > label {
+.text-field > label {
     text-transform: capitalize;
 }
 
-.form-date-field > input:read-only{
+.text-field > input:read-only {
     background-color: gray;
 }
 
-.form-date-field > span {
+.text-field > span {
     color: red;
 }

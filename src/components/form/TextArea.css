@@ -1,19 +1,19 @@
-.form-text-area {
+.text-area {
     display: flex;
     flex-direction: column;
 }
 
-.form-text-area > label {
+.text-area > label {
     text-transform: capitalize;
 }
 
-.form-text-area > textarea {
+.text-area > textarea {
     resize: vertical;
 }
 .form-text-area > textarea:read-only {
     background-color: gray;
 }
 
-.form-text-area > span {
+.text-area > span {
     color: red;
 }

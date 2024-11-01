@@ -1,33 +1,33 @@
 import { useForm } from "react-hook-form";
 
-import "./UpdatePropertyForm.css";
+import "./UpdateProperty.css";
 import {
   getStripAndZodResolver,
-  Property,
+  PropertySchema,
   propertyStates,
   propertyTypes,
-  UpdateProperty,
+  UpdatePropertySchema,
   updatePropertySchema,
 } from "../utils/domainSchemas";
 import { usePropertyStore } from "../utils/domainDataStore";
-import FormTextField from "./form/FormTextField";
-import FormSelectField from "./form/FormSelectField";
-import FormTextArea from "./form/FormTextArea";
-import FormDateField from "./form/FormDateField";
-import FormCreateSelectPerson from "./form/FormCreateSelectPerson";
+import TextField from "./form/TextField";
+import SelectField from "./form/SelectField";
+import TextArea from "./form/TextArea";
+import DateField from "./form/DateField";
+import CreateSelectPersonField from "./form/CreateSelectPersonField";
 import { useModalContext } from "./ModalContext";
 
-export interface UpdatePropertyFormProps {
-  propertyId: Property["id"];
-  onUpdate?: (updatedPropertyId: Property["id"]) => void;
+export interface UpdatePropertyProps {
+  propertyId: PropertySchema["id"];
+  onUpdate?: (updatedPropertyId: PropertySchema["id"]) => void;
   onClose?: () => void;
 }
 
-export default function UpdatePropertyForm({
+export default function UpdateProperty({
   propertyId,
   onUpdate,
   onClose,
-}: UpdatePropertyFormProps) {
+}: UpdatePropertyProps) {
   const { popModal } = useModalContext();
   const updateProperty = usePropertyStore((store) => store.updateProperty);
   const properties = usePropertyStore((store) => store.properties);
@@ -41,12 +41,12 @@ export default function UpdatePropertyForm({
     formState: { errors },
     setValue,
     control,
-  } = useForm<UpdateProperty>({
+  } = useForm<UpdatePropertySchema>({
     resolver: getStripAndZodResolver(updatePropertySchema),
     defaultValues: propertyToUpdate,
   });
 
-  const onSubmit = async (updatePropertyData: UpdateProperty) => {
+  const onSubmit = async (updatePropertyData: UpdatePropertySchema) => {
     const { error } = await updateProperty(propertyId, updatePropertyData);
     if (error) {
       //TODO: show error on ui
@@ -68,25 +68,25 @@ export default function UpdatePropertyForm({
   };
 
   return (
-    <form className="update-property-form">
+    <form className="update-property">
       {!propertyToUpdate && <span>Property not found</span>}
       {propertyToUpdate && (
-        <div className="update-property-form-fields">
-          <FormTextField
+        <div className="update-property-fields">
+          <TextField
             registration={register("address")}
             validationError={errors.address}
           />
-          <FormTextField
+          <TextField
             registration={register("coordinates.lat")}
             validationError={errors.coordinates?.lat}
             label="Latitude"
           />
-          <FormTextField
+          <TextField
             registration={register("coordinates.lng")}
             validationError={errors.coordinates?.lng}
             label="Longitude"
           />
-          <FormSelectField
+          <SelectField
             registration={register("type")}
             validationError={errors.type}
             options={propertyTypes.map((propertyType) => ({
@@ -95,7 +95,7 @@ export default function UpdatePropertyForm({
             }))}
             addEmptyOption
           />
-          <FormSelectField
+          <SelectField
             registration={register("state")}
             validationError={errors.state}
             options={propertyStates.map((propertyState) => ({
@@ -104,7 +104,7 @@ export default function UpdatePropertyForm({
             }))}
             addEmptyOption
           />
-          <FormCreateSelectPerson
+          <CreateSelectPersonField
             control={control}
             fieldName="ownerId"
             setValue={setValue}
@@ -112,18 +112,18 @@ export default function UpdatePropertyForm({
             label="Owner"
             emptyValueLabel="..."
           />
-          <FormTextArea
+          <TextArea
             registration={register("description")}
             validationError={errors.description}
           />
-          <FormTextField
+          <TextField
             registration={register("updatedBy")}
             validationError={errors.updatedBy}
             label="Updated by"
             value="pedriño"
             readOnly
           />
-          <FormDateField
+          <DateField
             registration={register("updatedAt")}
             validationError={errors.updatedAt}
             label="Updated at"
@@ -132,7 +132,7 @@ export default function UpdatePropertyForm({
           />
         </div>
       )}
-      <div className="update-property-form-controls">
+      <div className="update-property-controls">
         <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>

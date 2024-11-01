@@ -1,13 +1,13 @@
 import "./ViewProperty.css";
 import { usePropertyStore } from "../utils/domainDataStore";
-import { Property } from "../utils/domainSchemas";
+import { PropertySchema } from "../utils/domainSchemas";
 import ViewPerson from "./ViewPerson";
 import { useModalContext } from "./ModalContext";
 import Modal from "./Modal";
-import UpdatePropertyForm from "./UpdatePropertyForm";
+import UpdateProperty from "./UpdateProperty";
 
 export interface ViewPropertyProps {
-  propertyId: Property["id"];
+  propertyId: PropertySchema["id"];
   onClose?: () => void;
 }
 
@@ -36,7 +36,7 @@ export default function ViewProperty({
   const handleUpdateButtonClick = () => {
     const updatePropertyModal = (
       <Modal title="Update property">
-        <UpdatePropertyForm propertyId={propertyId} />
+        <UpdateProperty propertyId={propertyId} />
       </Modal>
     );
 

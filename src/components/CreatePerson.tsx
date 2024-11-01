@@ -1,26 +1,23 @@
 import { useForm } from "react-hook-form";
 
-import "./CreatePersonForm.css";
+import "./CreatePerson.css";
 import {
-  CreatePerson,
+  CreatePersonSchema,
   createPersonSchema,
   getStripAndZodResolver,
-  Person,
+  PersonSchema,
 } from "../utils/domainSchemas";
-import FormTextField from "./form/FormTextField";
+import TextField from "./form/TextField";
 import { usePersonStore } from "../utils/domainDataStore";
-import FormDateField from "./form/FormDateField";
+import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
 
-export interface CreatePersonFormProps {
-  onCreate: (newPersonId: Person["id"]) => void;
+export interface CreatePersonProps {
+  onCreate: (newPersonId: PersonSchema["id"]) => void;
   onClose?: () => void;
 }
 
-export default function CreatePersonForm({
-  onCreate,
-  onClose,
-}: CreatePersonFormProps) {
+export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
   const { popModal } = useModalContext();
 
   const createPerson = usePersonStore((store) => store.createPerson);
@@ -29,11 +26,11 @@ export default function CreatePersonForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreatePerson>({
+  } = useForm<CreatePersonSchema>({
     resolver: getStripAndZodResolver(createPersonSchema),
   });
 
-  const onSubmit = async (newPersonData: CreatePerson) => {
+  const onSubmit = async (newPersonData: CreatePersonSchema) => {
     const { error, data: personId } = await createPerson(newPersonData);
 
     if (error) {
@@ -54,31 +51,31 @@ export default function CreatePersonForm({
   };
 
   return (
-    <form className="create-person-form">
-      <div className="create-person-form-fields">
-        <FormTextField
+    <form className="create-person">
+      <div className="create-person-fields">
+        <TextField
           label="Name"
           registration={register("name")}
           validationError={errors.name}
         />
-        <FormTextField
+        <TextField
           label="Mobile"
           registration={register("mobile")}
           validationError={errors.mobile}
         />
-        <FormTextField
+        <TextField
           label="Email"
           registration={register("email")}
           validationError={errors.email}
         />
-        <FormTextField
+        <TextField
           label="Created by"
           registration={register("createdBy")}
           validationError={errors.createdBy}
           value="juano"
           readOnly
         />
-        <FormDateField
+        <DateField
           label="Created at"
           registration={register("createdAt")}
           validationError={errors.createdAt}
@@ -87,7 +84,7 @@ export default function CreatePersonForm({
         />
       </div>
 
-      <div className="create-person-form-controls">
+      <div className="create-person-controls">
         <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>

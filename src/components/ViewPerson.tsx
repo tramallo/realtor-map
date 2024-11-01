@@ -1,9 +1,9 @@
 import "./ViewPerson.css";
 import { usePersonStore } from "../utils/domainDataStore";
-import { Person } from "../utils/domainSchemas";
+import { PersonSchema } from "../utils/domainSchemas";
 
 export interface ViewPersonProps {
-  personId: Person["id"];
+  personId: PersonSchema["id"];
 }
 
 export default function ViewPerson({ personId }: ViewPersonProps) {

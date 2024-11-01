@@ -1,4 +1,4 @@
-.create-property-form {
+.create-property {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 3em;
@@ -9,12 +9,12 @@
     height: 100%;
 }
 
-.create-property-form > .create-property-form-fields {
+.create-property > .create-property-fields {
     overflow-x: hidden;
     overflow-y: auto;
 }
 
-.create-property-form > .create-property-form-controls {
+.create-property > .create-property-controls {
     display: flex;
     justify-content: space-around;
     align-items: center;

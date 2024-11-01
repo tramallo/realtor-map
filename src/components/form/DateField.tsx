@@ -1,9 +1,9 @@
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 import { format as formatDate } from "date-fns";
 
-import "./FormDateField.css";
+import "./DateField.css";
 
-export interface FormDateFieldProps {
+export interface DateFieldProps {
   registration: UseFormRegisterReturn<string>;
   validationError: FieldError | undefined;
   label?: string;
@@ -11,15 +11,15 @@ export interface FormDateFieldProps {
   readOnly?: boolean;
 }
 
-export default function FormDateField({
+export default function DateField({
   registration,
   validationError,
   label,
   value,
   readOnly,
-}: FormDateFieldProps) {
+}: DateFieldProps) {
   return (
-    <div className="form-date-field">
+    <div className="date-field">
       <label>{label ?? registration.name}</label>
       <input
         type="date"

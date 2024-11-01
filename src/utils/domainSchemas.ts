@@ -117,11 +117,11 @@ export const showingAppointmentSchema = dataSchema.extend({
     time: z.string()
 })
 
-export type Person = z.infer<typeof personSchema>;
-export type Realtor = z.infer<typeof realtorSchema>;
-export type Coordinates = z.infer<typeof coordinatesSchema>;
-export type Property = z.infer<typeof propertySchema>;
-export type ShowingAppointment = z.infer<typeof showingAppointmentSchema>;
+export type PersonSchema = z.infer<typeof personSchema>;
+export type RealtorSchema = z.infer<typeof realtorSchema>;
+export type CoordinatesSchema = z.infer<typeof coordinatesSchema>;
+export type PropertySchema = z.infer<typeof propertySchema>;
+export type ShowingAppointmentSchema = z.infer<typeof showingAppointmentSchema>;
 
 /** Variation schemas, some operations use only parts of the data
  * 
@@ -140,8 +140,8 @@ export const updatePropertySchema = propertySchema.omit({
     createdAt: true
 }).partial()
 
-export type CreateProperty = z.infer<typeof createPropertySchema>;
-export type UpdateProperty = z.infer<typeof updatePropertySchema>;
+export type CreatePropertySchema = z.infer<typeof createPropertySchema>;
+export type UpdatePropertySchema = z.infer<typeof updatePropertySchema>;
 
 export const createPersonSchema = personSchema.omit({
     id: true,
@@ -149,4 +149,4 @@ export const createPersonSchema = personSchema.omit({
     updatedAt: true,
 })
 
-export type CreatePerson = z.infer<typeof createPersonSchema>;
+export type CreatePersonSchema = z.infer<typeof createPersonSchema>;

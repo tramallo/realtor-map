@@ -1,8 +1,8 @@
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
-import "./FormTextField.css";
+import "./TextField.css";
 
-export interface FormTextFieldProps {
+export interface TextFieldProps {
   registration: UseFormRegisterReturn<string>;
   validationError: FieldError | undefined;
   label?: string;
@@ -11,16 +11,16 @@ export interface FormTextFieldProps {
   readOnly?: boolean;
 }
 
-export default function FormTextField({
+export default function TextField({
   registration,
   validationError,
   label,
   value,
   placeholder,
   readOnly,
-}: FormTextFieldProps) {
+}: TextFieldProps) {
   return (
-    <div className="form-text-field">
+    <div className="text-field">
       <label>{label ?? registration.name}</label>
       <input
         type="text"
