@@ -4,8 +4,8 @@
  */
 import { create } from "zustand";
 
-import { CreatePersonSchema, CreatePropertySchema, PersonSchema, PropertySchema, UpdatePropertySchema } from "./domainSchemas";
-import { testPersons, testProperties } from "./testData";
+import { CreatePersonSchema, CreatePropertySchema, CreateRealtorSchema, PersonSchema, PropertySchema, RealtorSchema, UpdatePropertySchema } from "./domainSchemas";
+import { testPersons, testProperties, testRealtors } from "./testData";
 
 
 /** Describes the response returned by the operations on the store
@@ -73,5 +73,27 @@ export const usePersonStore = create<PersonStore>((set) => ({
 
         set((prevState) => ({ persons: [...prevState.persons, newPerson]}))
         return { data: newPerson.id }
+    }
+}))
+
+/** Describes a store for realtors
+ */
+interface RealtorStore {
+    realtors: RealtorSchema[],
+    createRealtor: (newRealtorData: CreateRealtorSchema) => Promise<StoreResponse<RealtorSchema['id']>>
+}
+
+export const useRealtorStore = create<RealtorStore>((set) => ({
+    realtors: testRealtors,
+    createRealtor: async (newRealtorData) => {
+        //this data is generate by the db
+        const newId: string = new Date().getTime().toString();
+        const newRealtor: RealtorSchema = {
+            id: newId,
+            ...newRealtorData
+        }
+
+        set((prevState) => ({ realtors: [...prevState.realtors, newRealtor] }))
+        return { data: newRealtor.id }
     }
 }))

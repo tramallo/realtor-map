@@ -1,0 +1,4 @@
+.view-realtor {
+    display: flex;
+    flex-direction: column;
+}

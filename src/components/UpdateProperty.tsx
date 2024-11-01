@@ -16,6 +16,7 @@ import TextArea from "./form/TextArea";
 import DateField from "./form/DateField";
 import CreateSelectPersonField from "./form/CreateSelectPersonField";
 import { useModalContext } from "./ModalContext";
+import CreateSelectRealtorField from "./form/CreateSelectRealtorField";
 
 export interface UpdatePropertyProps {
   propertyId: PropertySchema["id"];
@@ -115,6 +116,13 @@ export default function UpdateProperty({
           <TextArea
             registration={register("description")}
             validationError={errors.description}
+          />
+          <CreateSelectRealtorField
+            control={control}
+            fieldName="exclusive"
+            setValue={setValue}
+            validationError={errors.exclusive}
+            emptyValueLabel="..."
           />
           <TextField
             registration={register("updatedBy")}

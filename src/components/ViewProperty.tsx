@@ -5,6 +5,7 @@ import ViewPerson from "./ViewPerson";
 import { useModalContext } from "./ModalContext";
 import Modal from "./Modal";
 import UpdateProperty from "./UpdateProperty";
+import ViewRealtor from "./ViewRealtor";
 
 export interface ViewPropertyProps {
   propertyId: PropertySchema["id"];
@@ -78,9 +79,8 @@ export default function ViewProperty({
               {property.realtors?.map((realtor) => realtor.name).join(" ; ")}
             </span>
           </label>
-          <label>
-            Exclusive: <span>{property.exclusive?.name}</span>
-          </label>
+          <label>Exclusive:</label>
+          {property.exclusive && <ViewRealtor realtorId={property.exclusive} />}
           <label>
             Description: <span>{property.description}</span>
           </label>

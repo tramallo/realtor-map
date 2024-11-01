@@ -105,7 +105,7 @@ export const propertySchema = dataSchema.extend({
     state: z.enum(propertyStates).optional(),
     ownerId: idSchema.optional(),
     realtors: realtorSchema.array().optional(),
-    exclusive: realtorSchema.optional(),
+    exclusive: idSchema.optional(),
     description: z.string().optional(),
 })
 
@@ -140,13 +140,19 @@ export const updatePropertySchema = propertySchema.omit({
     createdAt: true
 }).partial()
 
-export type CreatePropertySchema = z.infer<typeof createPropertySchema>;
-export type UpdatePropertySchema = z.infer<typeof updatePropertySchema>;
-
 export const createPersonSchema = personSchema.omit({
     id: true,
     updatedBy: true,
     updatedAt: true,
 })
 
+export const createRealtorSchema = realtorSchema.omit({
+    id: true,
+    updatedBy: true,
+    updatedAt: true,
+})
+
+export type CreatePropertySchema = z.infer<typeof createPropertySchema>;
+export type UpdatePropertySchema = z.infer<typeof updatePropertySchema>;
 export type CreatePersonSchema = z.infer<typeof createPersonSchema>;
+export type CreateRealtorSchema = z.infer<typeof createRealtorSchema>;

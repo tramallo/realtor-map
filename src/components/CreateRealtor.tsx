@@ -1,37 +1,39 @@
 import { useForm } from "react-hook-form";
 
-import "./CreatePerson.css";
+import "./CreateRealtor.css";
+import { useRealtorStore } from "../utils/domainDataStore";
 import {
-  CreatePersonSchema,
-  createPersonSchema,
+  createRealtorSchema,
+  CreateRealtorSchema,
   getStripAndZodResolver,
-  PersonSchema,
+  RealtorSchema,
 } from "../utils/domainSchemas";
-import TextField from "./form/TextField";
-import { usePersonStore } from "../utils/domainDataStore";
-import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
+import TextField from "./form/TextField";
+import DateField from "./form/DateField";
 
-export interface CreatePersonProps {
-  onCreate: (newPersonId: PersonSchema["id"]) => void;
+export interface CreateRealtorProps {
+  onCreate: (newRealtorId: RealtorSchema["id"]) => void;
   onClose?: () => void;
 }
 
-export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
+export default function CreateRealtor({
+  onCreate,
+  onClose,
+}: CreateRealtorProps) {
   const { popModal } = useModalContext();
-
-  const createPerson = usePersonStore((store) => store.createPerson);
+  const createRealtor = useRealtorStore((store) => store.createRealtor);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreatePersonSchema>({
-    resolver: getStripAndZodResolver(createPersonSchema),
+  } = useForm<CreateRealtorSchema>({
+    resolver: getStripAndZodResolver(createRealtorSchema),
   });
 
-  const onSubmit = async (newPersonData: CreatePersonSchema) => {
-    const { error, data: personId } = await createPerson(newPersonData);
+  const onSubmit = async (newRealtorData: CreateRealtorSchema) => {
+    const { error, data: realtorId } = await createRealtor(newRealtorData);
 
     if (error) {
       //TODO: show error on ui
@@ -40,7 +42,7 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
     }
 
     popModal();
-    onCreate(personId);
+    onCreate(realtorId);
   };
 
   const handleCloseButtonClick = () => {
@@ -51,22 +53,12 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
   };
 
   return (
-    <form className="create-person">
-      <div className="create-person-fields">
+    <form className="create-realtor">
+      <div className="create-realtor-fields">
         <TextField
           label="Name"
           registration={register("name")}
           validationError={errors.name}
-        />
-        <TextField
-          label="Mobile"
-          registration={register("mobile")}
-          validationError={errors.mobile}
-        />
-        <TextField
-          label="Email"
-          registration={register("email")}
-          validationError={errors.email}
         />
         <TextField
           label="Created by"
@@ -84,7 +76,7 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
         />
       </div>
 
-      <div className="create-person-controls">
+      <div className="create-realtor-controls">
         <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>

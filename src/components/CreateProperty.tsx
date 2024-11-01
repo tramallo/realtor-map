@@ -16,6 +16,7 @@ import TextArea from "./form/TextArea";
 import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
 import CreateSelectPersonField from "./form/CreateSelectPersonField";
+import CreateSelectRealtorField from "./form/CreateSelectRealtorField";
 
 export interface CreatePropertyProps {
   onCreate?: (newPropertyId: PropertySchema["id"]) => void;
@@ -113,6 +114,13 @@ export default function CreateProperty({
         <TextArea
           registration={register("description")}
           validationError={errors.description}
+        />
+        <CreateSelectRealtorField
+          control={control}
+          fieldName="exclusive"
+          setValue={setValue}
+          validationError={errors.exclusive}
+          emptyValueLabel="..."
         />
         <SelectField
           registration={register("createdBy")}
