@@ -36,13 +36,7 @@ export default function UpdateProperty({
     (property) => property.id == propertyId
   );
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    control,
-  } = useForm<UpdatePropertySchema>({
+  const formData = useForm<UpdatePropertySchema>({
     resolver: getStripAndZodResolver(updatePropertySchema),
     defaultValues: propertyToUpdate,
   });
@@ -74,22 +68,22 @@ export default function UpdateProperty({
       {propertyToUpdate && (
         <div className="update-property-fields">
           <TextField
-            registration={register("address")}
-            validationError={errors.address}
+            registration={formData.register("address")}
+            validationError={formData.formState.errors.address}
           />
           <TextField
-            registration={register("coordinates.lat")}
-            validationError={errors.coordinates?.lat}
+            registration={formData.register("coordinates.lat")}
+            validationError={formData.formState.errors.coordinates?.lat}
             label="Latitude"
           />
           <TextField
-            registration={register("coordinates.lng")}
-            validationError={errors.coordinates?.lng}
+            registration={formData.register("coordinates.lng")}
+            validationError={formData.formState.errors.coordinates?.lng}
             label="Longitude"
           />
           <SelectField
-            registration={register("type")}
-            validationError={errors.type}
+            registration={formData.register("type")}
+            validationError={formData.formState.errors.type}
             options={propertyTypes.map((propertyType) => ({
               label: propertyType,
               value: propertyType,
@@ -97,8 +91,8 @@ export default function UpdateProperty({
             addEmptyOption
           />
           <SelectField
-            registration={register("state")}
-            validationError={errors.state}
+            registration={formData.register("state")}
+            validationError={formData.formState.errors.state}
             options={propertyStates.map((propertyState) => ({
               label: propertyState,
               value: propertyState,
@@ -106,34 +100,30 @@ export default function UpdateProperty({
             addEmptyOption
           />
           <CreateSelectPersonField
-            control={control}
+            formData={formData}
             fieldName="ownerId"
-            setValue={setValue}
-            validationError={errors.ownerId}
             label="Owner"
             emptyValueLabel="..."
           />
           <TextArea
-            registration={register("description")}
-            validationError={errors.description}
+            registration={formData.register("description")}
+            validationError={formData.formState.errors.description}
           />
           <CreateSelectRealtorField
-            control={control}
+            formData={formData}
             fieldName="exclusive"
-            setValue={setValue}
-            validationError={errors.exclusive}
             emptyValueLabel="..."
           />
           <TextField
-            registration={register("updatedBy")}
-            validationError={errors.updatedBy}
+            registration={formData.register("updatedBy")}
+            validationError={formData.formState.errors.updatedBy}
             label="Updated by"
             value="pedriño"
             readOnly
           />
           <DateField
-            registration={register("updatedAt")}
-            validationError={errors.updatedAt}
+            registration={formData.register("updatedAt")}
+            validationError={formData.formState.errors.updatedAt}
             label="Updated at"
             value={new Date()}
             readOnly
@@ -144,7 +134,7 @@ export default function UpdateProperty({
         <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>
-        <button type="button" onClick={handleSubmit(onSubmit)}>
+        <button type="button" onClick={formData.handleSubmit(onSubmit)}>
           Update
         </button>
       </div>

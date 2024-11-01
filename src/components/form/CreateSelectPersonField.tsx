@@ -1,9 +1,10 @@
 import {
-  Control,
   Controller,
   FieldError,
   FieldPath,
+  FieldPathValue,
   FieldValues,
+  UseFormReturn,
 } from "react-hook-form";
 
 import "./CreateSelectPersonField.css";
@@ -18,33 +19,32 @@ const personToString = (person: PersonSchema) =>
 
 export interface CreateSelectPersonFieldProps<
   Schema extends FieldValues,
-  SchemaField extends FieldPath<Schema>
+  SchemaField = FieldPath<Schema>
 > {
+  formData: UseFormReturn<Schema>;
   fieldName: SchemaField;
-  control: Control<Schema>;
-  setValue: (name: SchemaField, value: string) => void;
   label?: string;
-  validationError: FieldError | undefined;
   emptyValueLabel?: string;
 }
 
 export default function CreateSelectPersonField<
   Schema extends FieldValues,
-  SchemaField extends FieldPath<Schema>
+  SchemaValue extends FieldPathValue<Schema, FieldPath<Schema>>
 >({
+  formData,
   fieldName,
-  control,
-  setValue,
-  validationError,
   label,
   emptyValueLabel,
-}: CreateSelectPersonFieldProps<Schema, SchemaField>) {
+}: CreateSelectPersonFieldProps<Schema>) {
   const { pushModal } = useModalContext();
-
   const persons = usePersonStore((store) => store.persons);
 
+  const validationError = formData.formState.errors[fieldName] as
+    | FieldError
+    | undefined;
+
   const handleNewPerson = (newPersonId: PersonSchema["id"]) => {
-    setValue(fieldName, newPersonId);
+    formData.setValue(fieldName, newPersonId as SchemaValue);
   };
 
   const openCreatePersonModal = () => {
@@ -62,7 +62,7 @@ export default function CreateSelectPersonField<
       <label>{label ?? fieldName}</label>
       <Controller
         name={fieldName}
-        control={control}
+        control={formData.control}
         render={({ field }) => (
           <select {...field}>
             {emptyValueLabel && <option value="">{emptyValueLabel}</option>}
@@ -74,7 +74,6 @@ export default function CreateSelectPersonField<
           </select>
         )}
       />
-
       {validationError && <span>{validationError.message}</span>}
       <button type="button" onClick={openCreatePersonModal}>
         New Person

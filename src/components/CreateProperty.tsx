@@ -34,13 +34,7 @@ export default function CreateProperty({
   const persons = usePersonStore((store) => store.persons);
   const createProperty = usePropertyStore((store) => store.createProperty);
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-    control,
-    setValue,
-  } = useForm<CreatePropertySchema>({
+  const formData = useForm<CreatePropertySchema>({
     resolver: getStripAndZodResolver(createPropertySchema),
     defaultValues: prefillData,
   });
@@ -72,22 +66,22 @@ export default function CreateProperty({
     <form className="create-property">
       <div className="create-property-fields">
         <TextField
-          registration={register("address")}
-          validationError={errors.address}
+          registration={formData.register("address")}
+          validationError={formData.formState.errors.address}
         />
         <TextField
-          registration={register("coordinates.lat")}
-          validationError={errors.coordinates?.lat}
+          registration={formData.register("coordinates.lat")}
+          validationError={formData.formState.errors.coordinates?.lat}
           label="Latitude"
         />
         <TextField
-          registration={register("coordinates.lng")}
-          validationError={errors.coordinates?.lng}
+          registration={formData.register("coordinates.lng")}
+          validationError={formData.formState.errors.coordinates?.lng}
           label="Longitude"
         />
         <SelectField
-          registration={register("type")}
-          validationError={errors.type}
+          registration={formData.register("type")}
+          validationError={formData.formState.errors.type}
           options={propertyTypes.map((propertyType) => ({
             label: propertyType,
             value: propertyType,
@@ -95,36 +89,34 @@ export default function CreateProperty({
           addEmptyOption
         />
         <SelectField
-          registration={register("state")}
-          validationError={errors.state}
+          registration={formData.register("state")}
+          validationError={formData.formState.errors.state}
           options={propertyStates.map((propertyState) => ({
             label: propertyState,
             value: propertyState,
           }))}
           addEmptyOption
         />
+
         <CreateSelectPersonField
-          control={control}
+          formData={formData}
           fieldName="ownerId"
-          setValue={setValue}
-          validationError={errors.ownerId}
           label="Owner"
           emptyValueLabel="..."
         />
+
         <TextArea
-          registration={register("description")}
-          validationError={errors.description}
+          registration={formData.register("description")}
+          validationError={formData.formState.errors.description}
         />
         <CreateSelectRealtorField
-          control={control}
+          formData={formData}
           fieldName="exclusive"
-          setValue={setValue}
-          validationError={errors.exclusive}
           emptyValueLabel="..."
         />
         <SelectField
-          registration={register("createdBy")}
-          validationError={errors.createdBy}
+          registration={formData.register("createdBy")}
+          validationError={formData.formState.errors.createdBy}
           label="Created by"
           options={persons.map((person) => ({
             label: `${person.name} - ${person.mobile ?? ""} - ${
@@ -136,8 +128,8 @@ export default function CreateProperty({
           readOnly
         />
         <DateField
-          registration={register("createdAt")}
-          validationError={errors.createdAt}
+          registration={formData.register("createdAt")}
+          validationError={formData.formState.errors.createdAt}
           label="Created at"
           value={new Date()}
           readOnly
@@ -148,7 +140,7 @@ export default function CreateProperty({
         <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>
-        <button type="button" onClick={handleSubmit(onSubmit)}>
+        <button type="button" onClick={formData.handleSubmit(onSubmit)}>
           Create
         </button>
       </div>
