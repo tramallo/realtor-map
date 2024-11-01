@@ -1,0 +1,4 @@
+.view-person {
+    display: flex;
+    flex-direction: column;
+}

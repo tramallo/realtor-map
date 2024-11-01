@@ -1,18 +1,22 @@
 import "./ViewProperty.css";
 import { usePropertyStore } from "../utils/domainDataStore";
 import { Property } from "../utils/domainSchemas";
+import ViewPerson from "./ViewPerson";
+import { useModalContext } from "./ModalContext";
+import Modal from "./Modal";
+import UpdatePropertyForm from "./UpdatePropertyForm";
 
 export interface ViewPropertyProps {
   propertyId: Property["id"];
-  onClose: () => void;
-  onClickUpdate: (propertyId: Property["id"]) => void;
+  onClose?: () => void;
 }
 
 export default function ViewProperty({
   propertyId,
   onClose,
-  onClickUpdate,
 }: ViewPropertyProps) {
+  const { popModal, pushModal } = useModalContext();
+
   const removeProperty = usePropertyStore((store) => store.removeProperty);
   const properties = usePropertyStore((store) => store.properties);
   const property = properties.find((property) => property.id == propertyId);
@@ -26,7 +30,24 @@ export default function ViewProperty({
       return;
     }
 
-    onClose();
+    popModal();
+  };
+
+  const handleUpdateButtonClick = () => {
+    const updatePropertyModal = (
+      <Modal title="Update property">
+        <UpdatePropertyForm propertyId={propertyId} />
+      </Modal>
+    );
+
+    pushModal(updatePropertyModal);
+  };
+
+  const handleCloseButtonClick = () => {
+    popModal();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -49,9 +70,8 @@ export default function ViewProperty({
           <label>
             State: <span>{property.state}</span>
           </label>
-          <label>
-            Owner id: <span>{property.ownerId}</span>
-          </label>
+          <label>Owner: </label>
+          {property.ownerId && <ViewPerson personId={property.ownerId} />}
           <label>
             Realtors:{" "}
             <span>
@@ -67,13 +87,13 @@ export default function ViewProperty({
         </div>
       )}
       <div className="view-property-controls">
-        <button type="button" onClick={onClose}>
+        <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>
         <button type="button" onClick={handleDeleteButtonClick}>
           Delete property
         </button>
-        <button type="button" onClick={() => onClickUpdate(propertyId)}>
+        <button type="button" onClick={handleUpdateButtonClick}>
           Update property
         </button>
       </div>

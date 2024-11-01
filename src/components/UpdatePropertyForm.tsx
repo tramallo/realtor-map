@@ -9,16 +9,18 @@ import {
   UpdateProperty,
   updatePropertySchema,
 } from "../utils/domainSchemas";
-import { usePersonStore, usePropertyStore } from "../utils/domainDataStore";
+import { usePropertyStore } from "../utils/domainDataStore";
 import FormTextField from "./form/FormTextField";
 import FormSelectField from "./form/FormSelectField";
 import FormTextArea from "./form/FormTextArea";
 import FormDateField from "./form/FormDateField";
+import FormCreateSelectPerson from "./form/FormCreateSelectPerson";
+import { useModalContext } from "./ModalContext";
 
 export interface UpdatePropertyFormProps {
   propertyId: Property["id"];
-  onUpdate: (updatedPropertyId: Property["id"]) => void;
-  onClose: () => void;
+  onUpdate?: (updatedPropertyId: Property["id"]) => void;
+  onClose?: () => void;
 }
 
 export default function UpdatePropertyForm({
@@ -26,8 +28,7 @@ export default function UpdatePropertyForm({
   onUpdate,
   onClose,
 }: UpdatePropertyFormProps) {
-  const persons = usePersonStore((store) => store.persons);
-
+  const { popModal } = useModalContext();
   const updateProperty = usePropertyStore((store) => store.updateProperty);
   const properties = usePropertyStore((store) => store.properties);
   const propertyToUpdate = properties.find(
@@ -38,6 +39,8 @@ export default function UpdatePropertyForm({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    control,
   } = useForm<UpdateProperty>({
     resolver: getStripAndZodResolver(updatePropertySchema),
     defaultValues: propertyToUpdate,
@@ -51,7 +54,17 @@ export default function UpdatePropertyForm({
       return;
     }
 
-    onUpdate(propertyId);
+    if (onUpdate) {
+      onUpdate(propertyId);
+    }
+    popModal();
+  };
+
+  const handleCloseButtonClick = () => {
+    popModal();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -91,17 +104,13 @@ export default function UpdatePropertyForm({
             }))}
             addEmptyOption
           />
-          <FormSelectField
-            registration={register("ownerId")}
+          <FormCreateSelectPerson
+            control={control}
+            fieldName="ownerId"
+            setValue={setValue}
             validationError={errors.ownerId}
-            label="Owner id"
-            options={persons.map((person) => ({
-              label: `${person.name} - ${person.mobile ?? ""} - ${
-                person.email ?? ""
-              }`,
-              value: person.id,
-            }))}
-            addEmptyOption
+            label="Owner"
+            emptyValueLabel="..."
           />
           <FormTextArea
             registration={register("description")}
@@ -124,7 +133,7 @@ export default function UpdatePropertyForm({
         </div>
       )}
       <div className="update-property-form-controls">
-        <button type="button" onClick={onClose}>
+        <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>
         <button type="button" onClick={handleSubmit(onSubmit)}>

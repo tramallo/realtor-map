@@ -14,10 +14,12 @@ import FormTextField from "./form/FormTextField";
 import FormSelectField from "./form/FormSelectField";
 import FormTextArea from "./form/FormTextArea";
 import FormDateField from "./form/FormDateField";
+import { useModalContext } from "./ModalContext";
+import FormCreateSelectPerson from "./form/FormCreateSelectPerson";
 
 export interface CreatePropertyFormProps {
-  onCreate: (newPropertyId: Property["id"]) => void;
-  onClose: () => void;
+  onCreate?: (newPropertyId: Property["id"]) => void;
+  onClose?: () => void;
   prefillData?: Partial<CreateProperty>;
 }
 
@@ -26,14 +28,17 @@ export default function CreatePropertyForm({
   onClose,
   prefillData,
 }: CreatePropertyFormProps) {
-  const persons = usePersonStore((store) => store.persons);
+  const { popModal } = useModalContext();
 
+  const persons = usePersonStore((store) => store.persons);
   const createProperty = usePropertyStore((store) => store.createProperty);
 
   const {
     handleSubmit,
     register,
     formState: { errors },
+    control,
+    setValue,
   } = useForm<CreateProperty>({
     resolver: getStripAndZodResolver(createPropertySchema),
     defaultValues: prefillData,
@@ -49,7 +54,17 @@ export default function CreatePropertyForm({
       return;
     }
 
-    onCreate(newPropertyId);
+    popModal();
+    if (onCreate) {
+      onCreate(newPropertyId);
+    }
+  };
+
+  const handleCloseButtonClick = () => {
+    popModal();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -87,17 +102,13 @@ export default function CreatePropertyForm({
           }))}
           addEmptyOption
         />
-        <FormSelectField
-          registration={register("ownerId")}
+        <FormCreateSelectPerson
+          control={control}
+          fieldName="ownerId"
+          setValue={setValue}
           validationError={errors.ownerId}
-          label="Owner id"
-          options={persons.map((person) => ({
-            label: `${person.name} - ${person.mobile ?? ""} - ${
-              person.email ?? ""
-            }`,
-            value: person.id,
-          }))}
-          addEmptyOption
+          label="Owner"
+          emptyValueLabel="..."
         />
         <FormTextArea
           registration={register("description")}
@@ -126,7 +137,7 @@ export default function CreatePropertyForm({
       </div>
 
       <div className="create-property-form-controls">
-        <button type="button" onClick={onClose}>
+        <button type="button" onClick={handleCloseButtonClick}>
           Close
         </button>
         <button type="button" onClick={handleSubmit(onSubmit)}>

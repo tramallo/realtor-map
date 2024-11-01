@@ -1,0 +1,17 @@
+.create-person-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 3em;
+    grid-template-areas:
+        "fields-area"
+        "controls-area";
+
+    height: 100%;
+}
+
+.create-person-form > .create-person-form-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}

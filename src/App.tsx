@@ -1,5 +1,4 @@
 import { Marker, Popup } from "react-leaflet";
-import { useState } from "react";
 
 import "./App.css";
 import SearchMap from "./components/SearchMap";
@@ -12,16 +11,12 @@ import { CreateProperty, Property } from "./utils/domainSchemas";
 import { usePropertyStore } from "./utils/domainDataStore";
 import { AddressData } from "./utils/mapServicesSchemas";
 import ViewProperty from "./components/ViewProperty";
-import UpdatePropertyForm from "./components/UpdatePropertyForm";
+import CreatePersonForm from "./components/CreatePersonForm";
+import { useModalContext } from "./components/ModalContext";
 
 export default function App() {
+  const { pushModal } = useModalContext();
   const properties = usePropertyStore((store) => store.properties);
-
-  const [modal, setModal] = useState<JSX.Element | undefined>(undefined);
-
-  const closeModal = () => {
-    setModal(undefined);
-  };
 
   const openCreatePropertyModal = (address: AddressData) => {
     const prefillAddress: Partial<CreateProperty> = {
@@ -33,48 +28,38 @@ export default function App() {
       <Modal title="New property">
         <CreatePropertyForm
           onCreate={openViewPropertyModal}
-          onClose={closeModal}
           prefillData={prefillAddress}
         />
       </Modal>
     );
 
-    setModal(createPropertyModal);
-  };
-
-  const openUpdatePropertyModal = (propertyId: Property["id"]) => {
-    const updatePropertyModal = (
-      <Modal title="Update property">
-        <UpdatePropertyForm
-          propertyId={propertyId}
-          onUpdate={openViewPropertyModal}
-          onClose={closeModal}
-        />
-      </Modal>
-    );
-
-    setModal(updatePropertyModal);
+    pushModal(createPropertyModal);
   };
 
   const openViewPropertyModal = (propertyId: Property["id"]) => {
     const viewPropertyModal = (
       <Modal title="View property">
-        <ViewProperty
-          propertyId={propertyId}
-          onClose={closeModal}
-          onClickUpdate={openUpdatePropertyModal}
-        />
+        <ViewProperty propertyId={propertyId} />
       </Modal>
     );
 
-    setModal(viewPropertyModal);
+    pushModal(viewPropertyModal);
+  };
+
+  const openTestModal = () => {
+    const testModal = (
+      <Modal title="Test">
+        <CreatePersonForm onCreate={(personId) => console.log(personId)} />
+      </Modal>
+    );
+
+    pushModal(testModal);
   };
 
   return (
     <div id="app">
       <span>
-        controls area{" "}
-        <button onClick={() => console.log("lcick")}>new property</button>
+        controls area <button onClick={openTestModal}>Open test modal</button>
       </span>
       <SearchMap
         geocodingService={googleGeocodingService}
@@ -99,7 +84,6 @@ export default function App() {
           </Marker>
         ))}
       </SearchMap>
-      {modal && modal}
     </div>
   );
 }

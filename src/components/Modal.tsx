@@ -17,3 +17,5 @@ export default function Modal({ title, children }: ModalProps) {
     </div>
   );
 }
+
+export type Modal = typeof Modal;

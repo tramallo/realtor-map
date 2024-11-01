@@ -1,0 +1,20 @@
+.form-create-select-person {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+        "label-area label-area"
+        "selector-area button-area" ;
+}
+
+.form-create-select-person > label {
+    grid-area: label-area;
+}
+
+.form-create-select-person > select {
+    grid-area: selector-area;
+}
+
+.form-create-select-person > button {
+    grid-area: button-area;
+}
