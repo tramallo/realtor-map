@@ -1,0 +1,17 @@
+.select-realtor-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.select-realtor-field > .select-realtor-field-controls {
+    display: flex;
+    flex-direction: row;
+}
+
+.select-realtor-field > .select-realtor-field-controls > select {
+    flex: 1 1 80%;
+}
+
+.select-realtor-field > .select-realtor-field-controls > button {
+    flex: 1 1 20%;
+}

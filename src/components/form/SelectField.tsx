@@ -1,4 +1,11 @@
-import { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import {
+  Controller,
+  FieldError,
+  FieldValues,
+  Path,
+  PathValue,
+  useFormContext,
+} from "react-hook-form";
 
 import "./SelectField.css";
 
@@ -7,49 +14,47 @@ export interface Option {
   value: string;
 }
 
-export interface SelectFieldProps {
-  registration: UseFormRegisterReturn<string>;
-  validationError: FieldError | undefined;
+export interface SelectFieldProps<Schema extends FieldValues> {
+  fieldName: Path<Schema>;
   options: Option[];
   label?: string;
-  defaultOption?: string;
-  addEmptyOption?: boolean;
-  readOnly?: boolean;
+  defaultValue?: PathValue<Schema, Path<Schema>>;
+  emptyOptionLabel?: string;
 }
 
-export default function SelectField({
-  registration,
-  validationError,
+export default function SelectField<Schema extends FieldValues>({
+  fieldName,
   options,
   label,
-  defaultOption,
-  addEmptyOption,
-  readOnly,
-}: SelectFieldProps) {
+  defaultValue,
+  emptyOptionLabel,
+}: SelectFieldProps<Schema>) {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<Schema>();
+
+  const error = errors[fieldName] as FieldError | undefined;
+
   return (
     <div className="select-field">
-      <label>{label ?? registration.name}</label>
-      <select
-        className={readOnly ? "read-only" : ""}
-        {...registration}
-        defaultValue={defaultOption}
-      >
-        {addEmptyOption && (
-          <option value="" disabled={readOnly}>
-            ...
-          </option>
+      {label && <label>{label}</label>}
+      <Controller
+        name={fieldName}
+        control={control}
+        defaultValue={defaultValue}
+        render={({ field }) => (
+          <select {...field}>
+            {emptyOptionLabel && <option value="">{emptyOptionLabel}</option>}
+            {options.map((option, index) => (
+              <option key={`${name}-option-${index}`} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         )}
-        {options.map((option, index) => (
-          <option
-            key={`${registration.name}-${index}`}
-            value={option.value}
-            disabled={readOnly}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {validationError && <span>{validationError.message}</span>}
+      />
+      {error && <span>{error.message}</span>}
     </div>
   );
 }
