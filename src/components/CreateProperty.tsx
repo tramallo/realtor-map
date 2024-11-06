@@ -1,11 +1,9 @@
-import { FormProvider, useForm } from "react-hook-form";
-
 import "./CreateProperty.css";
 import {
+  CreatePropertyData,
   CreatePropertySchema,
   createPropertySchema,
-  getStripAndZodResolver,
-  PropertySchema,
+  PropertyData,
   propertyStates,
   propertyTypes,
 } from "../utils/domainSchemas";
@@ -17,9 +15,10 @@ import { useModalContext } from "./ModalContext";
 import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
+import Form from "./form/Form";
 
 export interface CreatePropertyProps {
-  onCreate?: (newPropertyId: PropertySchema["id"]) => void;
+  onCreate?: (newPropertyId: PropertyData["id"]) => void;
   onClose?: () => void;
   prefillData?: Partial<CreatePropertySchema>;
 }
@@ -30,15 +29,9 @@ export default function CreateProperty({
   prefillData,
 }: CreatePropertyProps) {
   const { popModal } = useModalContext();
-
   const createProperty = usePropertyStore((store) => store.createProperty);
 
-  const formData = useForm<CreatePropertySchema>({
-    resolver: getStripAndZodResolver(createPropertySchema),
-    defaultValues: prefillData,
-  });
-
-  const onSubmit = async (newPropertyData: CreatePropertySchema) => {
+  const handleFormSubmit = async (newPropertyData: CreatePropertyData) => {
     const { error, data: newPropertyId } = await createProperty(
       newPropertyData
     );
@@ -54,7 +47,7 @@ export default function CreateProperty({
     }
   };
 
-  const handleCloseButtonClick = () => {
+  const handleFormCancel = () => {
     popModal();
     if (onClose) {
       onClose();
@@ -62,81 +55,62 @@ export default function CreateProperty({
   };
 
   return (
-    <form className="create-property">
-      <FormProvider {...formData}>
-        <div className="create-property-fields">
-          <TextField
-            registration={formData.register("address")}
-            validationError={formData.formState.errors.address}
-          />
-          <TextField
-            registration={formData.register("coordinates.lat")}
-            validationError={formData.formState.errors.coordinates?.lat}
-            label="Latitude"
-          />
-          <TextField
-            registration={formData.register("coordinates.lng")}
-            validationError={formData.formState.errors.coordinates?.lng}
-            label="Longitude"
-          />
-          <SelectField
-            fieldName="type"
-            label="Type"
-            options={propertyTypes.map((propertyType) => ({
-              label: propertyType,
-              value: propertyType,
-            }))}
-            emptyOptionLabel="..."
-          />
-          <SelectField
-            fieldName="state"
-            label="State"
-            options={propertyStates.map((propertyState) => ({
-              label: propertyState,
-              value: propertyState,
-            }))}
-            emptyOptionLabel="..."
-          />
-          <SelectPersonField
-            fieldName="ownerId"
-            label="Owner"
-            emptyPersonLabel="..."
-            allowCreateNewPerson
-          />
-          <TextArea
-            registration={formData.register("description")}
-            validationError={formData.formState.errors.description}
-          />
-          <SelectRealtorField
-            fieldName="exclusive"
-            label="Exclusive realtor"
-            emptyRealtorLabel="..."
-            allowCreateNewRealtor
-          />
-          <TextField
-            registration={formData.register("createdBy")}
-            validationError={formData.formState.errors.createdBy}
-            value="maria-id"
-            readOnly
-          />
-          <DateField
-            registration={formData.register("createdAt")}
-            validationError={formData.formState.errors.createdAt}
-            label="Created at"
-            value={new Date()}
-            readOnly
-          />
-        </div>
-
-        <div className="create-property-controls">
-          <button type="button" onClick={handleCloseButtonClick}>
-            Close
-          </button>
-          <button type="button" onClick={formData.handleSubmit(onSubmit)}>
-            Create
-          </button>
-        </div>
-      </FormProvider>
-    </form>
+    <Form<CreatePropertySchema>
+      schema={createPropertySchema}
+      onSubmit={handleFormSubmit}
+      onCancel={handleFormCancel}
+      prefillData={prefillData}
+    >
+      <TextField fieldName="address" label="Address" />
+      <TextField
+        fieldName="coordinates.lat"
+        label="Coordinates"
+        placeholder="Latitude"
+      />
+      <TextField fieldName="coordinates.lng" placeholder="Longitude" />
+      <SelectField
+        fieldName="type"
+        label="Type"
+        options={propertyTypes.map((propertyType) => ({
+          label: propertyType,
+          value: propertyType,
+        }))}
+        emptyOptionLabel="select a type"
+      />
+      <SelectField
+        fieldName="state"
+        label="State"
+        options={propertyStates.map((propertyState) => ({
+          label: propertyState,
+          value: propertyState,
+        }))}
+        emptyOptionLabel="select a state"
+      />
+      <SelectPersonField
+        fieldName="ownerId"
+        label="Owner"
+        emptyPersonLabel="select the owner"
+        allowCreateNewPerson
+      />
+      <TextArea fieldName="description" label="Description" />
+      <SelectRealtorField
+        fieldName="exclusive"
+        label="Exclusive realtor"
+        emptyRealtorLabel="select exclusive realtor"
+        allowCreateNewRealtor
+      />
+      <TextField
+        fieldName="createdBy"
+        label="Created by"
+        defaultValue="maria-id"
+        readOnly
+      />
+      <DateField
+        fieldName="createdAt"
+        label="Created at"
+        defaultValue={new Date()}
+        readOnly
+      />
+    </Form>
   );
 }

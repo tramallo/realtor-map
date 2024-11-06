@@ -1,33 +1,54 @@
-import { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import {
+  ArrayPath,
+  FieldError,
+  FieldValues,
+  Path,
+  PathValue,
+  useFormContext,
+} from "react-hook-form";
 import { format as formatDate } from "date-fns";
 
 import "./DateField.css";
 
-export interface DateFieldProps {
-  registration: UseFormRegisterReturn<string>;
-  validationError: FieldError | undefined;
+export interface DateFieldProps<
+  Schema extends FieldValues,
+  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
+  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
+    Schema,
+    SchemaFieldName
+  >
+> {
+  fieldName: SchemaFieldName;
   label?: string;
-  value?: Date;
+  defaultValue?: SchemaFieldValue;
   readOnly?: boolean;
 }
 
-export default function DateField({
-  registration,
-  validationError,
+export default function DateField<Schema extends FieldValues>({
+  fieldName,
   label,
-  value,
+  defaultValue,
   readOnly,
-}: DateFieldProps) {
+}: DateFieldProps<Schema>) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  const validationError = errors[fieldName] as FieldError | undefined;
+
   return (
     <div className="date-field">
-      <label>{label ?? registration.name}</label>
+      {label && <label>{label}</label>}
       <input
         type="date"
-        {...registration}
-        value={value && formatDate(value, "yyyy-MM-dd")}
+        {...register(fieldName)}
+        value={defaultValue && formatDate(defaultValue, "yyyy-MM-dd")}
         readOnly={readOnly}
       />
       {validationError && <span>{validationError.message}</span>}
     </div>
   );
 }
+
+export type DateField = typeof DateField;

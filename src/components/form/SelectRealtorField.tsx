@@ -1,4 +1,5 @@
 import {
+  ArrayPath,
   Controller,
   FieldError,
   FieldValues,
@@ -11,14 +12,21 @@ import "./SelectRealtorField.css";
 import { useRealtorStore } from "../../utils/domainDataStore";
 import { useModalContext } from "../ModalContext";
 import Modal from "../Modal";
-import { RealtorSchema } from "../../utils/domainSchemas";
+import { RealtorData } from "../../utils/domainSchemas";
 import CreateRealtor from "../CreateRealtor";
 
-export interface SelectRealtorFieldProps<Schema extends FieldValues> {
-  fieldName: Path<Schema>;
+export interface SelectRealtorFieldProps<
+  Schema extends FieldValues,
+  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
+  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
+    Schema,
+    SchemaFieldName
+  >
+> {
+  fieldName: SchemaFieldName;
   label?: string;
   emptyRealtorLabel?: string;
-  defaultRealtorId?: PathValue<Schema, Path<Schema>>;
+  defaultRealtorId?: SchemaFieldValue;
   allowCreateNewRealtor?: boolean;
 }
 
@@ -39,7 +47,7 @@ export default function SelectRealtorField<Schema extends FieldValues>({
 
   const error = errors[fieldName] as FieldError | undefined;
 
-  const handleNewRealtorCreate = (newRealtorId: RealtorSchema["id"]) => {
+  const handleNewRealtorCreate = (newRealtorId: RealtorData["id"]) => {
     setValue(fieldName, newRealtorId as PathValue<Schema, Path<Schema>>);
   };
 

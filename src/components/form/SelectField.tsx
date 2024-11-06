@@ -1,4 +1,5 @@
 import {
+  ArrayPath,
   Controller,
   FieldError,
   FieldValues,
@@ -9,16 +10,23 @@ import {
 
 import "./SelectField.css";
 
-export interface Option {
+export interface Option<T> {
   label: string;
-  value: string;
+  value: T;
 }
 
-export interface SelectFieldProps<Schema extends FieldValues> {
-  fieldName: Path<Schema>;
-  options: Option[];
+export interface SelectFieldProps<
+  Schema extends FieldValues,
+  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
+  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
+    Schema,
+    SchemaFieldName
+  >
+> {
+  fieldName: SchemaFieldName;
   label?: string;
-  defaultValue?: PathValue<Schema, Path<Schema>>;
+  defaultValue?: SchemaFieldValue;
+  options: Option<SchemaFieldValue>[];
   emptyOptionLabel?: string;
 }
 

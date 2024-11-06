@@ -3,40 +3,66 @@
  * 
  * Such schemas have validation rules attached, provided by zod validator (https://zod.dev)
  */
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Resolver, zodResolver as zodResolverFactory } from "@hookform/resolvers/zod";
 import { FieldValues, ResolverOptions } from "react-hook-form";
-import { z } from "zod";
+import { z, ZodSchema } from "zod";
 
-/** Removes empty attributes from a object, undefined & "" are considered empty
- * the process is recursive, so nested objects gets processed also
+/** Checks if the provided value is an emtpy value or not
+ * Empty values are:
+ * null - undefined - "" (after trimming) - {}
  * 
- * @param input: object to remove empty attributes
- * @returns: a copy of the object without the attributes equals to undefined or ""
+ * @param value: Value to check if is emtpy
+ * @returns: Boolean indicating that the input is empty
  */
-const stripEmptyAttributes = <T extends Record<string, unknown>>(input: T): T => {
-    if (typeof input !== 'object' || input === null) {
-        return input;
+const isEmpty = <T = unknown>(value: T): boolean => {
+    if (value == null || value == undefined) {
+        return true;
     }
 
-    const result: Record<string, unknown> = {};
+    if (typeof value === 'string' && value.trim() === "") {
+        return true;
+    }
 
-    for (const key of Object.keys(input)) {
-        const value = input[key];
-        if (value !== undefined && value !== "") {
-            // Recursively strip empty attributes for nested objects
-            if (typeof value === 'object' && value !== null) {
-                const strippedValue = stripEmptyAttributes(value as Record<string, unknown>);
-                if (Object.keys(strippedValue).length > 0) {
-                    result[key] = strippedValue;
-                }
-            } else {
-                result[key] = value;
+    if (Array.isArray(value)) {
+        return false;
+    }
+
+    if (typeof value === 'object' && Object.keys(value).length === 0) {
+        return true;
+    }
+
+    return false;
+};
+
+/** Removes empty attributes from an object.
+ * The process is recursive, so nested objects get their empty attributes removed also.
+ * 
+ * @param input: object to remove empty attributes
+ * @returns: a copy of the object without the attributes considered empty
+ */
+const stripEmptyAttributes = <T>(input: T): T => {
+    if (input == null || typeof input !== 'object') {
+        return input; // Return as is if it's not an object
+    }
+
+    const copy = {} as T;
+
+    for (const inputKey in input) {
+        if (Object.prototype.hasOwnProperty.call(input, inputKey)) {
+            let inputValue = input[inputKey];
+
+            if (typeof inputValue === 'object' && inputValue !== null) {
+                inputValue = stripEmptyAttributes(inputValue);
+            }
+
+            if (!isEmpty(inputValue)) {
+                copy[inputKey] = inputValue;
             }
         }
     }
 
-    return result as T;
-}
+    return copy;
+};
 
 /** Creates a custom resolver that strips empty data & validates using zod.
  * 
@@ -51,21 +77,22 @@ const stripEmptyAttributes = <T extends Record<string, unknown>>(input: T): T =>
  * @param schema: zod schema to use to validate the input data
  * @returns: a resolver that strips empty attributes from data, validates it and returns the result
  */
-export const getStripAndZodResolver = <TInput = unknown>(
-    schema: z.ZodType<TInput>
+export const customResolverFactory: Resolver = <Schema extends ZodSchema>(
+    schema: Schema
 ) => {
-    const zResolve = zodResolver(schema);
+    const zodResolve = zodResolverFactory<Schema>(schema);
   
-    const stripAndZodResolver = async <TFieldValues extends FieldValues>(
-        data: TFieldValues,
+    const customResolve = async <Data extends FieldValues = z.infer<Schema>>(
+        data: Data,
         context: unknown,
-        options: ResolverOptions<TFieldValues>
+        options: ResolverOptions<Data>
     ) => {
         const strippedData = stripEmptyAttributes(data);
-        const result = await zResolve(strippedData, context, options);
+        const result = await zodResolve<Data, unknown>(strippedData, context, options);
         return result;
     };
-    return stripAndZodResolver;
+
+    return customResolve;
 };
 
 /** Base schemas, describes base data used by the system "as saved in database"
@@ -117,11 +144,17 @@ export const showingAppointmentSchema = dataSchema.extend({
     time: z.string()
 })
 
-export type PersonSchema = z.infer<typeof personSchema>;
-export type RealtorSchema = z.infer<typeof realtorSchema>;
-export type CoordinatesSchema = z.infer<typeof coordinatesSchema>;
-export type PropertySchema = z.infer<typeof propertySchema>;
-export type ShowingAppointmentSchema = z.infer<typeof showingAppointmentSchema>;
+export type PersonSchema = typeof personSchema;
+export type RealtorSchema = typeof realtorSchema;
+export type CoordinatesSchema = typeof coordinatesSchema;
+export type PropertySchema = typeof propertySchema;
+export type ShowingAppointmentSchema = typeof showingAppointmentSchema;
+
+export type PersonData = z.infer<typeof personSchema>;
+export type RealtorData = z.infer<typeof realtorSchema>;
+export type CoordinatesData = z.infer<typeof coordinatesSchema>;
+export type PropertyData = z.infer<typeof propertySchema>;
+export type ShowingAppointmentData = z.infer<typeof showingAppointmentSchema>;
 
 /** Variation schemas, some operations use only parts of the data
  * 
@@ -152,7 +185,12 @@ export const createRealtorSchema = realtorSchema.omit({
     updatedAt: true,
 })
 
-export type CreatePropertySchema = z.infer<typeof createPropertySchema>;
-export type UpdatePropertySchema = z.infer<typeof updatePropertySchema>;
-export type CreatePersonSchema = z.infer<typeof createPersonSchema>;
-export type CreateRealtorSchema = z.infer<typeof createRealtorSchema>;
+export type CreatePropertySchema = typeof createPropertySchema;
+export type UpdatePropertySchema = typeof updatePropertySchema;
+export type CreatePersonSchema = typeof createPersonSchema;
+export type CreateRealtorSchema = typeof createRealtorSchema;
+
+export type CreatePropertyData = z.infer<typeof createPropertySchema>;
+export type UpdatePropertyData = z.infer<typeof updatePropertySchema>;
+export type CreatePersonData = z.infer<typeof createPersonSchema>;
+export type CreateRealtorData = z.infer<typeof createRealtorSchema>;

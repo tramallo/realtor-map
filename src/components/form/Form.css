@@ -1,0 +1,23 @@
+.form {
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 3em;
+    grid-template-areas:
+        "fields-area"
+        "controls-area";
+}
+
+.form > .form-fields {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.form > .form-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}

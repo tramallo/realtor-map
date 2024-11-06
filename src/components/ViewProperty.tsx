@@ -1,6 +1,6 @@
 import "./ViewProperty.css";
 import { usePropertyStore } from "../utils/domainDataStore";
-import { PropertySchema } from "../utils/domainSchemas";
+import { PropertyData } from "../utils/domainSchemas";
 import ViewPerson from "./ViewPerson";
 import { useModalContext } from "./ModalContext";
 import Modal from "./Modal";
@@ -8,7 +8,7 @@ import UpdateProperty from "./UpdateProperty";
 import ViewRealtor from "./ViewRealtor";
 
 export interface ViewPropertyProps {
-  propertyId: PropertySchema["id"];
+  propertyId: PropertyData["id"];
   onClose?: () => void;
 }
 

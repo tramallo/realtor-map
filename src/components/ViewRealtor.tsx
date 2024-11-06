@@ -1,9 +1,9 @@
 import "./ViewRealtor.css";
 import { useRealtorStore } from "../utils/domainDataStore";
-import { RealtorSchema } from "../utils/domainSchemas";
+import { RealtorData } from "../utils/domainSchemas";
 
 export interface ViewRealtorProps {
-  realtorId: RealtorSchema["id"];
+  realtorId: RealtorData["id"];
 }
 
 export default function ViewRealtor({ realtorId }: ViewRealtorProps) {

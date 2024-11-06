@@ -1,31 +1,50 @@
-import { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import {
+  ArrayPath,
+  FieldError,
+  FieldValues,
+  Path,
+  PathValue,
+  useFormContext,
+} from "react-hook-form";
 
 import "./TextField.css";
 
-export interface TextFieldProps {
-  registration: UseFormRegisterReturn<string>;
-  validationError: FieldError | undefined;
+export interface TextFieldProps<
+  Schema extends FieldValues,
+  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
+  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
+    Schema,
+    SchemaFieldName
+  >
+> {
+  fieldName: SchemaFieldName;
   label?: string;
-  value?: string;
+  defaultValue?: SchemaFieldValue;
   placeholder?: string;
   readOnly?: boolean;
 }
 
-export default function TextField({
-  registration,
-  validationError,
+export default function TextField<Schema extends FieldValues>({
+  fieldName,
   label,
-  value,
+  defaultValue,
   placeholder,
   readOnly,
-}: TextFieldProps) {
+}: TextFieldProps<Schema>) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  const validationError = errors[fieldName] as FieldError | undefined;
+
   return (
     <div className="text-field">
-      <label>{label ?? registration.name}</label>
+      {label && <label>{label}</label>}
       <input
         type="text"
-        {...registration}
-        value={value}
+        {...register(fieldName)}
+        value={defaultValue}
         placeholder={placeholder}
         readOnly={readOnly}
       />

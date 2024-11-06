@@ -1,4 +1,5 @@
 import {
+  ArrayPath,
   Controller,
   FieldError,
   FieldValues,
@@ -12,13 +13,20 @@ import { usePersonStore } from "../../utils/domainDataStore";
 import { useModalContext } from "../ModalContext";
 import Modal from "../Modal";
 import CreatePerson from "../CreatePerson";
-import { PersonSchema } from "../../utils/domainSchemas";
+import { PersonData } from "../../utils/domainSchemas";
 
-export interface SelectPersonFieldProps<Schema extends FieldValues> {
-  fieldName: Path<Schema>;
+export interface SelectPersonFieldProps<
+  Schema extends FieldValues,
+  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
+  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
+    Schema,
+    SchemaFieldName
+  >
+> {
+  fieldName: SchemaFieldName;
   label?: string;
   emptyPersonLabel?: string;
-  defaultPersonId?: PathValue<Schema, Path<Schema>>;
+  defaultPersonId?: SchemaFieldValue;
   allowCreateNewPerson?: boolean;
 }
 
@@ -39,7 +47,7 @@ export default function SelectPersonField<Schema extends FieldValues>({
 
   const error = errors[fieldName] as FieldError | undefined;
 
-  const handleNewPersonCreate = (newPersonId: PersonSchema["id"]) => {
+  const handleNewPersonCreate = (newPersonId: PersonData["id"]) => {
     setValue(fieldName, newPersonId as PathValue<Schema, Path<Schema>>);
   };
 
