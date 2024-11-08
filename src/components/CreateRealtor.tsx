@@ -7,9 +7,9 @@ import {
   RealtorData,
 } from "../utils/domainSchemas";
 import { useModalContext } from "./ModalContext";
-import TextField from "./form/TextField";
 import DateField from "./form/DateField";
 import Form from "./form/Form";
+import RHFMUITextField from "./form/RHFMUITextField";
 
 export interface CreateRealtorProps {
   onCreate?: (newRealtorId: RealtorData["id"]) => void;
@@ -51,8 +51,8 @@ export default function CreateRealtor({
       onSubmit={handleFormSubmit}
       onCancel={handleFormCancel}
     >
-      <TextField fieldName="name" label="Name" />
-      <TextField
+      <RHFMUITextField fieldName="name" label="Name" />
+      <RHFMUITextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="juano"

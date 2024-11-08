@@ -8,7 +8,6 @@ import {
   propertyTypes,
 } from "../utils/domainSchemas";
 import { usePropertyStore } from "../utils/domainDataStore";
-import TextField from "./form/TextField";
 import TextArea from "./form/TextArea";
 import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
@@ -16,6 +15,7 @@ import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
 import Form from "./form/Form";
+import RHFMUITextField from "./form/RHFMUITextField";
 
 export interface CreatePropertyProps {
   onCreate?: (newPropertyId: PropertyData["id"]) => void;
@@ -61,13 +61,13 @@ export default function CreateProperty({
       onCancel={handleFormCancel}
       prefillData={prefillData}
     >
-      <TextField fieldName="address" label="Address" />
-      <TextField
+      <RHFMUITextField fieldName="address" label="Address" />
+      <RHFMUITextField
         fieldName="coordinates.lat"
         label="Coordinates"
         placeholder="Latitude"
       />
-      <TextField fieldName="coordinates.lng" placeholder="Longitude" />
+      <RHFMUITextField fieldName="coordinates.lng" label="Lng" placeholder="Longitude" />
       <SelectField
         fieldName="type"
         label="Type"
@@ -99,7 +99,7 @@ export default function CreateProperty({
         emptyRealtorLabel="select exclusive realtor"
         allowCreateNewRealtor
       />
-      <TextField
+      <RHFMUITextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="maria-id"

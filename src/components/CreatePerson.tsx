@@ -5,11 +5,10 @@ import {
   createPersonSchema,
   PersonData,
 } from "../utils/domainSchemas";
-import TextField from "./form/TextField";
 import { usePersonStore } from "../utils/domainDataStore";
 import { useModalContext } from "./ModalContext";
 import Form from "./form/Form";
-import DateField from "./form/DateField";
+import RHFMUITextField from "./form/RHFMUITextField";
 
 export interface CreatePersonProps {
   onCreate?: (newPersonId: PersonData["id"]) => void;
@@ -21,6 +20,10 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
   const createPerson = usePersonStore((store) => store.createPerson);
 
   const handleFormSubmit = async (newPersonData: CreatePersonData) => {
+
+    console.log("submitt")
+    console.log(newPersonData)
+
     const { error, data: personId } = await createPerson(newPersonData);
 
     if (error) {
@@ -49,21 +52,30 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
       onCancel={handleFormCancel}
       submitButtonLabel="Create person"
     >
-      <TextField fieldName="name" label="Name" />
-      <TextField fieldName="mobile" label="Mobile" />
-      <TextField fieldName="email" label="Email" />
-      <TextField
-        fieldName="createdBy"
-        label="Created by"
-        defaultValue="sancho"
-        readOnly
-      />
-      <DateField
-        fieldName="createdAt"
-        label="Created at"
-        defaultValue={new Date()}
-        readOnly
-      />
+        <RHFMUITextField
+          fieldName="name"
+          label="Name"
+        />
+        <RHFMUITextField
+          fieldName="mobile"
+          label="Mobile"
+        />
+        <RHFMUITextField
+          fieldName="email"
+          label="Email"
+        />
+        <RHFMUITextField
+          fieldName="createdBy"
+          label="Created by"
+          defaultValue="juanito"
+          readOnly
+        />
+        <RHFMUITextField
+          fieldName="createdAt"
+          label="Created at"
+          defaultValue="15/05/1999"
+          readOnly
+        />
     </Form>
   );
 }
