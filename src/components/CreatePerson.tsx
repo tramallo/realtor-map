@@ -21,10 +21,6 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
   const createPerson = usePersonStore((store) => store.createPerson);
 
   const handleFormSubmit = async (newPersonData: CreatePersonData) => {
-
-    console.log("submitt")
-    console.log(newPersonData)
-
     const { error, data: personId } = await createPerson(newPersonData);
 
     if (error) {
@@ -53,25 +49,21 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
       onCancel={handleFormCancel}
       submitButtonLabel="Create person"
     >
-        <RHFMUITextField
-          fieldName="name"
-          label="Name"
-        />
-        <RHFMUITextField
-          fieldName="mobile"
-          label="Mobile"
-        />
-        <RHFMUITextField
-          fieldName="email"
-          label="Email"
-        />
-        <RHFMUITextField
-          fieldName="createdBy"
-          label="Created by"
-          defaultValue="juanito"
-          readOnly
-        />
-        <DateField fieldName="createdAt" label="Created at" defaultValue={new Date()} />
+      <RHFMUITextField fieldName="name" label="Name" />
+      <RHFMUITextField fieldName="mobile" label="Mobile" />
+      <RHFMUITextField fieldName="email" label="Email" />
+      <RHFMUITextField
+        fieldName="createdBy"
+        label="Created by"
+        defaultValue="juanito"
+        readOnly
+      />
+      <DateField
+        fieldName="createdAt"
+        label="Created at"
+        defaultValue={new Date()}
+        readOnly
+      />
     </Form>
   );
 }

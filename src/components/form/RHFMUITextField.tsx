@@ -1,5 +1,5 @@
-import { Controller, useFormContext } from 'react-hook-form';
-import { TextField } from '@mui/material';
+import { Controller, useFormContext } from "react-hook-form";
+import { TextField } from "@mui/material";
 
 interface MuiTextFieldProps {
   fieldName: string;
@@ -12,8 +12,8 @@ interface MuiTextFieldProps {
 export default function MuiTextField({
   fieldName,
   label,
-  placeholder = '',
-  defaultValue = '',
+  placeholder = "",
+  defaultValue = "",
   readOnly = false,
 }: MuiTextFieldProps) {
   const { control } = useFormContext();
@@ -28,7 +28,7 @@ export default function MuiTextField({
           {...field}
           label={label}
           placeholder={placeholder}
-          variant='filled'
+          variant="filled"
           fullWidth
           disabled={readOnly}
           error={!!fieldState?.error}
@@ -37,5 +37,4 @@ export default function MuiTextField({
       )}
     />
   );
-};
-
+}
