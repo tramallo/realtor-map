@@ -1,6 +1,4 @@
-import {
-  useFormContext, Controller
-} from "react-hook-form";
+import { useFormContext, Controller } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import { TextField } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -21,14 +19,11 @@ export default function DateField({
   defaultValue,
   readOnly,
 }: DateFieldProps) {
-  const {
-    control
-  } = useFormContext();
+  const { control } = useFormContext();
 
   return (
-
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <Controller
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Controller
         name={fieldName}
         control={control}
         defaultValue={defaultValue || null}
@@ -41,14 +36,13 @@ export default function DateField({
                 {...params}
                 label={label}
                 error={!!fieldState?.error}
-                helperText={fieldState?.error ? fieldState.error.message : ''}
+                helperText={fieldState?.error ? fieldState.error.message : ""}
                 fullWidth
               />
             )}
           />
         )}
       />
-      </LocalizationProvider>
+    </LocalizationProvider>
   );
 }
-
