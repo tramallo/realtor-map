@@ -1,54 +1,54 @@
 import {
-  ArrayPath,
-  FieldError,
-  FieldValues,
-  Path,
-  PathValue,
-  useFormContext,
+  useFormContext, Controller
 } from "react-hook-form";
-import { format as formatDate } from "date-fns";
+import { DatePicker } from "@mui/x-date-pickers";
+import { TextField } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
 import "./DateField.css";
 
-export interface DateFieldProps<
-  Schema extends FieldValues,
-  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
-  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
-    Schema,
-    SchemaFieldName
-  >
-> {
-  fieldName: SchemaFieldName;
+export interface DateFieldProps {
+  fieldName: string;
   label?: string;
-  defaultValue?: SchemaFieldValue;
+  defaultValue?: Date;
   readOnly?: boolean;
 }
 
-export default function DateField<Schema extends FieldValues>({
+export default function DateField({
   fieldName,
   label,
   defaultValue,
   readOnly,
-}: DateFieldProps<Schema>) {
+}: DateFieldProps) {
   const {
-    register,
-    formState: { errors },
+    control
   } = useFormContext();
 
-  const validationError = errors[fieldName] as FieldError | undefined;
-
   return (
-    <div className="date-field">
-      {label && <label>{label}</label>}
-      <input
-        type="date"
-        {...register(fieldName)}
-        value={defaultValue && formatDate(defaultValue, "yyyy-MM-dd")}
-        readOnly={readOnly}
+
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <Controller
+        name={fieldName}
+        control={control}
+        defaultValue={defaultValue || null}
+        render={({ field, fieldState }) => (
+          <DatePicker
+            {...field}
+            disabled={readOnly}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={label}
+                error={!!fieldState?.error}
+                helperText={fieldState?.error ? fieldState.error.message : ''}
+                fullWidth
+              />
+            )}
+          />
+        )}
       />
-      {validationError && <span>{validationError.message}</span>}
-    </div>
+      </LocalizationProvider>
   );
 }
 
-export type DateField = typeof DateField;

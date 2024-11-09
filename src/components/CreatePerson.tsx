@@ -9,6 +9,7 @@ import { usePersonStore } from "../utils/domainDataStore";
 import { useModalContext } from "./ModalContext";
 import Form from "./form/Form";
 import RHFMUITextField from "./form/RHFMUITextField";
+import DateField from "./form/DateField";
 
 export interface CreatePersonProps {
   onCreate?: (newPersonId: PersonData["id"]) => void;
@@ -70,12 +71,7 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
           defaultValue="juanito"
           readOnly
         />
-        <RHFMUITextField
-          fieldName="createdAt"
-          label="Created at"
-          defaultValue="15/05/1999"
-          readOnly
-        />
+        <DateField fieldName="createdAt" label="Created at" defaultValue={new Date()} />
     </Form>
   );
 }

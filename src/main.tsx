@@ -11,7 +11,7 @@ import ModalContextProvider from "./components/ModalContext.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ModalContextProvider>
-      <App />
+        <App />
     </ModalContextProvider>
   </StrictMode>
 );
