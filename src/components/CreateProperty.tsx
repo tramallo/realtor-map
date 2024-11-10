@@ -63,12 +63,12 @@ export default function CreateProperty({
       <MuiTextField fieldName="address" label="Address" />
       <MuiTextField
         fieldName="coordinates.lat"
-        label="Coordinates"
+        label="Latitude"
         placeholder="Latitude"
       />
       <MuiTextField
         fieldName="coordinates.lng"
-        label="Lng"
+        label="Longitude"
         placeholder="Longitude"
       />
       <SelectField
