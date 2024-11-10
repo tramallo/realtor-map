@@ -45,11 +45,11 @@ export default function SearchMap({
 
   return (
     <div className="search-map">
-      <span>{geocodingService.attribution}</span>
-      <SearchBar
-        onSearch={handleSearchBarOnSearch}
-        onClear={handleSearchBarOnClear}
-      />
+        <SearchBar
+          onSearch={handleSearchBarOnSearch}
+          onClear={handleSearchBarOnClear}
+          label={geocodingService.attribution}
+        />
       <Map mapTilesService={mapTilesService}>
         {children}
         {searchAddresses.map((address, index) => (
@@ -80,6 +80,6 @@ export default function SearchMap({
           </Marker>
         ))}
       </Map>
-    </div>
+      </div>
   );
 }
