@@ -33,13 +33,14 @@ npm run dev
 ## Project characteristics
 
 It consists on a map that shows markers, some markers represent properties, and others represent address searches
-When user interacts with the markers, he can perform the CRUD operations on the properties
+When user interacts with the markers, he can perform CRUD operations on the properties
 
 - To render the maps, its using [React-Leaflet]
 - To geocode the addresses, its using Google Maps Platform Geocoding API [Maps-Geocoding-API]
 - The map tiles are provided by [OpenStreetMap]
 - To handle input data & validation it's using [React-Hook-Form] & [Zod]
 - To manage local data storage, [Zustand]
+- Material-UI for components 
 
 [React-Leaflet]:https://react-leaflet.js.org
 [Maps-Geocoding-API]: https://developers.google.com/maps/documentation/geocoding
