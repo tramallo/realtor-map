@@ -16,7 +16,7 @@ export default function MuiTextField({
   placeholder = "",
   defaultValue = "",
   readOnly = false,
-  multiline
+  multiline,
 }: MuiTextFieldProps) {
   const { control } = useFormContext();
 
@@ -36,7 +36,7 @@ export default function MuiTextField({
           multiline={multiline}
           error={!!fieldState?.error}
           helperText={fieldState?.error?.message}
-          rows={multiline ? 3 : 1}
+          minRows={multiline ? 3 : undefined}
         />
       )}
     />
