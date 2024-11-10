@@ -15,7 +15,7 @@ import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/RHFMUITextField";
+import RHFMUITextField from "./form/MuiTextField";
 
 export interface CreatePropertyProps {
   onCreate?: (newPropertyId: PropertyData["id"]) => void;
@@ -67,7 +67,11 @@ export default function CreateProperty({
         label="Coordinates"
         placeholder="Latitude"
       />
-      <RHFMUITextField fieldName="coordinates.lng" label="Lng" placeholder="Longitude" />
+      <RHFMUITextField
+        fieldName="coordinates.lng"
+        label="Lng"
+        placeholder="Longitude"
+      />
       <SelectField
         fieldName="type"
         label="Type"

@@ -13,7 +13,7 @@ import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/RHFMUITextField";
+import RHFMUITextField from "./form/MuiTextField";
 
 export interface UpdatePropertyProps {
   propertyId: PropertyData["id"];
@@ -68,7 +68,11 @@ export default function UpdateProperty({
           label="Coordinates"
           placeholder="Latitude"
         />
-        <RHFMUITextField fieldName="coordinates.lng" label="Lng" placeholder="Longitude" />
+        <RHFMUITextField
+          fieldName="coordinates.lng"
+          label="Lng"
+          placeholder="Longitude"
+        />
         <SelectField
           fieldName="type"
           label="Type"
@@ -92,7 +96,11 @@ export default function UpdateProperty({
           emptyPersonLabel="select owner"
           allowCreateNewPerson
         />
-        <RHFMUITextField fieldName="description" label="Description" multiline />
+        <RHFMUITextField
+          fieldName="description"
+          label="Description"
+          multiline
+        />
         <SelectRealtorField
           fieldName="exclusive"
           label="Exclusive realtor"

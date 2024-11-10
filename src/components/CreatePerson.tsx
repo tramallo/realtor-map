@@ -8,7 +8,7 @@ import {
 import { usePersonStore } from "../utils/domainDataStore";
 import { useModalContext } from "./ModalContext";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/RHFMUITextField";
+import RHFMUITextField from "./form/MuiTextField";
 import DateField from "./form/DateField";
 
 export interface CreatePersonProps {
