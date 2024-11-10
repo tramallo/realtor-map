@@ -7,7 +7,6 @@ import {
   updatePropertySchema,
 } from "../utils/domainSchemas";
 import { usePropertyStore } from "../utils/domainDataStore";
-import TextArea from "./form/TextArea";
 import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
 import SelectField from "./form/SelectField";
@@ -93,7 +92,7 @@ export default function UpdateProperty({
           emptyPersonLabel="select owner"
           allowCreateNewPerson
         />
-        <TextArea fieldName="description" label="Description" />
+        <RHFMUITextField fieldName="description" label="Description" multiline />
         <SelectRealtorField
           fieldName="exclusive"
           label="Exclusive realtor"

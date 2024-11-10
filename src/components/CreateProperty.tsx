@@ -92,7 +92,7 @@ export default function CreateProperty({
         emptyPersonLabel="select the owner"
         allowCreateNewPerson
       />
-      <TextArea fieldName="description" label="Description" />
+      <RHFMUITextField fieldName="description" label="Description" multiline />
       <SelectRealtorField
         fieldName="exclusive"
         label="Exclusive realtor"

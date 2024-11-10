@@ -14,7 +14,7 @@
 }
 
 .modal > .modal-pane {
-    background-color: green;
+    background-color: white;
 
     width: 80%;
     height: 80%;
@@ -24,7 +24,9 @@
     grid-template-rows: 1.5em 1fr;
     grid-template-areas:
         "title-area"
-        "content-area"
+        "content-area";
+
+    border: 2px solid black;
 }
 
 .modal > .modal-pane > label {
