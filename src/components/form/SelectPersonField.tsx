@@ -1,54 +1,33 @@
-import {
-  ArrayPath,
-  Controller,
-  FieldError,
-  FieldValues,
-  Path,
-  PathValue,
-  useFormContext,
-} from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
-import "./SelectPersonField.css";
 import { usePersonStore } from "../../utils/domainDataStore";
 import { useModalContext } from "../ModalContext";
 import Modal from "../Modal";
 import CreatePerson from "../CreatePerson";
 import { PersonData } from "../../utils/domainSchemas";
+import SelectField from "./SelectField";
 
-export interface SelectPersonFieldProps<
-  Schema extends FieldValues,
-  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
-  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
-    Schema,
-    SchemaFieldName
-  >
-> {
-  fieldName: SchemaFieldName;
+export interface SelectPersonFieldProps {
+  fieldName: string;
   label?: string;
-  emptyPersonLabel?: string;
-  defaultPersonId?: SchemaFieldValue;
+  defaultPersonId?: string;
   allowCreateNewPerson?: boolean;
+  emptyOptionLabel?: string;
 }
 
-export default function SelectPersonField<Schema extends FieldValues>({
+export default function SelectPersonField({
   fieldName,
   label,
-  emptyPersonLabel,
   defaultPersonId,
   allowCreateNewPerson,
-}: SelectPersonFieldProps<Schema>) {
+  emptyOptionLabel,
+}: SelectPersonFieldProps) {
   const persons = usePersonStore((store) => store.persons);
-  const {
-    control,
-    formState: { errors },
-    setValue,
-  } = useFormContext<Schema>();
   const { pushModal } = useModalContext();
-
-  const error = errors[fieldName] as FieldError | undefined;
+  const { setValue } = useFormContext();
 
   const handleNewPersonCreate = (newPersonId: PersonData["id"]) => {
-    setValue(fieldName, newPersonId as PathValue<Schema, Path<Schema>>);
+    setValue(fieldName, newPersonId);
   };
 
   const openCreatePersonModal = () => {
@@ -62,31 +41,19 @@ export default function SelectPersonField<Schema extends FieldValues>({
   };
 
   return (
-    <div className="select-person-field">
-      {label && <label>{label}</label>}
-      <div className="select-person-field-controls">
-        <Controller
-          name={fieldName}
-          control={control}
-          defaultValue={defaultPersonId}
-          render={({ field }) => (
-            <select {...field}>
-              {emptyPersonLabel && <option value="">{emptyPersonLabel}</option>}
-              {persons.map((person, index) => (
-                <option key={`${fieldName}-option-${index}`} value={person.id}>
-                  {person.name} ; {person.mobile ?? ""} ; {person.email ?? ""}
-                </option>
-              ))}
-            </select>
-          )}
-        />
-        {allowCreateNewPerson && (
-          <button type="button" onClick={openCreatePersonModal}>
-            New Person
-          </button>
-        )}
-      </div>
-      {error && <span>{error.message}</span>}
-    </div>
+    <SelectField
+      fieldName={fieldName}
+      label={label}
+      defaultValue={defaultPersonId}
+      options={persons.map((person) => ({
+        label: person.name,
+        value: person.id,
+      }))}
+      emptyOptionLabel={emptyOptionLabel}
+      actionButtonLabel={allowCreateNewPerson ? "New person" : undefined}
+      actionButtonOnClick={
+        allowCreateNewPerson ? openCreatePersonModal : undefined
+      }
+    />
   );
 }

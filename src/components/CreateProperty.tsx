@@ -92,14 +92,12 @@ export default function CreateProperty({
       <SelectPersonField
         fieldName="ownerId"
         label="Owner"
-        emptyPersonLabel="select the owner"
         allowCreateNewPerson
       />
       <MuiTextField fieldName="description" label="Description" multiline />
       <SelectRealtorField
         fieldName="exclusive"
         label="Exclusive realtor"
-        emptyRealtorLabel="select exclusive realtor"
         allowCreateNewRealtor
       />
       <MuiTextField
