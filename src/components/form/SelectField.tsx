@@ -1,68 +1,58 @@
 import {
-  ArrayPath,
   Controller,
-  FieldError,
-  FieldValues,
-  Path,
-  PathValue,
   useFormContext,
 } from "react-hook-form";
 
 import "./SelectField.css";
+import { MenuItem, TextField } from "@mui/material";
 
-export interface Option<T> {
+export interface Option {
   label: string;
-  value: T;
+  value: string;
 }
 
-export interface SelectFieldProps<
-  Schema extends FieldValues,
-  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
-  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
-    Schema,
-    SchemaFieldName
-  >
-> {
-  fieldName: SchemaFieldName;
+export interface SelectFieldProps {
+  fieldName: string;
+  options: Option[];
   label?: string;
-  defaultValue?: SchemaFieldValue;
-  options: Option<SchemaFieldValue>[];
+  defaultValue?: string;
   emptyOptionLabel?: string;
+  readOnly?: boolean;
 }
 
-export default function SelectField<Schema extends FieldValues>({
+export default function SelectField({
   fieldName,
   options,
   label,
   defaultValue,
   emptyOptionLabel,
-}: SelectFieldProps<Schema>) {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<Schema>();
-
-  const error = errors[fieldName] as FieldError | undefined;
+  readOnly,
+}: SelectFieldProps) {
+  const { control } = useFormContext();
 
   return (
-    <div className="select-field">
-      {label && <label>{label}</label>}
       <Controller
         name={fieldName}
         control={control}
         defaultValue={defaultValue}
-        render={({ field }) => (
-          <select {...field}>
-            {emptyOptionLabel && <option value="">{emptyOptionLabel}</option>}
+        render={({ field, fieldState }) => (
+          <TextField 
+            {...field} 
+            label={label} 
+            variant="filled" 
+            fullWidth select
+            disabled={readOnly}
+            error={!!fieldState?.error}
+            helperText={fieldState?.error?.message}
+          >
+            <MenuItem value="">{emptyOptionLabel ?? "..."}</MenuItem>
             {options.map((option, index) => (
-              <option key={`${name}-option-${index}`} value={option.value}>
+              <MenuItem key={`${fieldName}-option-${index}`} value={option.value}>
                 {option.label}
-              </option>
+              </MenuItem>
             ))}
-          </select>
+          </TextField>
         )}
       />
-      {error && <span>{error.message}</span>}
-    </div>
   );
 }

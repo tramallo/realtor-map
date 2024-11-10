@@ -77,7 +77,6 @@ export default function UpdateProperty({
             label: propertyType,
             value: propertyType,
           }))}
-          emptyOptionLabel="select type"
         />
         <SelectField
           fieldName="state"
