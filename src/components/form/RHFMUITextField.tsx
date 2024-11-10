@@ -7,6 +7,7 @@ interface MuiTextFieldProps {
   placeholder?: string;
   defaultValue?: string;
   readOnly?: boolean;
+  multiline?: boolean;
 }
 
 export default function MuiTextField({
@@ -15,6 +16,7 @@ export default function MuiTextField({
   placeholder = "",
   defaultValue = "",
   readOnly = false,
+  multiline
 }: MuiTextFieldProps) {
   const { control } = useFormContext();
 
@@ -31,8 +33,10 @@ export default function MuiTextField({
           variant="filled"
           fullWidth
           disabled={readOnly}
+          multiline={multiline}
           error={!!fieldState?.error}
           helperText={fieldState?.error?.message}
+          rows={multiline ? 3 : 1}
         />
       )}
     />
