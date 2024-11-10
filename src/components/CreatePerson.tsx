@@ -8,7 +8,7 @@ import {
 import { usePersonStore } from "../utils/domainDataStore";
 import { useModalContext } from "./ModalContext";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/MuiTextField";
+import MuiTextField from "./form/MuiTextField";
 import DateField from "./form/DateField";
 
 export interface CreatePersonProps {
@@ -49,10 +49,10 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
       onCancel={handleFormCancel}
       submitButtonLabel="Create person"
     >
-      <RHFMUITextField fieldName="name" label="Name" />
-      <RHFMUITextField fieldName="mobile" label="Mobile" />
-      <RHFMUITextField fieldName="email" label="Email" />
-      <RHFMUITextField
+      <MuiTextField fieldName="name" label="Name" />
+      <MuiTextField fieldName="mobile" label="Mobile" />
+      <MuiTextField fieldName="email" label="Email" />
+      <MuiTextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="juanito"

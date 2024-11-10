@@ -13,7 +13,7 @@ import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/MuiTextField";
+import MuiTextField from "./form/MuiTextField";
 
 export interface UpdatePropertyProps {
   propertyId: PropertyData["id"];
@@ -62,15 +62,15 @@ export default function UpdateProperty({
         onCancel={handleFormCancel}
         prefillData={propertyToUpdate}
       >
-        <RHFMUITextField fieldName="address" label="Address" />
-        <RHFMUITextField
+        <MuiTextField fieldName="address" label="Address" />
+        <MuiTextField
           fieldName="coordinates.lat"
-          label="Coordinates"
+          label="Latitude"
           placeholder="Latitude"
         />
-        <RHFMUITextField
+        <MuiTextField
           fieldName="coordinates.lng"
-          label="Lng"
+          label="Longitude"
           placeholder="Longitude"
         />
         <SelectField
@@ -95,18 +95,14 @@ export default function UpdateProperty({
           emptyPersonLabel="select owner"
           allowCreateNewPerson
         />
-        <RHFMUITextField
-          fieldName="description"
-          label="Description"
-          multiline
-        />
+        <MuiTextField fieldName="description" label="Description" multiline />
         <SelectRealtorField
           fieldName="exclusive"
           label="Exclusive realtor"
           emptyRealtorLabel="select ex. realtor"
           allowCreateNewRealtor
         />
-        <RHFMUITextField
+        <MuiTextField
           fieldName="updatedBy"
           label="Updated by"
           defaultValue="pedriño"

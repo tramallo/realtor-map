@@ -9,7 +9,7 @@ import {
 import { useModalContext } from "./ModalContext";
 import DateField from "./form/DateField";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/MuiTextField";
+import MuiTextField from "./form/MuiTextField";
 
 export interface CreateRealtorProps {
   onCreate?: (newRealtorId: RealtorData["id"]) => void;
@@ -51,8 +51,8 @@ export default function CreateRealtor({
       onSubmit={handleFormSubmit}
       onCancel={handleFormCancel}
     >
-      <RHFMUITextField fieldName="name" label="Name" />
-      <RHFMUITextField
+      <MuiTextField fieldName="name" label="Name" />
+      <MuiTextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="juano"

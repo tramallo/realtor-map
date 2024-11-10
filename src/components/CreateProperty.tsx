@@ -8,14 +8,13 @@ import {
   propertyTypes,
 } from "../utils/domainSchemas";
 import { usePropertyStore } from "../utils/domainDataStore";
-import TextArea from "./form/TextArea";
 import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
 import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
 import Form from "./form/Form";
-import RHFMUITextField from "./form/MuiTextField";
+import MuiTextField from "./form/MuiTextField";
 
 export interface CreatePropertyProps {
   onCreate?: (newPropertyId: PropertyData["id"]) => void;
@@ -61,13 +60,13 @@ export default function CreateProperty({
       onCancel={handleFormCancel}
       prefillData={prefillData}
     >
-      <RHFMUITextField fieldName="address" label="Address" />
-      <RHFMUITextField
+      <MuiTextField fieldName="address" label="Address" />
+      <MuiTextField
         fieldName="coordinates.lat"
         label="Coordinates"
         placeholder="Latitude"
       />
-      <RHFMUITextField
+      <MuiTextField
         fieldName="coordinates.lng"
         label="Lng"
         placeholder="Longitude"
@@ -96,14 +95,14 @@ export default function CreateProperty({
         emptyPersonLabel="select the owner"
         allowCreateNewPerson
       />
-      <RHFMUITextField fieldName="description" label="Description" multiline />
+      <MuiTextField fieldName="description" label="Description" multiline />
       <SelectRealtorField
         fieldName="exclusive"
         label="Exclusive realtor"
         emptyRealtorLabel="select exclusive realtor"
         allowCreateNewRealtor
       />
-      <RHFMUITextField
+      <MuiTextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="maria-id"
