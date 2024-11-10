@@ -88,7 +88,6 @@ export default function UpdateProperty({
             label: propertyState,
             value: propertyState,
           }))}
-          emptyOptionLabel="select state"
         />
         <SelectPersonField
           fieldName="ownerId"
