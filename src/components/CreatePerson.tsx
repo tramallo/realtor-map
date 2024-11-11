@@ -1,14 +1,13 @@
-import "./CreatePerson.css";
 import {
   CreatePersonData,
   CreatePersonSchema,
   createPersonSchema,
   PersonData,
 } from "../utils/domainSchemas";
-import TextField from "./form/TextField";
 import { usePersonStore } from "../utils/domainDataStore";
 import { useModalContext } from "./ModalContext";
 import Form from "./form/Form";
+import MuiTextField from "./form/MuiTextField";
 import DateField from "./form/DateField";
 
 export interface CreatePersonProps {
@@ -49,13 +48,13 @@ export default function CreatePerson({ onCreate, onClose }: CreatePersonProps) {
       onCancel={handleFormCancel}
       submitButtonLabel="Create person"
     >
-      <TextField fieldName="name" label="Name" />
-      <TextField fieldName="mobile" label="Mobile" />
-      <TextField fieldName="email" label="Email" />
-      <TextField
+      <MuiTextField fieldName="name" label="Name" />
+      <MuiTextField fieldName="mobile" label="Mobile" />
+      <MuiTextField fieldName="email" label="Email" />
+      <MuiTextField
         fieldName="createdBy"
         label="Created by"
-        defaultValue="sancho"
+        defaultValue="juanito"
         readOnly
       />
       <DateField

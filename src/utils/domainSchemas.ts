@@ -102,9 +102,9 @@ const idSchema = z.string();
 export const dataSchema = z.object({
     id: idSchema,
     createdBy: z.string(),
-    createdAt: z.string(),
+    createdAt: z.string().date(),
     updatedBy: z.string().optional(),
-    updatedAt: z.string().optional()
+    updatedAt: z.string().date().optional()
 }) 
 
 export const personSchema = dataSchema.extend({

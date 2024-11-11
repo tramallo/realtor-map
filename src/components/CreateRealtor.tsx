@@ -1,4 +1,3 @@
-import "./CreateRealtor.css";
 import { useRealtorStore } from "../utils/domainDataStore";
 import {
   CreateRealtorData,
@@ -7,9 +6,9 @@ import {
   RealtorData,
 } from "../utils/domainSchemas";
 import { useModalContext } from "./ModalContext";
-import TextField from "./form/TextField";
 import DateField from "./form/DateField";
 import Form from "./form/Form";
+import MuiTextField from "./form/MuiTextField";
 
 export interface CreateRealtorProps {
   onCreate?: (newRealtorId: RealtorData["id"]) => void;
@@ -51,8 +50,8 @@ export default function CreateRealtor({
       onSubmit={handleFormSubmit}
       onCancel={handleFormCancel}
     >
-      <TextField fieldName="name" label="Name" />
-      <TextField
+      <MuiTextField fieldName="name" label="Name" />
+      <MuiTextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="juano"

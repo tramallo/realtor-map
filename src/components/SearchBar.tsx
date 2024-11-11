@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-import "./SearchBar.css";
 import SimpleSpinner from "./SimpleSpinner";
+import { Button, FormGroup, IconButton, InputAdornment, TextField } from "@mui/material";
 
 export interface SearchBarProps {
   onSearch: (searchValue: string) => Promise<void>;
   onClear?: () => void;
+  label?: string | JSX.Element;
   allowEmptySearch?: boolean;
 }
 const defaults = {
@@ -15,6 +16,7 @@ const defaults = {
 export default function SearchBar({
   onSearch,
   onClear,
+  label,
   allowEmptySearch = defaults.allowEmptySearch,
 }: SearchBarProps) {
   const [searchValue, setSearchValue] = useState("");
@@ -51,17 +53,30 @@ export default function SearchBar({
   };
 
   return (
-    <div className="search-bar">
-      <input
-        type="text"
+    <FormGroup row>
+      <TextField
+        variant="outlined"
         value={searchValue}
         onChange={handleInputChange}
         onKeyDown={handleInputEnter}
+        sx={{ flex: 9 }}
+        label={label}
+        slotProps={{ 
+          input: { endAdornment: <InputAdornment position="end">
+              <IconButton onClick={clearSearch}>x</IconButton></InputAdornment>
+          },
+          inputLabel: { shrink: true }
+        }}
+        disabled={isSearching}
       />
-      <button onClick={clearSearch}>X</button>
-      <button onClick={fireSearchEvent}>
-        {isSearching ? <SimpleSpinner /> : "Search"}
-      </button>
-    </div>
+      <Button 
+        variant="outlined" 
+        sx={{ flex: 1 }}
+        onClick={fireSearchEvent}
+        disabled={isSearching}
+      >
+        { isSearching ? <SimpleSpinner /> : "Search" }
+      </Button>
+    </FormGroup>
   );
 }

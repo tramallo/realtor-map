@@ -1,22 +1,9 @@
 .search-map {
-    border: 2px solid red;
-
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1em 2em 1fr;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
-        "attribution-area"
         "search-area"
         "map-area";
 }
 
-.search-map > span {
-    display: flex;
-    justify-content: end;
-    font-size: 12px;
-    padding-inline: 5px;
-}
-
-.search-map > span a {
-    text-decoration: none;
-}

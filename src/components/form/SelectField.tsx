@@ -1,68 +1,73 @@
-import {
-  ArrayPath,
-  Controller,
-  FieldError,
-  FieldValues,
-  Path,
-  PathValue,
-  useFormContext,
-} from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
+import { Button, FormGroup, MenuItem, TextField } from "@mui/material";
 
-import "./SelectField.css";
-
-export interface Option<T> {
+export interface Option {
   label: string;
-  value: T;
+  value: string;
 }
 
-export interface SelectFieldProps<
-  Schema extends FieldValues,
-  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
-  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
-    Schema,
-    SchemaFieldName
-  >
-> {
-  fieldName: SchemaFieldName;
+export interface SelectFieldProps {
+  fieldName: string;
+  options: Option[];
   label?: string;
-  defaultValue?: SchemaFieldValue;
-  options: Option<SchemaFieldValue>[];
+  defaultValue?: string;
   emptyOptionLabel?: string;
+  readOnly?: boolean;
+  actionButtonLabel?: string | JSX.Element;
+  actionButtonOnClick?: () => void;
 }
 
-export default function SelectField<Schema extends FieldValues>({
+export default function SelectField({
   fieldName,
   options,
   label,
   defaultValue,
   emptyOptionLabel,
-}: SelectFieldProps<Schema>) {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<Schema>();
-
-  const error = errors[fieldName] as FieldError | undefined;
+  readOnly,
+  actionButtonLabel,
+  actionButtonOnClick,
+}: SelectFieldProps) {
+  const { control } = useFormContext();
 
   return (
-    <div className="select-field">
-      {label && <label>{label}</label>}
-      <Controller
-        name={fieldName}
-        control={control}
-        defaultValue={defaultValue}
-        render={({ field }) => (
-          <select {...field}>
-            {emptyOptionLabel && <option value="">{emptyOptionLabel}</option>}
+    <Controller
+      name={fieldName}
+      control={control}
+      defaultValue={defaultValue || ""}
+      render={({ field, fieldState }) => (
+        <FormGroup row>
+          <TextField
+            {...field}
+            label={label}
+            variant="filled"
+            select
+            disabled={readOnly}
+            error={!!fieldState?.error}
+            helperText={fieldState?.error?.message}
+            sx={{ flex: 9 }}
+          >
+            <MenuItem value="">{emptyOptionLabel ?? "..."}</MenuItem>
             {options.map((option, index) => (
-              <option key={`${name}-option-${index}`} value={option.value}>
+              <MenuItem
+                key={`${fieldName}-option-${index}`}
+                value={option.value}
+              >
                 {option.label}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        )}
-      />
-      {error && <span>{error.message}</span>}
-    </div>
+          </TextField>
+          {actionButtonLabel && (
+            <Button
+              variant="outlined"
+              sx={{ flex: 1, whiteSpace: "nowrap" }}
+              onClick={actionButtonOnClick}
+              disabled={readOnly}
+            >
+              {actionButtonLabel}
+            </Button>
+          )}
+        </FormGroup>
+      )}
+    />
   );
 }

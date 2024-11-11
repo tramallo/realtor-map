@@ -1,4 +1,3 @@
-import "./CreateProperty.css";
 import {
   CreatePropertyData,
   CreatePropertySchema,
@@ -8,14 +7,13 @@ import {
   propertyTypes,
 } from "../utils/domainSchemas";
 import { usePropertyStore } from "../utils/domainDataStore";
-import TextField from "./form/TextField";
-import TextArea from "./form/TextArea";
 import DateField from "./form/DateField";
 import { useModalContext } from "./ModalContext";
 import SelectField from "./form/SelectField";
 import SelectPersonField from "./form/SelectPersonField";
 import SelectRealtorField from "./form/SelectRealtorField";
 import Form from "./form/Form";
+import MuiTextField from "./form/MuiTextField";
 
 export interface CreatePropertyProps {
   onCreate?: (newPropertyId: PropertyData["id"]) => void;
@@ -61,13 +59,17 @@ export default function CreateProperty({
       onCancel={handleFormCancel}
       prefillData={prefillData}
     >
-      <TextField fieldName="address" label="Address" />
-      <TextField
+      <MuiTextField fieldName="address" label="Address" />
+      <MuiTextField
         fieldName="coordinates.lat"
-        label="Coordinates"
+        label="Latitude"
         placeholder="Latitude"
       />
-      <TextField fieldName="coordinates.lng" placeholder="Longitude" />
+      <MuiTextField
+        fieldName="coordinates.lng"
+        label="Longitude"
+        placeholder="Longitude"
+      />
       <SelectField
         fieldName="type"
         label="Type"
@@ -89,17 +91,15 @@ export default function CreateProperty({
       <SelectPersonField
         fieldName="ownerId"
         label="Owner"
-        emptyPersonLabel="select the owner"
         allowCreateNewPerson
       />
-      <TextArea fieldName="description" label="Description" />
+      <MuiTextField fieldName="description" label="Description" multiline />
       <SelectRealtorField
         fieldName="exclusive"
         label="Exclusive realtor"
-        emptyRealtorLabel="select exclusive realtor"
         allowCreateNewRealtor
       />
-      <TextField
+      <MuiTextField
         fieldName="createdBy"
         label="Created by"
         defaultValue="maria-id"

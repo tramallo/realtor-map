@@ -6,6 +6,7 @@ import { useModalContext } from "./ModalContext";
 import Modal from "./Modal";
 import UpdateProperty from "./UpdateProperty";
 import ViewRealtor from "./ViewRealtor";
+import { Button } from "@mui/material";
 
 export interface ViewPropertyProps {
   propertyId: PropertyData["id"];
@@ -87,15 +88,15 @@ export default function ViewProperty({
         </div>
       )}
       <div className="view-property-controls">
-        <button type="button" onClick={handleCloseButtonClick}>
+        <Button variant="outlined" onClick={handleCloseButtonClick}>
           Close
-        </button>
-        <button type="button" onClick={handleDeleteButtonClick}>
+        </Button>
+        <Button variant="outlined" onClick={handleDeleteButtonClick}>
           Delete property
-        </button>
-        <button type="button" onClick={handleUpdateButtonClick}>
+        </Button>
+        <Button variant="contained" onClick={handleUpdateButtonClick}>
           Update property
-        </button>
+        </Button>
       </div>
     </div>
   );

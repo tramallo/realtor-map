@@ -1,8 +1,0 @@
-.select-field {
-    display: flex;
-    flex-direction: column;
-}
-
-.select-field > span {
-    color: red;
-}

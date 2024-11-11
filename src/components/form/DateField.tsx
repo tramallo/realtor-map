@@ -1,54 +1,67 @@
-import {
-  ArrayPath,
-  FieldError,
-  FieldValues,
-  Path,
-  PathValue,
-  useFormContext,
-} from "react-hook-form";
-import { format as formatDate } from "date-fns";
+import { useFormContext, Controller } from "react-hook-form";
+import { DatePicker } from "@mui/x-date-pickers";
 
-import "./DateField.css";
+import { format, isValid, parse } from "date-fns";
 
-export interface DateFieldProps<
-  Schema extends FieldValues,
-  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
-  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
-    Schema,
-    SchemaFieldName
-  >
-> {
-  fieldName: SchemaFieldName;
+export const dateToString = (date: Date | null | undefined): string => {
+  if (!date || !isValid(date)) {
+    return "";
+  }
+
+  return format(date, "yyyy-MM-dd"); 
+}
+
+export const stringToDate = (dateString: string | undefined): Date | null => {
+  if (!dateString) {
+    return null;
+  }
+
+  const date = parse(dateString, "yyyy-MM-dd", new Date());
+
+  if (!isValid(date)) {
+    return null;
+  }
+
+  return date;
+}
+
+export interface DateFieldProps {
+  fieldName: string;
   label?: string;
-  defaultValue?: SchemaFieldValue;
+  defaultValue?: Date;
   readOnly?: boolean;
 }
 
-export default function DateField<Schema extends FieldValues>({
+export default function DateField({
   fieldName,
   label,
   defaultValue,
   readOnly,
-}: DateFieldProps<Schema>) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const validationError = errors[fieldName] as FieldError | undefined;
+}: DateFieldProps) {
+  const { control } = useFormContext();
 
   return (
-    <div className="date-field">
-      {label && <label>{label}</label>}
-      <input
-        type="date"
-        {...register(fieldName)}
-        value={defaultValue && formatDate(defaultValue, "yyyy-MM-dd")}
-        readOnly={readOnly}
-      />
-      {validationError && <span>{validationError.message}</span>}
-    </div>
+    <Controller
+      name={fieldName}
+      control={control}
+      defaultValue={dateToString(defaultValue) || ""}
+      render={({ field: { value, onChange, ...field }, fieldState }) => (
+        <DatePicker
+          {...field}
+          value={stringToDate(value)}
+          onChange={(newDate) => onChange(dateToString(newDate))}
+          disabled={readOnly}
+          label={label}
+          slotProps={{
+            textField: {
+              variant: "filled",
+              fullWidth: true,
+              error: !!fieldState?.error,
+              helperText: `${fieldState.error?.message ?? ''}: ${fieldState.error?.type ?? ''}`,
+            },
+          }}
+        />
+      )}
+    />
   );
 }
-
-export type DateField = typeof DateField;

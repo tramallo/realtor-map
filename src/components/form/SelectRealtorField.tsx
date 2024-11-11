@@ -1,54 +1,33 @@
-import {
-  ArrayPath,
-  Controller,
-  FieldError,
-  FieldValues,
-  Path,
-  PathValue,
-  useFormContext,
-} from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
-import "./SelectRealtorField.css";
 import { useRealtorStore } from "../../utils/domainDataStore";
 import { useModalContext } from "../ModalContext";
 import Modal from "../Modal";
 import { RealtorData } from "../../utils/domainSchemas";
 import CreateRealtor from "../CreateRealtor";
+import SelectField from "./SelectField";
 
-export interface SelectRealtorFieldProps<
-  Schema extends FieldValues,
-  SchemaFieldName extends Path<Schema> | ArrayPath<Schema> = Path<Schema>,
-  SchemaFieldValue extends PathValue<Schema, SchemaFieldName> = PathValue<
-    Schema,
-    SchemaFieldName
-  >
-> {
-  fieldName: SchemaFieldName;
+export interface SelectRealtorFieldProps {
+  fieldName: string;
   label?: string;
-  emptyRealtorLabel?: string;
-  defaultRealtorId?: SchemaFieldValue;
+  emptyOptionLabel?: string;
+  defaultRealtorId?: string;
   allowCreateNewRealtor?: boolean;
 }
 
-export default function SelectRealtorField<Schema extends FieldValues>({
+export default function SelectRealtorField({
   fieldName,
   label,
-  emptyRealtorLabel,
+  emptyOptionLabel,
   defaultRealtorId,
   allowCreateNewRealtor,
-}: SelectRealtorFieldProps<Schema>) {
+}: SelectRealtorFieldProps) {
   const realtors = useRealtorStore((store) => store.realtors);
-  const {
-    control,
-    formState: { errors },
-    setValue,
-  } = useFormContext<Schema>();
+  const { setValue } = useFormContext();
   const { pushModal } = useModalContext();
 
-  const error = errors[fieldName] as FieldError | undefined;
-
   const handleNewRealtorCreate = (newRealtorId: RealtorData["id"]) => {
-    setValue(fieldName, newRealtorId as PathValue<Schema, Path<Schema>>);
+    setValue(fieldName, newRealtorId);
   };
 
   const openCreateRealtorModal = () => {
@@ -62,33 +41,19 @@ export default function SelectRealtorField<Schema extends FieldValues>({
   };
 
   return (
-    <div className="select-realtor-field">
-      {label && <label>{label}</label>}
-      <div className="select-realtor-field-controls">
-        <Controller
-          name={fieldName}
-          control={control}
-          defaultValue={defaultRealtorId}
-          render={({ field }) => (
-            <select {...field}>
-              {emptyRealtorLabel && (
-                <option value="">{emptyRealtorLabel}</option>
-              )}
-              {realtors.map((realtor, index) => (
-                <option key={`${fieldName}-option-${index}`} value={realtor.id}>
-                  {realtor.name}
-                </option>
-              ))}
-            </select>
-          )}
-        />
-        {allowCreateNewRealtor && (
-          <button type="button" onClick={openCreateRealtorModal}>
-            New Realtor
-          </button>
-        )}
-      </div>
-      {error && <span>{error.message}</span>}
-    </div>
+    <SelectField
+      fieldName={fieldName}
+      label={label}
+      defaultValue={defaultRealtorId}
+      options={realtors.map((realtor) => ({
+        label: realtor.name,
+        value: realtor.id,
+      }))}
+      emptyOptionLabel={emptyOptionLabel}
+      actionButtonLabel={allowCreateNewRealtor ? "New realtor" : undefined}
+      actionButtonOnClick={
+        allowCreateNewRealtor ? openCreateRealtorModal : undefined
+      }
+    />
   );
 }

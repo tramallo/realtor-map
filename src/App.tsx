@@ -1,5 +1,8 @@
 import { Marker, Popup } from "react-leaflet";
 
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+
 import "./App.css";
 import SearchMap from "./components/SearchMap";
 import Modal from "./components/Modal";
@@ -57,6 +60,7 @@ export default function App() {
   };
 
   return (
+
     <div id="app">
       <span>
         controls area <button onClick={openTestModal}>Open test modal</button>
