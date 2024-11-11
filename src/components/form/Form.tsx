@@ -9,6 +9,7 @@ import { ZodSchema, TypeOf as ZTypeOf } from "zod";
 import "./Form.css";
 import { customResolverFactory } from "../../utils/domainSchemas";
 import React from "react";
+import { Button } from "@mui/material";
 
 export interface FormProps<
   Schema extends ZodSchema,
@@ -45,12 +46,12 @@ export default function Form<
       <form className="form">
         <div className="form-fields">{children}</div>
         <div className="form-controls">
-          <button type="button" onClick={onCancel}>
+          <Button variant="outlined" onClick={onCancel}>
             {cancelButtonLabel ?? "Cancel"}
-          </button>
-          <button type="button" onClick={formData.handleSubmit(onSubmit)}>
+          </Button>
+          <Button variant="contained" onClick={formData.handleSubmit(onSubmit)}>
             {submitButtonLabel ?? "Submit"}
-          </button>
+          </Button>
         </div>
       </form>
     </FormProvider>

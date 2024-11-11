@@ -1,4 +1,3 @@
-import "./CreateProperty.css";
 import {
   CreatePropertyData,
   CreatePropertySchema,

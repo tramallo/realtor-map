@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import "./SearchBar.css";
 import SimpleSpinner from "./SimpleSpinner";
 import { Button, FormGroup, IconButton, InputAdornment, TextField } from "@mui/material";
 

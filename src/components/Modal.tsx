@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-
-import "./Modal.css";
+import { Dialog, DialogContent, DialogTitle, Slide } from "@mui/material";
 
 export interface ModalProps {
   title: string;
@@ -9,12 +8,10 @@ export interface ModalProps {
 
 export default function Modal({ title, children }: ModalProps) {
   return (
-    <div className="modal">
-      <div className="modal-pane">
-        <label>{title}</label>
-        <div className="modal-pane-content">{children}</div>
-      </div>
-    </div>
+    <Dialog open={true}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>{children}</DialogContent>
+    </Dialog>
   );
 }
 

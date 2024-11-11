@@ -1,4 +1,3 @@
-import "./CreateRealtor.css";
 import { useRealtorStore } from "../utils/domainDataStore";
 import {
   CreateRealtorData,

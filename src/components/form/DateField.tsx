@@ -1,7 +1,6 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 
-import "./DateField.css";
 import { format, isValid, parse } from "date-fns";
 
 export const dateToString = (date: Date | null | undefined): string => {

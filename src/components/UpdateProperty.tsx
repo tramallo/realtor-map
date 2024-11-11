@@ -1,4 +1,3 @@
-import "./UpdateProperty.css";
 import {
   PropertyData,
   propertyStates,
@@ -55,7 +54,6 @@ export default function UpdateProperty({
   };
 
   return (
-    <div className="update-property">
       <Form
         schema={updatePropertySchema}
         onSubmit={handleFormSubmit}
@@ -113,6 +111,5 @@ export default function UpdateProperty({
           readOnly
         />
       </Form>
-    </div>
   );
 }

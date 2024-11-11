@@ -1,4 +1,3 @@
-import "./CreatePerson.css";
 import {
   CreatePersonData,
   CreatePersonSchema,
