@@ -6,7 +6,6 @@ import Modal from "../Modal";
 import { RealtorData } from "../../utils/domainSchemas";
 import CreateRealtor from "../CreateRealtor";
 import SelectField from "./SelectField";
-import MultiSelectField from "./MultiSelectField";
 
 export interface SelectRealtorFieldProps {
   fieldName: string;
@@ -47,37 +46,20 @@ export default function SelectRealtorField({
   };
 
   return (
-    <>
-      {!multiple ? (
-        <SelectField
-          fieldName={fieldName}
-          label={label}
-          defaultValue={defaultRealtorId}
-          options={realtors.map((realtor) => ({
-            label: realtor.name,
-            value: realtor.id,
-          }))}
-          emptyOptionLabel={emptyOptionLabel}
-          actionButtonLabel={allowCreateNewRealtor ? "New" : undefined}
-          actionButtonOnClick={
-            allowCreateNewRealtor ? openCreateRealtorModal : undefined
-          }
-        />
-      ) : (
-        <MultiSelectField
-          fieldName={fieldName}
-          label={label}
-          defaultValue={defaultRealtorId ? [defaultRealtorId] : undefined}
-          options={realtors.map((realtor) => ({
-            label: realtor.name,
-            value: realtor.id,
-          }))}
-          actionButtonLabel={allowCreateNewRealtor ? "New" : undefined}
-          actionButtonOnClick={
-            allowCreateNewRealtor ? openCreateRealtorModal : undefined
-          }
-        />
-      )}
-    </>
+    <SelectField
+      fieldName={fieldName}
+      label={label}
+      defaultValue={defaultRealtorId}
+      options={realtors.map((realtor) => ({
+        label: realtor.name,
+        value: realtor.id,
+      }))}
+      multiple={multiple}
+      emptyOptionLabel={emptyOptionLabel}
+      actionButtonLabel={allowCreateNewRealtor ? "New" : undefined}
+      actionButtonOnClick={
+        allowCreateNewRealtor ? openCreateRealtorModal : undefined
+      }
+    />
   );
 }

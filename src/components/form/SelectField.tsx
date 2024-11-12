@@ -13,6 +13,7 @@ export interface SelectFieldProps {
   defaultValue?: string;
   emptyOptionLabel?: string;
   readOnly?: boolean;
+  multiple?: boolean;
   actionButtonLabel?: string | JSX.Element;
   actionButtonOnClick?: () => void;
 }
@@ -21,9 +22,9 @@ export default function SelectField({
   fieldName,
   options,
   label,
-  defaultValue,
   emptyOptionLabel,
   readOnly,
+  multiple,
   actionButtonLabel,
   actionButtonOnClick,
 }: SelectFieldProps) {
@@ -33,20 +34,23 @@ export default function SelectField({
     <Controller
       name={fieldName}
       control={control}
-      defaultValue={defaultValue || ""}
-      render={({ field, fieldState }) => (
+      render={({ field: { value, ...field }, fieldState }) => (
         <FormGroup row>
           <TextField
             {...field}
+            value={value || (multiple ? [] : "")}
             label={label}
             variant="filled"
             select
             disabled={readOnly}
             error={!!fieldState?.error}
             helperText={fieldState?.error?.message}
+            slotProps={multiple ? { select: { multiple: true } } : undefined}
             sx={{ flex: 9 }}
           >
-            <MenuItem value="">{emptyOptionLabel ?? "..."}</MenuItem>
+            {emptyOptionLabel && (
+              <MenuItem value="">{emptyOptionLabel ?? "..."}</MenuItem>
+            )}
             {options.map((option, index) => (
               <MenuItem
                 key={`${fieldName}-option-${index}`}
