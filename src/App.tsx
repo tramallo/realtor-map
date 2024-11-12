@@ -1,8 +1,5 @@
 import { Marker, Popup } from "react-leaflet";
 
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-
 import "./App.css";
 import SearchMap from "./components/SearchMap";
 import Modal from "./components/Modal";
@@ -10,7 +7,7 @@ import { googleGeocodingService } from "./utils/googleApi";
 import { osmMapTilesService } from "./utils/nominatimOSMApi";
 import { getIconForProperty } from "./utils/mapMarkerIcons";
 import CreateProperty from "./components/CreateProperty";
-import { CreatePropertySchema, PropertySchema } from "./utils/domainSchemas";
+import { CreatePropertyData, PropertyData } from "./utils/domainSchemas";
 import { usePropertyStore } from "./utils/domainDataStore";
 import { AddressData } from "./utils/mapServicesSchemas";
 import ViewProperty from "./components/ViewProperty";
@@ -22,7 +19,7 @@ export default function App() {
   const properties = usePropertyStore((store) => store.properties);
 
   const openCreatePropertyModal = (address: AddressData) => {
-    const prefillAddress: Partial<CreatePropertySchema> = {
+    const prefillAddress: Partial<CreatePropertyData> = {
       address: address.text,
       coordinates: { lat: address.position.lat, lng: address.position.lng },
     };
@@ -39,7 +36,7 @@ export default function App() {
     pushModal(createPropertyModal);
   };
 
-  const openViewPropertyModal = (propertyId: PropertySchema["id"]) => {
+  const openViewPropertyModal = (propertyId: PropertyData["id"]) => {
     const viewPropertyModal = (
       <Modal title="View property">
         <ViewProperty propertyId={propertyId} />
@@ -60,7 +57,6 @@ export default function App() {
   };
 
   return (
-
     <div id="app">
       <span>
         controls area <button onClick={openTestModal}>Open test modal</button>
