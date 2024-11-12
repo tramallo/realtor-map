@@ -54,62 +54,68 @@ export default function UpdateProperty({
   };
 
   return (
-      <Form
-        schema={updatePropertySchema}
-        onSubmit={handleFormSubmit}
-        onCancel={handleFormCancel}
-        prefillData={propertyToUpdate}
-      >
-        <MuiTextField fieldName="address" label="Address" />
-        <MuiTextField
-          fieldName="coordinates.lat"
-          label="Latitude"
-          placeholder="Latitude"
-        />
-        <MuiTextField
-          fieldName="coordinates.lng"
-          label="Longitude"
-          placeholder="Longitude"
-        />
-        <SelectField
-          fieldName="type"
-          label="Type"
-          options={propertyTypes.map((propertyType) => ({
-            label: propertyType,
-            value: propertyType,
-          }))}
-        />
-        <SelectField
-          fieldName="state"
-          label="State"
-          options={propertyStates.map((propertyState) => ({
-            label: propertyState,
-            value: propertyState,
-          }))}
-        />
-        <SelectPersonField
-          fieldName="ownerId"
-          label="Owner"
-          allowCreateNewPerson
-        />
-        <MuiTextField fieldName="description" label="Description" multiline />
-        <SelectRealtorField
-          fieldName="exclusive"
-          label="Exclusive realtor"
-          allowCreateNewRealtor
-        />
-        <MuiTextField
-          fieldName="updatedBy"
-          label="Updated by"
-          defaultValue="pedriño"
-          readOnly
-        />
-        <DateField
-          fieldName="updatedAt"
-          label="Updated at"
-          defaultValue={new Date()}
-          readOnly
-        />
-      </Form>
+    <Form
+      schema={updatePropertySchema}
+      onSubmit={handleFormSubmit}
+      onCancel={handleFormCancel}
+      prefillData={propertyToUpdate}
+    >
+      <MuiTextField fieldName="address" label="Address" />
+      <MuiTextField
+        fieldName="coordinates.lat"
+        label="Latitude"
+        placeholder="Latitude"
+      />
+      <MuiTextField
+        fieldName="coordinates.lng"
+        label="Longitude"
+        placeholder="Longitude"
+      />
+      <SelectField
+        fieldName="type"
+        label="Type"
+        options={propertyTypes.map((propertyType) => ({
+          label: propertyType,
+          value: propertyType,
+        }))}
+      />
+      <SelectField
+        fieldName="state"
+        label="State"
+        options={propertyStates.map((propertyState) => ({
+          label: propertyState,
+          value: propertyState,
+        }))}
+      />
+      <SelectPersonField
+        fieldName="ownerId"
+        label="Owner"
+        allowCreateNewPerson
+      />
+      <MuiTextField fieldName="description" label="Description" multiline />
+      <SelectRealtorField
+        fieldName="exclusive"
+        label="Exclusive realtor"
+        allowCreateNewRealtor
+      />
+      <SelectRealtorField
+        fieldName="realtors"
+        label="Associated realtors"
+        multiple
+        allowCreateNewRealtor
+      />
+      <MuiTextField
+        fieldName="updatedBy"
+        label="Updated by"
+        defaultValue="pedriño"
+        readOnly
+      />
+      <DateField
+        fieldName="updatedAt"
+        label="Updated at"
+        defaultValue={new Date()}
+        readOnly
+      />
+    </Form>
   );
 }
