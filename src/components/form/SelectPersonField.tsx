@@ -50,7 +50,7 @@ export default function SelectPersonField({
         value: person.id,
       }))}
       emptyOptionLabel={emptyOptionLabel}
-      actionButtonLabel={allowCreateNewPerson ? "New person" : undefined}
+      actionButtonLabel={allowCreateNewPerson ? "New" : undefined}
       actionButtonOnClick={
         allowCreateNewPerson ? openCreatePersonModal : undefined
       }

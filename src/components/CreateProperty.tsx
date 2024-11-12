@@ -99,6 +99,12 @@ export default function CreateProperty({
         label="Exclusive realtor"
         allowCreateNewRealtor
       />
+      <SelectRealtorField
+        fieldName="realtors"
+        label="Associated realtors"
+        multiple
+        allowCreateNewRealtor
+      />
       <MuiTextField
         fieldName="createdBy"
         label="Created by"

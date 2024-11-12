@@ -77,7 +77,9 @@ export default function ViewProperty({
           <label>
             Realtors:{" "}
             <span>
-              {property.realtors?.map((realtor) => realtor.name).join(" ; ")}
+              {property.realtors?.map((realtorId) => (
+                <ViewRealtor key={realtorId} realtorId={realtorId} />
+              ))}
             </span>
           </label>
           <label>Exclusive:</label>

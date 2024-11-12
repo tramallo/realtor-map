@@ -6,6 +6,7 @@ import Modal from "../Modal";
 import { RealtorData } from "../../utils/domainSchemas";
 import CreateRealtor from "../CreateRealtor";
 import SelectField from "./SelectField";
+import MultiSelectField from "./MultiSelectField";
 
 export interface SelectRealtorFieldProps {
   fieldName: string;
@@ -13,6 +14,7 @@ export interface SelectRealtorFieldProps {
   emptyOptionLabel?: string;
   defaultRealtorId?: string;
   allowCreateNewRealtor?: boolean;
+  multiple?: boolean;
 }
 
 export default function SelectRealtorField({
@@ -21,13 +23,17 @@ export default function SelectRealtorField({
   emptyOptionLabel,
   defaultRealtorId,
   allowCreateNewRealtor,
+  multiple,
 }: SelectRealtorFieldProps) {
   const realtors = useRealtorStore((store) => store.realtors);
-  const { setValue } = useFormContext();
+  const { setValue, watch } = useFormContext();
   const { pushModal } = useModalContext();
 
   const handleNewRealtorCreate = (newRealtorId: RealtorData["id"]) => {
-    setValue(fieldName, newRealtorId);
+    setValue(
+      fieldName,
+      multiple ? [...watch(fieldName, []), newRealtorId] : newRealtorId
+    );
   };
 
   const openCreateRealtorModal = () => {
@@ -41,19 +47,37 @@ export default function SelectRealtorField({
   };
 
   return (
-    <SelectField
-      fieldName={fieldName}
-      label={label}
-      defaultValue={defaultRealtorId}
-      options={realtors.map((realtor) => ({
-        label: realtor.name,
-        value: realtor.id,
-      }))}
-      emptyOptionLabel={emptyOptionLabel}
-      actionButtonLabel={allowCreateNewRealtor ? "New realtor" : undefined}
-      actionButtonOnClick={
-        allowCreateNewRealtor ? openCreateRealtorModal : undefined
-      }
-    />
+    <>
+      {!multiple ? (
+        <SelectField
+          fieldName={fieldName}
+          label={label}
+          defaultValue={defaultRealtorId}
+          options={realtors.map((realtor) => ({
+            label: realtor.name,
+            value: realtor.id,
+          }))}
+          emptyOptionLabel={emptyOptionLabel}
+          actionButtonLabel={allowCreateNewRealtor ? "New" : undefined}
+          actionButtonOnClick={
+            allowCreateNewRealtor ? openCreateRealtorModal : undefined
+          }
+        />
+      ) : (
+        <MultiSelectField
+          fieldName={fieldName}
+          label={label}
+          defaultValue={defaultRealtorId ? [defaultRealtorId] : undefined}
+          options={realtors.map((realtor) => ({
+            label: realtor.name,
+            value: realtor.id,
+          }))}
+          actionButtonLabel={allowCreateNewRealtor ? "New" : undefined}
+          actionButtonOnClick={
+            allowCreateNewRealtor ? openCreateRealtorModal : undefined
+          }
+        />
+      )}
+    </>
   );
 }

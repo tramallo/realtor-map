@@ -5,11 +5,10 @@ import {
   useForm,
 } from "react-hook-form";
 import { ZodSchema, TypeOf as ZTypeOf } from "zod";
+import { Button } from "@mui/material";
 
 import "./Form.css";
-import { customResolverFactory } from "../../utils/domainSchemas";
-import React from "react";
-import { Button } from "@mui/material";
+import { stripEmptyDataResolver } from "../../utils/domainSchemas";
 
 export interface FormProps<
   Schema extends ZodSchema,
@@ -37,7 +36,7 @@ export default function Form<
   children,
 }: FormProps<Schema>) {
   const formData = useForm<Data>({
-    resolver: customResolverFactory<Schema>(schema),
+    resolver: stripEmptyDataResolver<Schema>(schema),
     defaultValues: prefillData,
   });
 
