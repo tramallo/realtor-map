@@ -8,7 +8,7 @@ import { ZodSchema, TypeOf as ZTypeOf } from "zod";
 import { Button } from "@mui/material";
 
 import "./Form.css";
-import { stripEmptyDataResolver } from "../../utils/domainSchemas";
+import { stripEmptyDataResolver } from "../../utils/stripEmptyDataResolver";
 
 export interface FormProps<
   Schema extends ZodSchema,
