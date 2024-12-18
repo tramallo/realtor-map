@@ -12,20 +12,27 @@ export default function ChipField({ label, chips }: ChipFieldProps) {
       value={""}
       label={label}
       fullWidth
-      multiline
       slotProps={{
         htmlInput: {
-          sx: { width: 0, padding: 0 },
+          sx: { width: 0, paddingInline: 0 },
         },
+        inputLabel: { shrink: !!chips.length },
         input: {
           startAdornment: !chips.length ? (
             ""
           ) : (
-            <InputAdornment position="start" sx={{ width: "100%" }}>
+            <InputAdornment
+              position="start"
+              sx={(theme) => ({
+                width: "100%",
+                maxHeight: "unset",
+                marginTop: `${theme.spacing(3)} !important`,
+                marginBottom: theme.spacing(1),
+              })}
+            >
               <Box
                 sx={{
                   display: "flex",
-
                   flexWrap: "wrap",
                   width: "100%",
                   gap: 1,
