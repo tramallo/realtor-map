@@ -2,18 +2,20 @@
  * different geocoding & map tiles services with the components that consume it
  */
 
+import { OperationResponse } from "./helperFunctions";
+
 /** Address info expected from geocoding services responses
  */
-export interface AddressData {
-    text: string;
-    position: { lat: number; lng: number };
+export interface Location {
+    address: string;
+    coordinates: { lat: number; lng: number };
 }
 
 /** Geocoding services must expose a searchAddress function
  * and a attribution element to pray the required attribution by them
  */
 export interface GeocodingService {
-    searchAddress: (address: string) => Promise<AddressData[]>;
+    searchAddress: (searchValue: string) => Promise<OperationResponse<Location[]>>;
     attribution: React.ReactElement
 }
 
@@ -21,6 +23,6 @@ export interface GeocodingService {
  * and the proper attribution (Leaflet interprets this string, so you can write a link tag on it)
  */
 export interface MapTilesService {
-    getMapTilesUrl: () => Promise<string>;
+    getMapTilesUrl: () => Promise<OperationResponse<string>>;
     attribution: string
 }

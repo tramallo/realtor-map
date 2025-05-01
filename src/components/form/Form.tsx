@@ -1,3 +1,4 @@
+import { useEffect, memo } from "react";
 import {
   DefaultValues,
   FieldValues,
@@ -5,9 +6,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { ZodSchema, TypeOf as ZTypeOf } from "zod";
-import { Button } from "@mui/material";
 
-import "./Form.css";
 import { stripEmptyDataResolver } from "../../utils/stripEmptyDataResolver";
 
 export interface FormProps<
@@ -15,44 +14,39 @@ export interface FormProps<
   Data extends FieldValues = ZTypeOf<Schema>
 > {
   schema: Schema;
-  onSubmit: (data: Data) => void;
-  onCancel: () => void;
   prefillData?: DefaultValues<Data>;
-  submitButtonLabel?: string;
-  cancelButtonLabel?: string;
   children: React.ReactNode;
 }
 
-export default function Form<
+export function Form<
   Schema extends ZodSchema,
   Data extends FieldValues = ZTypeOf<Schema>
->({
-  schema,
-  onSubmit,
-  onCancel,
-  prefillData,
-  submitButtonLabel,
-  cancelButtonLabel,
-  children,
-}: FormProps<Schema>) {
+>({ schema, prefillData, children }: FormProps<Schema>) {
   const formData = useForm<Data>({
-    resolver: stripEmptyDataResolver<Schema>(schema),
-    defaultValues: prefillData,
+    resolver: stripEmptyDataResolver(schema),
+    values: prefillData,
   });
+
+  console.log(`Form -> render - data: ${JSON.stringify(formData.getValues())}`);
+
+  //resetForm effect
+  useEffect(() => {
+    // reset form when prefillData changes, to show up-to-date data values
+    if (!prefillData) {
+      return;
+    }
+
+    console.log(
+      `Form -> effect [resetForm] - prefillData: ${JSON.stringify(prefillData)}`
+    );
+    formData.reset(prefillData);
+  }, [prefillData, formData]);
 
   return (
     <FormProvider {...formData}>
-      <form className="form">
-        <div className="form-fields">{children}</div>
-        <div className="form-controls">
-          <Button variant="outlined" onClick={onCancel}>
-            {cancelButtonLabel ?? "Cancel"}
-          </Button>
-          <Button variant="contained" onClick={formData.handleSubmit(onSubmit)}>
-            {submitButtonLabel ?? "Submit"}
-          </Button>
-        </div>
-      </form>
+      <form>{children}</form>
     </FormProvider>
   );
 }
+
+export const MemoForm = memo(Form) as typeof Form;

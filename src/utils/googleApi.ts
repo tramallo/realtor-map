@@ -6,22 +6,23 @@
 import { createElement } from "react";
 
 import {
-  AddressData,
+  Location,
   GeocodingService,
   MapTilesService,
 } from "./mapServicesSchemas";
+import { OperationResponse } from "./helperFunctions";
 
 const geocodingApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const geocodingApiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
 
 /** Following interfaces describes google geocoding responses
  */
-interface GoogleAddressComponent {
+interface GoogleLocationComponent {
   long_name: string;
   short_name: string;
   types: string[]; // ex: ['street_number','route','locality','political','administrative_area_level_1', 'country', 'postal_code']
 }
-interface GoogleAddress {
+interface GoogleLocation {
   place_id: string; // ex: EjdCcmFzaWwgNTY1LCA1MDAwMCBTYWx0bywgRGVwYXJ0YW1lbnRvIGRlIFNhbHRvLCBVcnVndWF5IjESLwoUChIJ396_RtPCrZURDRzJAC9xa_oQtQQqFAoSCe9JjgzV3K2VETw0li2p6ZS3
   formatted_address: string; // ex: Brasil 565, 50000 Salto, Departamento de Salto, Uruguay
   types: string[]; // ex: ['street_address']
@@ -31,38 +32,40 @@ interface GoogleAddress {
       lng: number;
     };
   };
-  address_components: GoogleAddressComponent[];
+  address_components: GoogleLocationComponent[];
 }
 interface GoogleAddressSearchResponse {
   status: string; // ex: "OK"
-  results: GoogleAddress[];
+  results: GoogleLocation[];
 }
 
-/** Converts address object returned by google api to a local type AddressData
+/** Converts location object returned by google api to a local type Location
  * 
- * @param googleAddress: address object returned by google
- * @returns: AddressData object
+ * @param googleLocation: address object returned by google
+ * @returns: Location object
  */
-const googleAddressToAddressData = (
-  googleAddress: GoogleAddress
-): AddressData => {
+const googleLocationToLocation = (
+  googleLocation: GoogleLocation
+): Location => {
   return {
-    text: googleAddress.formatted_address,
-    position: {
-      lat: googleAddress.geometry.location.lat,
-      lng: googleAddress.geometry.location.lng,
+    address: googleLocation.formatted_address,
+    coordinates: {
+      lat: googleLocation.geometry.location.lat,
+      lng: googleLocation.geometry.location.lng,
     },
-  } as AddressData;
+  } as Location;
 };
 
-/** Performs a geocoding request to google geocoding service and returns the results mapped to AddressData
+/** Performs a geocoding request to google geocoding service and returns the results mapped to Location
  * 
- * @param address: address to geocode
- * @returns: an array containing all addresses related to the seach parameter
+ * @param searchValue: address to geocode
+ * @returns: an array containing all locations related to the seach parameter
  */
-const searchAddress = async (address: string): Promise<AddressData[]> => {
+const searchAddress = async (searchValue: string): Promise<OperationResponse<Location[]>> => {
+  return { data: [{ address: 'liber seregni 2401', coordinates: { lat: -31.3641713, lng: -57.95752539999999 } }] }
+
   const searchParams = new URLSearchParams({
-    address: address,
+    address: searchValue,
     key: geocodingApiKey,
   });
 
@@ -82,16 +85,13 @@ const searchAddress = async (address: string): Promise<AddressData[]> => {
     }
 
     const responseBody = (await response.json()) as GoogleAddressSearchResponse;
-    const googleAddresses = responseBody.results;
+    const googleLocations = responseBody.results;
 
-    const addresses = googleAddresses.map(googleAddressToAddressData);
-    return addresses;
+    const locations = googleLocations.map(googleLocationToLocation);
+    return { data: locations};
   } catch (error) {
-    console.log(error);
+    return { error: error as Error }
   }
-
-  // return empty if there was an error
-  return [];
 };
 
 const mapTilesApiKey = import.meta.env.VITE_GOOGLE_MAPS_TILES_API_KEY;
@@ -154,7 +154,7 @@ interface CreateMapTilesSessionResponse {
 /** Performs a request to google MapTiles api to create a new session
  * and stores the session token on local storage
  */
-const createMapTilesSession = async () => {
+const createMapTilesSession = async (): Promise<OperationResponse> => {
   try {
     const response = await fetch(createMapTilesSessionUrl, {
       method: "POST",
@@ -171,7 +171,6 @@ const createMapTilesSession = async () => {
     if (!response.ok) {
       throw new Error(`Reponse status non-2XX - ${JSON.stringify(response)}`);
     }
-
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       throw new Error(
@@ -181,14 +180,15 @@ const createMapTilesSession = async () => {
 
     const responseBody =
       (await response.json()) as CreateMapTilesSessionResponse;
-
     const token: MapTilesSessionToken = {
       expiration: responseBody.expiry,
       value: responseBody.session,
     };
+
     storeMapTilesSessionToken(token);
+    return { data: undefined };
   } catch (error) {
-    console.log(error);
+    return { error: error as Error };
   }
 };
 
@@ -196,13 +196,20 @@ const createMapTilesSession = async () => {
  * 
  * @returns: url string
  */
-const getMapTilesUrl = async (): Promise<string> => {
+const getMapTilesUrl = async (): Promise<OperationResponse<string>> => {
   if (!isMapTilesSessionTokenValid()) {
-    await createMapTilesSession();
+    const { error } = await createMapTilesSession();
+    if (error) {
+      return { error };
+    }
   }
 
-  const sessionToken = retrieveMapTilesSessionToken()!;
-  return `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${sessionToken.value}&key=${mapTilesApiKey}`;
+  const sessionToken = retrieveMapTilesSessionToken();
+  if (!sessionToken) {
+    return { error: new Error("Map tiles session token not found") }
+  }
+
+  return { data: `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${sessionToken.value}&key=${mapTilesApiKey}`};
 };
 
 // export services

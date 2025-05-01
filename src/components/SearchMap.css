@@ -1,9 +1,0 @@
-.search-map {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-        "search-area"
-        "map-area";
-}
-

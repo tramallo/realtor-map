@@ -1,89 +1,32 @@
-import { Marker, Popup } from "react-leaflet";
+import { memo } from "react";
 
-import "./App.css";
-import SearchMap from "./components/SearchMap";
-import Modal from "./components/Modal";
-import { googleGeocodingService } from "./utils/googleApi";
-import { osmMapTilesService } from "./utils/nominatimOSMApi";
-import { getIconForProperty } from "./utils/mapMarkerIcons";
-import CreateProperty from "./components/CreateProperty";
-import { CreatePropertyData, PropertyData } from "./utils/domainSchemas";
-import { usePropertyStore } from "./utils/domainDataStore";
-import { AddressData } from "./utils/mapServicesSchemas";
-import ViewProperty from "./components/ViewProperty";
-import CreatePerson from "./components/CreatePerson";
-import { useModalContext } from "./components/ModalContext";
+import MapProperties from "./components/properties/MapProperties";
+import Navigation, { NavigationSlide } from "./components/Navigation";
+import ListPersons from "./components/persons/ListPersons";
+import ListRealtors from "./components/realtors/ListRealtors";
+import ListProperties from "./components/properties/ListProperties";
+import Test from "./layouts/Test";
+import { Button } from "@mui/material";
+import { useAuthContext } from "./components/AuthContext";
 
-export default function App() {
-  const { pushModal } = useModalContext();
-  const properties = usePropertyStore((store) => store.properties);
+export function App() {
+  const { endSession } = useAuthContext();
 
-  const openCreatePropertyModal = (address: AddressData) => {
-    const prefillAddress: Partial<CreatePropertyData> = {
-      address: address.text,
-      coordinates: { lat: address.position.lat, lng: address.position.lng },
-    };
-
-    const createPropertyModal = (
-      <Modal title="New property">
-        <CreateProperty
-          onCreate={openViewPropertyModal}
-          prefillData={prefillAddress}
-        />
-      </Modal>
-    );
-
-    pushModal(createPropertyModal);
-  };
-
-  const openViewPropertyModal = (propertyId: PropertyData["id"]) => {
-    const viewPropertyModal = (
-      <Modal title="View property">
-        <ViewProperty propertyId={propertyId} />
-      </Modal>
-    );
-
-    pushModal(viewPropertyModal);
-  };
-
-  const openTestModal = () => {
-    const testModal = (
-      <Modal title="Test">
-        <CreatePerson onCreate={(personId) => console.log(personId)} />
-      </Modal>
-    );
-
-    pushModal(testModal);
-  };
+  const slides: NavigationSlide[] = [
+    { label: "Map", component: <MapProperties /> },
+    { label: "Properties", component: <ListProperties /> },
+    { label: "Persons", component: <ListPersons /> },
+    { label: "Realtors", component: <ListRealtors /> },
+    //{ label: "test", component: <Test /> },
+  ];
 
   return (
-    <div id="app">
-      <span>
-        controls area <button onClick={openTestModal}>Open test modal</button>
-      </span>
-      <SearchMap
-        geocodingService={googleGeocodingService}
-        mapTilesService={osmMapTilesService}
-        onAddressClick={openCreatePropertyModal}
-      >
-        {properties.map((property) => (
-          <Marker
-            key={property.id}
-            position={property.coordinates}
-            icon={getIconForProperty(property)}
-          >
-            <Popup>
-              {property.id}: {property.address}
-              <button
-                type="button"
-                onClick={() => openViewPropertyModal(property.id)}
-              >
-                Open details
-              </button>
-            </Popup>
-          </Marker>
-        ))}
-      </SearchMap>
-    </div>
+    <Navigation slides={slides}>
+      <Button variant="contained" onClick={endSession} sx={{ flex: 1 }}>
+        Logout
+      </Button>
+    </Navigation>
   );
 }
+
+export const MemoApp = memo(App);

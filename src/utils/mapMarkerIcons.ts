@@ -32,6 +32,11 @@ export const redBlankMarkerIcon = new Icon({
     ...defaultIconSizes
 })
 
+export const blueBlankMarkerIcon = new Icon({
+    iconUrl: "map-marker-icons/blue-blank-marker-icon.png",
+    ...defaultIconSizes
+})
+
 export const searchMarkerIcon = new Icon({
     iconUrl: "map-marker-icons/search-marker-icon.png",
     ...defaultIconSizes,

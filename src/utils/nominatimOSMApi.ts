@@ -1,15 +1,17 @@
 /** This file exposes a GeocodingService and a MapTilesService that are provided by Nominatim & OpenStreetMaps respectively
  */
 import { createElement } from "react";
+
 import {
-  AddressData,
+  Location,
   GeocodingService,
   MapTilesService,
 } from "./mapServicesSchemas";
+import { OperationResponse } from "./helperFunctions";
 
 const nominatimApiUrl = "https://nominatim.openstreetmap.org/search";
 
-interface NominatimAddress {
+interface NominatimLocation {
   // not all values will be present, that depends on the request
   place_id: number;
   licence: string;
@@ -46,28 +48,28 @@ interface NominatimAddress {
   };
 }
 
-/** Converts an address object returned by nominatim api to a local address type (AddressData) 
+/** Converts a location object returned by nominatim api to Location type 
  * 
- * @param nominatimAddress: address returned by nominatim NominatimAddress
- * @returns: local address type AddressData
+ * @param nominatimLocation: location returned by nominatim (NominatimLocation)
+ * @returns: Location
  */
-const nominatimAddressToAddressData = (
-  nominatimAddress: NominatimAddress
-): AddressData => {
+const nominatimLocationToLocation = (
+  nominatimLocation: NominatimLocation
+): Location => {
   return {
-    text: nominatimAddress.display_name,
-    position: { lat: nominatimAddress.lat, lng: nominatimAddress.lon },
-  } as AddressData;
+    address: nominatimLocation.display_name,
+    coordinates: { lat: nominatimLocation.lat, lng: nominatimLocation.lon },
+  } as Location;
 };
 
-/** Peforms a geocode request to nominatim api and returns the results mapped to AddressData
+/** Peforms a geocode request to nominatim api and returns the results mapped to Location
  * 
- * @param address: address to geocode
- * @returns: an array containing all addresses related to the seach parameter
+ * @param searchValue: address to geocode
+ * @returns: an array containing all locations related to the seach parameter
  */
-const searchAddress = async (address: string): Promise<AddressData[]> => {
+const searchAddress = async (searchValue: string): Promise<OperationResponse<Location[]>> => {
   const searchParams = new URLSearchParams({
-    q: address,
+    q: searchValue,
     format: "json",
   }).toString();
 
@@ -81,30 +83,26 @@ const searchAddress = async (address: string): Promise<AddressData[]> => {
 
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      console.log(response);
       throw new Error(
         `Content type not supported - ${JSON.stringify(response)}`
       );
     }
 
-    const responseBody = (await response.json()) as NominatimAddress[];
+    const responseBody = (await response.json()) as NominatimLocation[];
 
-    const addresses = responseBody.map(nominatimAddressToAddressData);
-    return addresses;
+    const locations = responseBody.map(nominatimLocationToLocation);
+    return { data: locations };
   } catch (error) {
-    console.log(error);
+    return { error: error as Error }
   }
-
-  // return empty if there was an error
-  return [];
 };
 
-/** Returns the url for opensteetmaps tiles api
+/** Returns the url for openstreetmaps tiles api
  * 
  * @returns string url
  */
-const getMapTilesUrl = async () => {
-  return `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`;
+const getMapTilesUrl = async (): Promise<OperationResponse<string>> => {
+  return { data: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png` };
 };
 
 // export services
