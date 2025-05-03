@@ -2,16 +2,8 @@ import { create } from "zustand";
 
 import { CreatePropertyData, PropertyData, PropertyFilterData, UpdatePropertyData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { 
-    createProperty, 
-    deleteProperty, 
-    getProperties, 
-    invalidateProperties, 
-    propertiesSubscribe, 
-    searchPropertyIds, 
-    updateProperty, 
-    WsEvent 
-} from "../utils/realtorMapService";
+import { realtorMapApi as backendApi } from "../utils/realtorMapService";
+import { BackendEvent } from "../utils/backendApiInterface";
 
 export interface PropertyStore {
     properties: Record<PropertyData["id"], PropertyData>;
@@ -65,18 +57,18 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
     };
 
     const newPropertyHandler = (newProperty: PropertyData) => {
-        console.log(`event -> [${WsEvent.NewProperty}] ${newProperty.address} `);
+        console.log(`event -> [${BackendEvent.NewProperty}] ${newProperty.address} `);
         storeProperties([newProperty]);
     }
     const updatedPropertyHandler = (updatedProperty: PropertyData) => {
-        console.log(`event -> [${WsEvent.UpdatedProperty}] ${updatedProperty.address} `);
+        console.log(`event -> [${BackendEvent.UpdatedProperty}] ${updatedProperty.address} `);
         storeProperties([updatedProperty]);
     }
     const deletedPropertyHandler = (deletedProperty: PropertyData) => {
-        console.log(`event -> [${WsEvent.DeletedProperty}] ${deletedProperty.address}`);
+        console.log(`event -> [${BackendEvent.DeletedProperty}] ${deletedProperty.address}`);
         removeProperties([deletedProperty.id]);
     }
-    propertiesSubscribe(newPropertyHandler, updatedPropertyHandler, deletedPropertyHandler);
+    backendApi.propertiesSubscribe(newPropertyHandler, updatedPropertyHandler, deletedPropertyHandler);
 
     const syncLocalStorageState = async () => {
         console.log(`propertiesStorage -> syncLocalStorageState`);
@@ -99,7 +91,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return;
         }
     
-        const { data: validIds, error: invalidatePropertiesError } = await invalidateProperties(localStoragePropertyIds, Date.now());
+        const { data: validIds, error: invalidatePropertiesError } = await backendApi.invalidateProperties(localStoragePropertyIds, Date.now());
     
         if (invalidatePropertiesError) {
             console.error('propertiesStorage -> syncLocalStorageState -> error: ', invalidatePropertiesError);
@@ -127,7 +119,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
                 return { data: undefined };
             }
 
-            const { data: properties, error } = await getProperties([propertyId]);
+            const { data: properties, error } = await backendApi.getProperties([propertyId]);
 
             if (error) {
                 return { error };
@@ -142,7 +134,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         searchProperties: async (filter) => {
             console.log(`propertyStore -> searchProperties - filter: ${JSON.stringify(filter)}`)
     
-            const { error, data } = await searchPropertyIds(filter);
+            const { error, data } = await backendApi.searchPropertyIds(filter);
         
             if (error) {
                 return { error };
@@ -156,7 +148,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
                 return { data: undefined };
             }
 
-            const { error: getPropertiesError, data: nonStoredProperties } = await getProperties(nonStoredPropertyIds);
+            const { error: getPropertiesError, data: nonStoredProperties } = await backendApi.getProperties(nonStoredPropertyIds);
         
             if (getPropertiesError) {
                 return { error: getPropertiesError };
@@ -168,7 +160,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         createProperty: async (newPropertyData) => {
             console.log(`propertyStore -> createProperty - propertyData: ${JSON.stringify(newPropertyData)}`)
 
-            const { error } = await createProperty(newPropertyData);
+            const { error } = await backendApi.createProperty(newPropertyData);
 
             if (error) {
                 return { error };
@@ -179,7 +171,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         updateProperty: async (propertyId, updateData) => {
             console.log(`propertyStore -> updateProperty - propertyId: ${propertyId} updateData: ${JSON.stringify(updateData)}`)
 
-            const { error } = await updateProperty(propertyId, updateData);
+            const { error } = await backendApi.updateProperty(propertyId, updateData);
 
             if (error) {
                 return { error };
@@ -190,7 +182,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         deleteProperty: async (propertyId) => {
             console.log(`propertyStore -> deleteProperty propertyId: ${propertyId}`);
         
-            const { error } = await deleteProperty(propertyId);
+            const { error } = await backendApi.deleteProperty(propertyId);
         
             if (error) {
                 return { error };

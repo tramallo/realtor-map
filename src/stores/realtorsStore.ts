@@ -1,7 +1,9 @@
 import { create } from "zustand";
+
 import { CreateRealtorData, RealtorData, RealtorFilterData, UpdateRealtorData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { createRealtor, deleteRealtor, getRealtors, invalidateRealtors, realtorsSubscribe, searchRealtorIds, updateRealtor, WsEvent } from "../utils/realtorMapService";
+import { realtorMapApi as backendApi } from "../utils/realtorMapService";
+import { BackendEvent } from "../utils/backendApiInterface";
 
 const REALTORS_LOCAL_STORAGE_KEY = "realtors-store";
 const fetchLocalStorageRealtors = (): OperationResponse<Record<RealtorData["id"], RealtorData> | undefined> => {
@@ -55,18 +57,18 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
     };
 
     const newRealtorHandler = (newRealtor: RealtorData) => {
-        console.log(`event -> [${WsEvent.NewRealtor}] ${newRealtor.name} `);
+        console.log(`event -> [${BackendEvent.NewRealtor}] ${newRealtor.name} `);
         storeRealtors([newRealtor]);
     }
     const updatedRealtorHandler = (updatedRealtor: RealtorData) => {
-        console.log(`event -> [${WsEvent.UpdatedRealtor}] ${updatedRealtor.name} `);
+        console.log(`event -> [${BackendEvent.UpdatedRealtor}] ${updatedRealtor.name} `);
         storeRealtors([updatedRealtor]);
     }
     const deletedRealtorHandler = (deletedRealtor: RealtorData) => {
-        console.log(`event -> [${WsEvent.DeletedRealtor}] ${deletedRealtor.name}`);
+        console.log(`event -> [${BackendEvent.DeletedRealtor}] ${deletedRealtor.name}`);
         removeRealtors([deletedRealtor.id]);
     }
-    realtorsSubscribe(newRealtorHandler, updatedRealtorHandler, deletedRealtorHandler);
+    backendApi.realtorsSubscribe(newRealtorHandler, updatedRealtorHandler, deletedRealtorHandler);
 
     const syncLocalStorageState = async () => {
         console.log(`realtorsStorage -> syncLocalStorageState`);
@@ -89,7 +91,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             return;
         }
     
-        const { data: validIds, error: invalidateRealtorsError } = await invalidateRealtors(localStorageRealtorIds, Date.now());
+        const { data: validIds, error: invalidateRealtorsError } = await backendApi.invalidateRealtors(localStorageRealtorIds, Date.now());
     
         if (invalidateRealtorsError) {
             console.error('realtorsStorage -> syncLocalStorageState -> error: ', invalidateRealtorsError);
@@ -117,7 +119,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
                 return { data: undefined };
             }
 
-            const { data: realtors, error } = await getRealtors([realtorId]);
+            const { data: realtors, error } = await backendApi.getRealtors([realtorId]);
 
             if (error) {
                 return { error };
@@ -132,7 +134,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
         searchRealtors: async (filter) => {
             console.log(`realtorStore -> searchRealtors - filter: ${JSON.stringify(filter)}`)
     
-            const { error, data } = await searchRealtorIds(filter);
+            const { error, data } = await backendApi.searchRealtorIds(filter);
         
             if (error) {
                 return { error };
@@ -146,7 +148,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
                 return { data: undefined };
             }
 
-            const { error: getRealtorsError, data: nonStoredRealtors } = await getRealtors(nonStoredRealtorIds);
+            const { error: getRealtorsError, data: nonStoredRealtors } = await backendApi.getRealtors(nonStoredRealtorIds);
             
             if (getRealtorsError) {
                 return { error: getRealtorsError };
@@ -158,7 +160,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
         createRealtor: async (newRealtorData) => {
             console.log(`realtorStore -> createRealtor - realtorData: ${JSON.stringify(newRealtorData)}`)
 
-            const { error } = await createRealtor(newRealtorData);
+            const { error } = await backendApi.createRealtor(newRealtorData);
 
             if (error) {
                 return {error};
@@ -169,7 +171,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
         updateRealtor: async (realtorId, updateData) => {
             console.log(`realtorStore -> updateRealtor - realtorId: ${realtorId} updateData: ${JSON.stringify(updateData)}`)
 
-            const { error } = await updateRealtor(realtorId, updateData);
+            const { error } = await backendApi.updateRealtor(realtorId, updateData);
 
             if (error) {
                 return { error };
@@ -180,7 +182,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
         deleteRealtor: async (realtorId) => {
             console.log(`realtorStore -> deleteRealtor realtorId: ${realtorId}`);
         
-            const { error } = await deleteRealtor(realtorId);
+            const { error } = await backendApi.deleteRealtor(realtorId);
         
             if (error) {
                 return { error };

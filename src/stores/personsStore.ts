@@ -2,7 +2,8 @@ import { create } from "zustand";
 
 import { CreatePersonData, PersonData, PersonFilterData, UpdatePersonData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { createPerson, getPersons, searchPersonIds, invalidatePersons, personsSubscribe, updatePerson, WsEvent, deletePerson } from "../utils/realtorMapService";
+import { BackendEvent } from "../utils/backendApiInterface";
+import { realtorMapApi as backendApi } from "../utils/realtorMapService";
 
 export interface PersonStore {
     persons: Record<PersonData["id"], PersonData>;
@@ -56,18 +57,18 @@ export const usePersonStore = create<PersonStore>((set, get) => {
     }
 
     const newPersonHandler = (newPerson: PersonData) => {
-        console.log(`event -> [${WsEvent.NewPerson}] ${newPerson.name} `);
+        console.log(`event -> [${BackendEvent.NewPerson}] ${newPerson.name} `);
         storePersons([newPerson]);
     }
     const updatedPersonHandler = (updatedPerson: PersonData) => {
-        console.log(`event -> [${WsEvent.UpdatedPerson}] ${updatedPerson.name} `);
+        console.log(`event -> [${BackendEvent.UpdatedPerson}] ${updatedPerson.name} `);
         storePersons([updatedPerson]);
     }
     const deletedPersonHandler = (deletedPerson: PersonData) => {
-        console.log(`event -> [${WsEvent.DeletedPerson}] ${deletedPerson.name}`);
+        console.log(`event -> [${BackendEvent.DeletedPerson}] ${deletedPerson.name}`);
         removePersons([deletedPerson.id]);
     }
-    personsSubscribe(newPersonHandler, updatedPersonHandler, deletedPersonHandler);
+    backendApi.personsSubscribe(newPersonHandler, updatedPersonHandler, deletedPersonHandler);
 
     const syncLocalStorageState = async () => {
         console.log(`personsStorage -> syncLocalStorageState`);
@@ -90,7 +91,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
             return;
         }
 
-        const { data: validIds, error: invalidatePersonsError } = await invalidatePersons(localStoragePersonIds, Date.now());
+        const { data: validIds, error: invalidatePersonsError } = await backendApi.invalidatePersons(localStoragePersonIds, Date.now());
 
         if (invalidatePersonsError) {
             console.error('personsStorage -> syncLocalStorageState -> error: ', invalidatePersonsError);
@@ -118,7 +119,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
                 return { data: undefined };
             }
 
-            const { data: persons, error } = await getPersons([personId]);
+            const { data: persons, error } = await backendApi.getPersons([personId]);
 
             if (error) {
                 return { error };
@@ -133,7 +134,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
         searchPersons: async (filter) => {
             console.log(`personStore -> searchPersons - filter: ${JSON.stringify(filter)}`)
 
-            const { error, data } = await searchPersonIds(filter);
+            const { error, data } = await backendApi.searchPersonIds(filter);
 
             if (error) {
                 return { error };
@@ -147,7 +148,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
                 return { data: undefined };
             }
 
-            const { error: getPersonsError, data: nonStoredPersons } = await getPersons(nonStoredPersonIds);
+            const { error: getPersonsError, data: nonStoredPersons } = await backendApi.getPersons(nonStoredPersonIds);
 
             if (getPersonsError) {
                 return { error: getPersonsError };
@@ -159,7 +160,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
         createPerson: async (newPersonData) => {
             console.log(`personStore -> createPerson - personData: ${JSON.stringify(newPersonData)}`)
 
-            const { error } = await createPerson(newPersonData);
+            const { error } = await backendApi.createPerson(newPersonData);
 
             if (error) {
                 return { error };
@@ -170,7 +171,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
         updatePerson: async (personId, updateData) => {
             console.log(`personStore -> updatePerson - personId: ${personId} updateData: ${JSON.stringify(updateData)}`)
 
-            const { error } = await updatePerson(personId, updateData);
+            const { error } = await backendApi.updatePerson(personId, updateData);
 
             if (error) {
                 return { error };
@@ -181,7 +182,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
         deletePerson: async (personId) => {
             console.log(`personStore -> deletePerson personId: ${personId}`);
 
-            const { error } = await deletePerson(personId);
+            const { error } = await backendApi.deletePerson(personId);
 
             if (error) {
                 return { error };

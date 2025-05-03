@@ -10,27 +10,20 @@ import CustomSnackbar from "./CustomSnackbar";
 import { LoginPane } from "./LoginPane";
 import CustomModal from "./CustomModal";
 import { useAuthContext } from "./AuthContext";
-import { BackendApi } from "../utils/backendApiInterface";
 
 type AppContext = {
-  backendApi: BackendApi;
   notifyUser: (message: string) => void;
 };
 
 const appContext = createContext<AppContext | undefined>({
-  backendApi: undefined as unknown as BackendApi,
   notifyUser: () => undefined,
 });
 
 export interface AppContenxtProviderProps {
-  backendApi: BackendApi;
   children: ReactNode;
 }
 
-export function AppContextProvider({
-  backendApi,
-  children,
-}: AppContenxtProviderProps) {
+export function AppContextProvider({ children }: AppContenxtProviderProps) {
   const { userSession } = useAuthContext();
 
   const [currentMessage, setCurrentMessage] = useState("");
@@ -40,7 +33,7 @@ export function AppContextProvider({
   }, []);
 
   return (
-    <appContext.Provider value={{ backendApi, notifyUser }}>
+    <appContext.Provider value={{ notifyUser }}>
       {children}
       <CustomSnackbar
         open={currentMessage != ""}
