@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { CreatePersonData, PersonData, PersonFilterData, UpdatePersonData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
 import { BackendEvent } from "../utils/services-interface";
-import { realtorMapApi as backendApi } from "../services/realtorMapService";
+import { supabaseApi as backendApi } from "../services/supabaseApi";
 
 export interface PersonStore {
     persons: Record<PersonData["id"], PersonData>;

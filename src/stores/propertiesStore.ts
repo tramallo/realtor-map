@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { CreatePropertyData, PropertyData, PropertyFilterData, UpdatePropertyData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { realtorMapApi as backendApi } from "../services/realtorMapService";
+import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { BackendEvent } from "../utils/services-interface";
 
 export interface PropertyStore {

@@ -83,12 +83,6 @@ export const showingAppointmentSchema = baseSchema.extend({
     time: z.string()
 })
 
-export type BaseSchema = typeof baseSchema;
-export type PersonSchema = typeof personSchema;
-export type RealtorSchema = typeof realtorSchema;
-export type CoordinatesSchema = typeof coordinatesSchema;
-export type PropertySchema = typeof propertySchema;
-export type ShowingAppointmentSchema = typeof showingAppointmentSchema;
 export const PropertyTypesSchema = z.enum(propertyTypes);
 export const PropertyStatesSchema = z.enum(propertyStates);
 
@@ -100,11 +94,6 @@ export type PropertyData = z.infer<typeof propertySchema>;
 export type ShowingAppointmentData = z.infer<typeof showingAppointmentSchema>;
 export type PropertyType = z.infer<typeof PropertyTypesSchema>;
 export type PropertyState = z.infer<typeof PropertyStatesSchema>;
-
-export type BaseFilter = typeof baseFilterSchema;
-export type PropertyFilter = typeof propertyFilterSchema;
-export type PersonFilter = typeof personFilterSchema;
-export type RealtorFilter = typeof realtorFilterSchema;
 
 export type BaseFilterData = z.infer<typeof baseFilterSchema>;
 export type PropertyFilterData = z.infer<typeof propertyFilterSchema>;
@@ -151,13 +140,6 @@ export const updateRealtorSchema = realtorSchema.omit({
     createdBy: true,
     createdAt: true,
 }).partial()
-
-export type CreatePropertySchema = typeof createPropertySchema;
-export type UpdatePropertySchema = typeof updatePropertySchema;
-export type CreatePersonSchema = typeof createPersonSchema;
-export type UpdatePersonSchema = typeof updatePersonSchema
-export type CreateRealtorSchema = typeof createRealtorSchema;
-export type UpdateRealtorSchema = typeof updateRealtorSchema;
 
 export type CreatePropertyData = z.infer<typeof createPropertySchema>;
 export type UpdatePropertyData = z.infer<typeof updatePropertySchema>;
