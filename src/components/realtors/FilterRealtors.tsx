@@ -1,13 +1,13 @@
 import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
 
-import { RealtorFilterData } from "../../utils/domainSchemas";
 import FilterBaseData from "../FilterBaseData";
 import { DebouncedTextField } from "../DebouncedTextField";
+import { RealtorFilter } from "../../utils/data-filter-schema";
 
 export interface FilterRealtorsProps {
-  filter: RealtorFilterData;
-  onChange: (newValue: RealtorFilterData) => void;
+  filter: RealtorFilter;
+  onChange: (newValue: RealtorFilter) => void;
 }
 
 export function FilterRealtors({ filter, onChange }: FilterRealtorsProps) {
@@ -16,7 +16,7 @@ export function FilterRealtors({ filter, onChange }: FilterRealtorsProps) {
   );
 
   const setFilterValue = useCallback(
-    (value: Partial<RealtorFilterData>) => {
+    (value: Partial<RealtorFilter>) => {
       onChange({ ...filter, ...value });
     },
     [filter, onChange]

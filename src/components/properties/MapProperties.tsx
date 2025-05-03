@@ -11,7 +11,7 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
-import { PropertyData, PropertyFilterData } from "../../utils/domainSchemas";
+import { Property } from "../../utils/data-schema";
 import { propertyCompliesFilter } from "../../utils/filter-evaluators";
 import CreateProperty from "./CreateProperty";
 import ViewProperty from "./ViewProperty";
@@ -26,6 +26,7 @@ import {
 import { MemoMapComponent } from "../MapComponent";
 import CustomModal from "../CustomModal";
 import { usePropertyStore } from "../../stores/propertiesStore";
+import { PropertyFilter } from "../../utils/data-filter-schema";
 
 export default function MapProperties() {
   const searchProperties = usePropertyStore((store) => store.searchProperties);
@@ -38,11 +39,11 @@ export default function MapProperties() {
   const [showFiltersPane, setShowFiltersPane] = useState(false);
   const [propertiesFilter, setPropertiesFilter] = useState({
     deleted: false,
-  } as PropertyFilterData);
+  } as PropertyFilter);
 
   const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
   const [viewPropertyId, setViewPropertyId] = useState(
-    undefined as PropertyData["id"] | undefined
+    undefined as Property["id"] | undefined
   );
 
   const propertiesCache = usePropertyStore((store) => store.properties);

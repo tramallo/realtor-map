@@ -1,12 +1,13 @@
 import { create } from "zustand";
 
-import { CreateRealtorData, RealtorData, RealtorFilterData, UpdateRealtorData } from "../utils/domainSchemas";
+import { CreateRealtorDTO, Realtor, UpdateRealtorDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { BackendEvent } from "../utils/services-interface";
+import { RealtorFilter } from "../utils/data-filter-schema";
 
 const REALTORS_LOCAL_STORAGE_KEY = "realtors-store";
-const fetchLocalStorageRealtors = (): OperationResponse<Record<RealtorData["id"], RealtorData> | undefined> => {
+const fetchLocalStorageRealtors = (): OperationResponse<Record<Realtor["id"], Realtor> | undefined> => {
     console.log(`realtorsStore -> fetchLocalStorageRealtors`);
 
     const rawLocalStorageData = localStorage.getItem(REALTORS_LOCAL_STORAGE_KEY);
@@ -24,18 +25,18 @@ const fetchLocalStorageRealtors = (): OperationResponse<Record<RealtorData["id"]
 }
 
 export interface RealtorStore {
-    realtors: Record<RealtorData["id"], RealtorData>;
-    fetchRealtor: (realtorId: RealtorData["id"]) => Promise<OperationResponse>;
-    searchRealtors: (filter: RealtorFilterData) => Promise<OperationResponse>;
-    createRealtor: (newRealtorData: CreateRealtorData) => Promise<OperationResponse>;
-    updateRealtor: (realtorId: RealtorData['id'], updateData: UpdateRealtorData) => Promise<OperationResponse>;
-    deleteRealtor: (realtorId: RealtorData['id']) => Promise<OperationResponse>;
+    realtors: Record<Realtor["id"], Realtor>;
+    fetchRealtor: (realtorId: Realtor["id"]) => Promise<OperationResponse>;
+    searchRealtors: (filter: RealtorFilter) => Promise<OperationResponse>;
+    createRealtor: (newRealtorData: CreateRealtorDTO) => Promise<OperationResponse>;
+    updateRealtor: (realtorId: Realtor['id'], updateData: UpdateRealtorDTO) => Promise<OperationResponse>;
+    deleteRealtor: (realtorId: Realtor['id']) => Promise<OperationResponse>;
 }
 
 export const useRealtorStore = create<RealtorStore>((set, get) => {
     console.log(`realtorsStore -> create`);
 
-    const storeRealtors = (realtors: RealtorData[]) => {
+    const storeRealtors = (realtors: Realtor[]) => {
         const { realtors: realtorsCache } = get();
         const cacheCopy = { ...realtorsCache };
 
@@ -45,7 +46,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
     
         set({ realtors: cacheCopy });
     };
-    const removeRealtors = (realtorIds: Array<RealtorData['id']>) => {
+    const removeRealtors = (realtorIds: Array<Realtor['id']>) => {
             const { realtors: storedRealtors } = get();
             const storedRealtorsCopy = { ...storedRealtors };
             
@@ -56,15 +57,15 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             set({ realtors: storedRealtorsCopy });
     };
 
-    const newRealtorHandler = (newRealtor: RealtorData) => {
+    const newRealtorHandler = (newRealtor: Realtor) => {
         console.log(`event -> [${BackendEvent.NewRealtor}] ${newRealtor.name} `);
         storeRealtors([newRealtor]);
     }
-    const updatedRealtorHandler = (updatedRealtor: RealtorData) => {
+    const updatedRealtorHandler = (updatedRealtor: Realtor) => {
         console.log(`event -> [${BackendEvent.UpdatedRealtor}] ${updatedRealtor.name} `);
         storeRealtors([updatedRealtor]);
     }
-    const deletedRealtorHandler = (deletedRealtor: RealtorData) => {
+    const deletedRealtorHandler = (deletedRealtor: Realtor) => {
         console.log(`event -> [${BackendEvent.DeletedRealtor}] ${deletedRealtor.name}`);
         removeRealtors([deletedRealtor.id]);
     }
@@ -85,7 +86,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             return;
         }
     
-        const localStorageRealtorIds = Object.keys(localStorageRealtors) as unknown as Array<RealtorData["id"]>;
+        const localStorageRealtorIds = Object.keys(localStorageRealtors) as unknown as Array<Realtor["id"]>;
     
         if (localStorageRealtorIds.length == 0) {
             return;
@@ -98,7 +99,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             return;
         }
     
-        const validRealtors: Record<RealtorData["id"], RealtorData> = {};
+        const validRealtors: Record<Realtor["id"], Realtor> = {};
         validIds.forEach((validId) => {
             validRealtors[validId] = localStorageRealtors![validId];
         })
@@ -109,7 +110,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
 
     return {
         realtors: {},
-        fetchRealtor: async (realtorId: RealtorData["id"]) => {
+        fetchRealtor: async (realtorId: Realtor["id"]) => {
             console.log(`realtorStore -> fetchRealtor - realtorId: ${realtorId}`)
 
             const { realtors: storedRealtors } = get();
@@ -197,6 +198,6 @@ useRealtorStore.subscribe((state) => {
     localStorage.setItem(REALTORS_LOCAL_STORAGE_KEY, JSON.stringify(state.realtors));
 })
 
-export const fetchByIdSelector = (realtorId: RealtorData["id"]) => {
+export const fetchByIdSelector = (realtorId: Realtor["id"]) => {
     return (store: RealtorStore) => store.realtors[realtorId];
 }

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Grid2, Switch } from "@mui/material";
 
-import { BaseFilterData } from "../utils/domainSchemas";
+import { BaseFilterData } from "../utils/data-schema";
 import PersonField from "./PersonField";
 import ComponentsField from "./ComponentsField";
 import DateField from "./DateField";

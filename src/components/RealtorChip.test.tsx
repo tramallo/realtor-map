@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, CircularProgress } from "@mui/material";
 
 import RealtorChip from "./RealtorChip";
-import { RealtorData } from "../utils/domainSchemas";
+import { Realtor } from "../utils/data-schema";
 import CustomModal from "./CustomModal";
 import ViewRealtor from "./realtors/ViewRealtor";
 
@@ -20,7 +20,7 @@ vi.mock("@mui/material", () => ({
   CircularProgress: vi.fn(() => <div data-testid="circular-progress" />),
 }));
 
-let realtorsMock = {} as Record<RealtorData["id"], RealtorData>;
+let realtorsMock = {} as Record<Realtor["id"], Realtor>;
 const fetchRealtorMock = vi.fn();
 vi.mock("../stores/realtorsStore", async (requireActual) => {
   const actual = await requireActual<
@@ -99,7 +99,7 @@ describe("RealtorChip", () => {
     realtorsMock[realtorId] = {
       id: realtorId,
       name: realtorName,
-    } as RealtorData;
+    } as Realtor;
     fetchRealtorMock.mockResolvedValueOnce({ data: undefined });
 
     render(<RealtorChip realtorId={realtorId} />);

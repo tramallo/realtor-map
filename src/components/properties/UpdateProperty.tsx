@@ -2,12 +2,12 @@ import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  PropertyData,
+  Property,
   propertyStates,
   propertyTypes,
-  UpdatePropertyData,
+  UpdatePropertyDTO,
   updatePropertySchema,
-} from "../../utils/domainSchemas";
+} from "../../utils/data-schema";
 import {
   usePropertyStore,
   fetchByIdSelector,
@@ -27,7 +27,7 @@ import FormLocationField from "../form/FormLocationField";
 import { useAppContext } from "../AppContext";
 
 export interface UpdatePropertyProps {
-  propertyId: PropertyData["id"];
+  propertyId: Property["id"];
   onUpdate?: () => void;
 }
 
@@ -53,7 +53,7 @@ export default function UpdateProperty({
       //TODO: use logged in user id
       updatedBy: 3,
       updatedAt: dateToTimestamp(new Date()),
-    } as UpdatePropertyData;
+    } as UpdatePropertyDTO;
 
     return cachedProperty
       ? { ...cachedProperty, ...updateMetadata }
@@ -61,7 +61,7 @@ export default function UpdateProperty({
   }, [cachedProperty]);
 
   const submitUpdate = useCallback(
-    async (updatePropertyData: UpdatePropertyData) => {
+    async (updatePropertyData: UpdatePropertyDTO) => {
       console.log(
         `UpdateProperty -> submitUpdate propertyId: ${cachedProperty?.id}`
       );

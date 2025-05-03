@@ -1,21 +1,22 @@
 import { create } from "zustand";
 
-import { CreatePersonData, PersonData, PersonFilterData, UpdatePersonData } from "../utils/domainSchemas";
+import { CreatePersonDTO, Person, UpdatePersonDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { BackendEvent } from "../utils/services-interface";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
+import { PersonFilter } from "../utils/data-filter-schema";
 
 export interface PersonStore {
-    persons: Record<PersonData["id"], PersonData>;
-    fetchPerson: (personId: PersonData["id"]) => Promise<OperationResponse>;
-    searchPersons: (filter: PersonFilterData) => Promise<OperationResponse>;
-    createPerson: (newPersonData: CreatePersonData) => Promise<OperationResponse>;
-    updatePerson: (personId: PersonData["id"], updateData: UpdatePersonData) => Promise<OperationResponse>;
-    deletePerson: (personId: PersonData['id']) => Promise<OperationResponse>;
+    persons: Record<Person["id"], Person>;
+    fetchPerson: (personId: Person["id"]) => Promise<OperationResponse>;
+    searchPersons: (filter: PersonFilter) => Promise<OperationResponse>;
+    createPerson: (newPersonData: CreatePersonDTO) => Promise<OperationResponse>;
+    updatePerson: (personId: Person["id"], updateData: UpdatePersonDTO) => Promise<OperationResponse>;
+    deletePerson: (personId: Person['id']) => Promise<OperationResponse>;
 }
 
 const PERSONS_LOCAL_STORAGE_KEY = "persons-store";
-const fetchLocalStoragePersons = (): OperationResponse<Record<PersonData["id"], PersonData> | undefined> => {
+const fetchLocalStoragePersons = (): OperationResponse<Record<Person["id"], Person> | undefined> => {
     console.log(`personsStorage -> fetchLocalStoragePersons`);
 
     const rawLocalStorageData = localStorage.getItem(PERSONS_LOCAL_STORAGE_KEY);
@@ -35,7 +36,7 @@ const fetchLocalStoragePersons = (): OperationResponse<Record<PersonData["id"], 
 export const usePersonStore = create<PersonStore>((set, get) => {
     console.log(`personsStore -> create`);
 
-    const storePersons = (persons: PersonData[]) => {
+    const storePersons = (persons: Person[]) => {
         const { persons: storedPersons } = get();
         const storedPersonsCopy = { ...storedPersons };
 
@@ -45,7 +46,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
     
         set({ persons: storedPersonsCopy });
     }
-    const removePersons = (personIds: Array<PersonData['id']>) => {
+    const removePersons = (personIds: Array<Person['id']>) => {
         const { persons: storedPersons } = get();
         const storedPersonsCopy = { ...storedPersons };
         
@@ -56,15 +57,15 @@ export const usePersonStore = create<PersonStore>((set, get) => {
         set({ persons: storedPersonsCopy });
     }
 
-    const newPersonHandler = (newPerson: PersonData) => {
+    const newPersonHandler = (newPerson: Person) => {
         console.log(`event -> [${BackendEvent.NewPerson}] ${newPerson.name} `);
         storePersons([newPerson]);
     }
-    const updatedPersonHandler = (updatedPerson: PersonData) => {
+    const updatedPersonHandler = (updatedPerson: Person) => {
         console.log(`event -> [${BackendEvent.UpdatedPerson}] ${updatedPerson.name} `);
         storePersons([updatedPerson]);
     }
-    const deletedPersonHandler = (deletedPerson: PersonData) => {
+    const deletedPersonHandler = (deletedPerson: Person) => {
         console.log(`event -> [${BackendEvent.DeletedPerson}] ${deletedPerson.name}`);
         removePersons([deletedPerson.id]);
     }
@@ -85,7 +86,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
             return;
         }
 
-        const localStoragePersonIds = Object.keys(localStoragePersons) as unknown as Array<PersonData["id"]>;
+        const localStoragePersonIds = Object.keys(localStoragePersons) as unknown as Array<Person["id"]>;
 
         if (localStoragePersonIds.length == 0) {
             return;
@@ -98,7 +99,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
             return;
         }
 
-        const validPersons: Record<PersonData["id"], PersonData> = {};
+        const validPersons: Record<Person["id"], Person> = {};
         validIds.forEach((validId) => {
             validPersons[validId] = localStoragePersons![validId];
         })
@@ -109,7 +110,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
 
     return {
         persons: {},
-        fetchPerson: async (personId: PersonData["id"]) => {
+        fetchPerson: async (personId: Person["id"]) => {
             console.log(`personStore -> fetchPerson - personId: ${personId}`)
 
             const { persons: storedPersons } = get();
@@ -197,6 +198,6 @@ usePersonStore.subscribe((state) => {
     localStorage.setItem(PERSONS_LOCAL_STORAGE_KEY, JSON.stringify(state.persons));
 })
 
-export const fetchByIdSelector = (personId: PersonData["id"]) => {
+export const fetchByIdSelector = (personId: Person["id"]) => {
     return (store: PersonStore) => store.persons[personId];
 }

@@ -2,12 +2,11 @@ import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
 import {
-  CreatePropertyData,
-  CreatePropertySchema,
+  CreatePropertyDTO,
   createPropertySchema,
   propertyStates,
   propertyTypes,
-} from "../../utils/domainSchemas";
+} from "../../utils/data-schema";
 import FormDateField from "../form/FormDateField";
 import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
@@ -21,7 +20,7 @@ import { usePropertyStore } from "../../stores/propertiesStore";
 import { useAppContext } from "../AppContext";
 
 export interface CreatePropertyProps {
-  prefillProperty?: Partial<CreatePropertyData>;
+  prefillProperty?: Partial<CreatePropertyDTO>;
   onCreate?: () => void;
 }
 
@@ -47,7 +46,7 @@ export default function CreateProperty({
   );
 
   const submitProperty = useCallback(
-    async (newPropertyData: CreatePropertyData) => {
+    async (newPropertyData: CreatePropertyDTO) => {
       console.log(
         `CreateProperty -> submitProperty ${newPropertyData.address}`
       );
@@ -70,7 +69,7 @@ export default function CreateProperty({
   );
 
   return (
-    <MemoForm<CreatePropertySchema>
+    <MemoForm<typeof createPropertySchema>
       schema={createPropertySchema}
       prefillData={prefillData}
     >

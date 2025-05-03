@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
-import { RealtorData } from "../../utils/domainSchemas";
+import { Realtor } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
@@ -17,7 +17,7 @@ import {
 import { useAppContext } from "../AppContext";
 
 export interface DeleteRealtorProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
   onSoftDelete?: () => void;
   onRestore?: () => void;
 }

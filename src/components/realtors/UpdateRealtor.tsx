@@ -2,10 +2,10 @@ import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  RealtorData,
-  UpdateRealtorData,
+  Realtor,
+  UpdateRealtorDTO,
   updateRealtorSchema,
-} from "../../utils/domainSchemas";
+} from "../../utils/data-schema";
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
 import FormDateField from "../form/FormDateField";
 import FormPersonField from "../form/FormPersonField";
@@ -19,7 +19,7 @@ import {
 import { useAppContext } from "../AppContext";
 
 export interface UpdateRealtorProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
   onUpdate?: () => void;
 }
 
@@ -45,7 +45,7 @@ export default function UpdateRealtor({
       //TODO: use logged in user id
       updatedBy: 3,
       updatedAt: dateToTimestamp(new Date()),
-    } as UpdateRealtorData;
+    } as UpdateRealtorDTO;
 
     return cachedRealtor
       ? { ...cachedRealtor, ...updateMetadata }
@@ -53,7 +53,7 @@ export default function UpdateRealtor({
   }, [cachedRealtor]);
 
   const submitUpdate = useCallback(
-    async (updateRealtorData: UpdateRealtorData) => {
+    async (updateRealtorData: UpdateRealtorDTO) => {
       console.log(
         `UpdateRealtor -> submitUpdate realtorId: ${cachedRealtor?.id}`
       );

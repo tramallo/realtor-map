@@ -2,10 +2,10 @@ import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  PersonData,
-  UpdatePersonData,
+  Person,
+  UpdatePersonDTO,
   updatePersonSchema,
-} from "../../utils/domainSchemas";
+} from "../../utils/data-schema";
 import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
 import FormDateField from "../form/FormDateField";
 import FormPersonField from "../form/FormPersonField";
@@ -19,7 +19,7 @@ import {
 import { useAppContext } from "../AppContext";
 
 export interface UpdatePersonProps {
-  personId: PersonData["id"];
+  personId: Person["id"];
   onUpdate?: () => void;
 }
 
@@ -45,7 +45,7 @@ export default function UpdatePerson({
       //TODO: use logged in user id
       updatedBy: 3,
       updatedAt: dateToTimestamp(new Date()),
-    } as UpdatePersonData;
+    } as UpdatePersonDTO;
 
     return cachedPerson
       ? { ...cachedPerson, ...updateMetadata }
@@ -53,7 +53,7 @@ export default function UpdatePerson({
   }, [cachedPerson]);
 
   const submitUpdate = useCallback(
-    async (updatePersonData: UpdatePersonData) => {
+    async (updatePersonData: UpdatePersonDTO) => {
       console.log(`UpdatePerson -> submitUpdate personId: ${cachedPerson?.id}`);
 
       setUpdatingPerson(true);

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, CircularProgress } from "@mui/material";
 
 import PersonChip from "./PersonChip";
-import { PersonData } from "../utils/domainSchemas";
+import { Person } from "../utils/data-schema";
 import CustomModal from "./CustomModal";
 import ViewPerson from "./persons/ViewPerson";
 
@@ -20,7 +20,7 @@ vi.mock("@mui/material", () => ({
   CircularProgress: vi.fn(() => <div data-testid="circular-progress" />),
 }));
 
-let personsMock = {} as Record<PersonData["id"], PersonData>;
+let personsMock = {} as Record<Person["id"], Person>;
 const fetchPersonMock = vi.fn();
 vi.mock("../stores/personsStore", async (requireActual) => {
   const actual = await requireActual<typeof import("../stores/personsStore")>();
@@ -92,7 +92,7 @@ describe("PersonChip", () => {
   it("shows person name when fetch succeeds", async () => {
     const personId = 1;
     const personName = "John Doe";
-    personsMock[personId] = { id: personId, name: personName } as PersonData;
+    personsMock[personId] = { id: personId, name: personName } as Person;
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
     render(<PersonChip personId={personId} />);

@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { RealtorData, RealtorFilterData } from "../../utils/domainSchemas";
+import { Realtor } from "../../utils/data-schema";
 import { useRealtorStore } from "../../stores/realtorsStore";
 import {
   countDefinedAttributes,
@@ -30,10 +30,11 @@ import CustomModal from "../CustomModal";
 import CreateRealtor from "./CreateRealtor";
 import ViewRealtor from "./ViewRealtor";
 import RealtorChip from "../RealtorChip";
+import { RealtorFilter } from "../../utils/data-filter-schema";
 
 interface ListRealtorsProps {
-  onSelect?: (realtorIds: Array<RealtorData["id"]>) => void;
-  defaultSelected?: Array<RealtorData["id"]>;
+  onSelect?: (realtorIds: Array<Realtor["id"]>) => void;
+  defaultSelected?: Array<Realtor["id"]>;
   multiple?: boolean;
 }
 
@@ -51,7 +52,7 @@ export default function ListRealtors({
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [realtorsFilter, setRealtorsFilter] = useState({
     deleted: false,
-  } as RealtorFilterData);
+  } as RealtorFilter);
 
   const [searchingRealtors, setSearchingRealtors] = useState(false);
   const [searchRealtorsResponse, setSearchRealtorsResponse] = useState(
@@ -59,7 +60,7 @@ export default function ListRealtors({
   );
 
   const [viewRealtorId, setViewRealtorId] = useState(
-    undefined as RealtorData["id"] | undefined
+    undefined as Realtor["id"] | undefined
   );
   const [createRealtorModalOpen, setCreateRealtorModalOpen] = useState(false);
 
@@ -73,7 +74,7 @@ export default function ListRealtors({
   );
 
   const toggleRealtorSelection = useCallback(
-    (realtorId: RealtorData["id"]) => {
+    (realtorId: Realtor["id"]) => {
       const alreadySelected = selectedRealtors.some(
         (selectedId) => selectedId === realtorId
       );

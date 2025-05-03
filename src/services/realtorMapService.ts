@@ -1,21 +1,19 @@
 import { io, Socket } from "socket.io-client";
 
 import { 
-    CreatePersonData, 
-    CreatePropertyData, 
-    CreateRealtorData, 
-    PersonData, 
-    PersonFilterData, 
-    PropertyData, 
-    PropertyFilterData, 
-    RealtorData, 
-    RealtorFilterData, 
-    UpdatePersonData, 
-    UpdatePropertyData, 
-    UpdateRealtorData 
-} from "../utils/domainSchemas";
+    CreatePersonDTO, 
+    CreatePropertyDTO, 
+    CreateRealtorDTO, 
+    Person, 
+    Property, 
+    Realtor, 
+    UpdatePersonDTO, 
+    UpdatePropertyDTO, 
+    UpdateRealtorDTO 
+} from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { BackendApi, BackendEvent } from "../utils/services-interface";
+import { PersonFilter, PropertyFilter, RealtorFilter } from "../utils/data-filter-schema";
 
 const realtorMapServiceUrl = import.meta.env.VITE_REALTOR_MAP_SERVICE_URL;
 
@@ -23,7 +21,7 @@ const propertiesConnection: Socket = io(`${realtorMapServiceUrl}/properties`, { 
 const realtorsConnection: Socket = io(`${realtorMapServiceUrl}/realtors`, { autoConnect: false });
 const personsConnection: Socket = io(`${realtorMapServiceUrl}/persons`, { autoConnect: false });
 
-const getProperties = async (propertyIds: Array<PropertyData['id']>): Promise<OperationResponse<Array<PropertyData>>> => {
+const getProperties = async (propertyIds: Array<Property['id']>): Promise<OperationResponse<Array<Property>>> => {
     console.log(`realtorMapService -> getProperties - propertyIds: ${propertyIds}`);
 
     try {
@@ -36,13 +34,13 @@ const getProperties = async (propertyIds: Array<PropertyData['id']>): Promise<Op
             return { error: new Error(`getProperties -> error: ${response.status}`) }
         }
 
-        const { properties } = await response.json() as { properties: Array<PropertyData> };
+        const { properties } = await response.json() as { properties: Array<Property> };
         return { data: properties };
     } catch (error) {
         return { error: new Error(`getProperties -> error: ${error}`) };
     }
 }
-const searchPropertyIds = async (filter: PropertyFilterData): Promise<OperationResponse<Array<PropertyData['id']>>> => {
+const searchPropertyIds = async (filter: PropertyFilter): Promise<OperationResponse<Array<Property['id']>>> => {
     console.log(`realtorMapService -> searchPropertyIds - filter: ${JSON.stringify(filter)}`);
 
     try {
@@ -55,13 +53,13 @@ const searchPropertyIds = async (filter: PropertyFilterData): Promise<OperationR
             return { error: new Error(`searchPropertyIds -> error: ${response.status}`) };
         }
 
-        const { propertyIds } = await response.json() as { propertyIds: Array<PropertyData['id']> };
+        const { propertyIds } = await response.json() as { propertyIds: Array<Property['id']> };
         return { data: propertyIds };
     } catch (error) {
         return { error: new Error(`searchPropertyIds -> error: ${error}`) };
     }
 }
-const createProperty = async (newPropertyData: CreatePropertyData): Promise<OperationResponse> => {
+const createProperty = async (newPropertyData: CreatePropertyDTO): Promise<OperationResponse> => {
     console.log(`realtorMapService -> createProperty - propertyData: ${newPropertyData.address}`);
 
     try {
@@ -82,7 +80,7 @@ const createProperty = async (newPropertyData: CreatePropertyData): Promise<Oper
         return { error: new Error(`createProperty -> error: ${error}`) };
     }
 }
-const updateProperty = async (propertyId: PropertyData["id"], updateData: UpdatePropertyData): Promise<OperationResponse> => {
+const updateProperty = async (propertyId: Property["id"], updateData: UpdatePropertyDTO): Promise<OperationResponse> => {
     console.log(`realtorMapService -> updateProperty - propertyId: ${propertyId} updateData: ${JSON.stringify(updateData)}`);
 
     try {
@@ -103,7 +101,7 @@ const updateProperty = async (propertyId: PropertyData["id"], updateData: Update
         return { error: new Error(`updateProperty -> error: ${error}`) };
     }
 }
-const deleteProperty = async (propertyId: PropertyData['id']):Promise<OperationResponse> => {
+const deleteProperty = async (propertyId: Property['id']):Promise<OperationResponse> => {
     console.log(`realtorMapService -> deleteProperty propertyId: ${propertyId}`);
 
     try {
@@ -122,7 +120,7 @@ const deleteProperty = async (propertyId: PropertyData['id']):Promise<OperationR
         return { error: new Error(`deleteProperty -> error: ${error}`) };
     }
 }
-const invalidateProperties = async (propertyIds: Array<PropertyData["id"]>, timestamp: number): Promise<OperationResponse<Array<PropertyData["id"]>>> => {
+const invalidateProperties = async (propertyIds: Array<Property["id"]>, timestamp: number): Promise<OperationResponse<Array<Property["id"]>>> => {
     console.log(`realtorMapService -> invalidateProperties - propertyIds: ${propertyIds} timestamp: ${timestamp}`);
 
     try {
@@ -135,14 +133,14 @@ const invalidateProperties = async (propertyIds: Array<PropertyData["id"]>, time
             return { error: new Error(`invalidateProperties -> error: ${response.status}`) };
         }
 
-        const { validIds } = await response.json() as { validIds: Array<PropertyData["id"]> };
+        const { validIds } = await response.json() as { validIds: Array<Property["id"]> };
         return { data: validIds };
     } catch (error) {
         return error instanceof Error ? { error } : { error: new Error("Request error") };
     }
 }
 
-const getRealtors = async (realtorIds: Array<RealtorData['id']>): Promise<OperationResponse<Array<RealtorData>>> => {
+const getRealtors = async (realtorIds: Array<Realtor['id']>): Promise<OperationResponse<Array<Realtor>>> => {
     console.log(`realtorMapService -> getRealtors - realtorIds: ${realtorIds}`);
 
     try {
@@ -155,13 +153,13 @@ const getRealtors = async (realtorIds: Array<RealtorData['id']>): Promise<Operat
             return { error: new Error(`getRealtors -> error: ${response.status}`) }
         }
 
-        const { realtors } = await response.json() as { realtors: Array<RealtorData> };
+        const { realtors } = await response.json() as { realtors: Array<Realtor> };
         return { data: realtors };
     } catch (error) {
         return { error: new Error(`getRealtors -> error: ${error}`) };
     }
 }
-const searchRealtorIds = async (filter: RealtorFilterData): Promise<OperationResponse<Array<RealtorData['id']>>> => {
+const searchRealtorIds = async (filter: RealtorFilter): Promise<OperationResponse<Array<Realtor['id']>>> => {
     console.log(`realtorMapService -> searchRealtorIds - filter: ${JSON.stringify(filter)}`);
 
     try {
@@ -174,13 +172,13 @@ const searchRealtorIds = async (filter: RealtorFilterData): Promise<OperationRes
             return { error: new Error(`searchRealtorIds -> error: ${response.status}`) };
         }
 
-        const { realtorIds } = await response.json() as { realtorIds: Array<RealtorData['id']> };
+        const { realtorIds } = await response.json() as { realtorIds: Array<Realtor['id']> };
         return { data: realtorIds };
     } catch (error) {
         return { error: new Error(`searchRealtorIds -> error: ${error}`) };
     }
 }
-const createRealtor = async (newRealtorData: CreateRealtorData): Promise<OperationResponse> => {
+const createRealtor = async (newRealtorData: CreateRealtorDTO): Promise<OperationResponse> => {
     console.log(`realtorMapService -> createRealtor - realtorData: ${newRealtorData.name}`);
 
     try {
@@ -201,7 +199,7 @@ const createRealtor = async (newRealtorData: CreateRealtorData): Promise<Operati
         return { error: new Error(`createRealtor -> error: ${error}`) };
     }
 }
-const updateRealtor = async (realtorId: RealtorData["id"], updateData: UpdateRealtorData): Promise<OperationResponse> => {
+const updateRealtor = async (realtorId: Realtor["id"], updateData: UpdateRealtorDTO): Promise<OperationResponse> => {
     console.log(`realtorMapService -> updateRealtor - realtorId: ${realtorId} updateData: ${JSON.stringify(updateData)}`);
 
     try {
@@ -222,7 +220,7 @@ const updateRealtor = async (realtorId: RealtorData["id"], updateData: UpdateRea
         return { error: new Error(`updateRealtor -> error: ${error}`) };
     }
 }
-const deleteRealtor = async (realtorId: RealtorData['id']):Promise<OperationResponse> => {
+const deleteRealtor = async (realtorId: Realtor['id']):Promise<OperationResponse> => {
     console.log(`realtorMapService -> deleteRealtor realtorId: ${realtorId}`);
 
     try {
@@ -241,7 +239,7 @@ const deleteRealtor = async (realtorId: RealtorData['id']):Promise<OperationResp
         return { error: new Error(`deleteRealtor -> error: ${error}`) };
     }
 }
-const invalidateRealtors = async (realtorIds: Array<RealtorData["id"]>, timestamp: number): Promise<OperationResponse<Array<RealtorData["id"]>>> => {
+const invalidateRealtors = async (realtorIds: Array<Realtor["id"]>, timestamp: number): Promise<OperationResponse<Array<Realtor["id"]>>> => {
     console.log(`realtorMapService -> invalidateRealtors - realtorIds: ${realtorIds} timestamp: ${timestamp}`);
 
     try {
@@ -254,14 +252,14 @@ const invalidateRealtors = async (realtorIds: Array<RealtorData["id"]>, timestam
             return { error: new Error(`invalidateRealtors -> error: ${response.status}`) };
         }
 
-        const { validIds } = await response.json() as { validIds: Array<RealtorData["id"]> };
+        const { validIds } = await response.json() as { validIds: Array<Realtor["id"]> };
         return { data: validIds };
     } catch (error) {
         return error instanceof Error ? { error } : { error: new Error("Request error") };
     }
 }
 
-const getPersons = async (personIds: Array<PersonData['id']>): Promise<OperationResponse<Array<PersonData>>> => {
+const getPersons = async (personIds: Array<Person['id']>): Promise<OperationResponse<Array<Person>>> => {
     console.log(`realtorMapService -> getPersons - personIds: ${personIds}`);
 
     try {
@@ -274,13 +272,13 @@ const getPersons = async (personIds: Array<PersonData['id']>): Promise<Operation
             return { error: new Error(`getPersons -> error: ${response.status}`) };
         }
         
-        const { persons } = await response.json() as { persons: Array<PersonData> };
+        const { persons } = await response.json() as { persons: Array<Person> };
         return { data: persons };
     } catch (error) {
         return { error: new Error(`getPersons -> error: ${error}`) };
     }
 }
-const searchPersonIds = async (filter: PersonFilterData): Promise<OperationResponse<Array<PersonData['id']>>> => {
+const searchPersonIds = async (filter: PersonFilter): Promise<OperationResponse<Array<Person['id']>>> => {
     console.log(`realtorMapService -> searchPersonIds - filter: ${JSON.stringify(filter)}`);
 
     try {
@@ -293,13 +291,13 @@ const searchPersonIds = async (filter: PersonFilterData): Promise<OperationRespo
             return { error: new Error(`searchPersonIds -> error: ${response.status}`) }
         }
 
-        const { personIds } = await response.json() as { personIds: Array<PersonData['id']> };
+        const { personIds } = await response.json() as { personIds: Array<Person['id']> };
         return { data: personIds };
     } catch (error) {
         return { error: new Error(`searchPersonIds -> error: ${error}`) }
     }
 }
-const createPerson = async (newPersonData: CreatePersonData): Promise<OperationResponse> => {
+const createPerson = async (newPersonData: CreatePersonDTO): Promise<OperationResponse> => {
     console.log(`realtorMapService -> createPerson - personData: ${newPersonData.name}`);
 
     try {
@@ -320,7 +318,7 @@ const createPerson = async (newPersonData: CreatePersonData): Promise<OperationR
         return { error: new Error(`createPerson -> error: ${error}`) };
     }
 }
-const updatePerson = async (personId: PersonData["id"], updateData: UpdatePersonData): Promise<OperationResponse> => {
+const updatePerson = async (personId: Person["id"], updateData: UpdatePersonDTO): Promise<OperationResponse> => {
     console.log(`realtorMapService -> updatePerson - personId: ${personId} updateData: ${JSON.stringify(updateData)}`);
 
     try {
@@ -341,7 +339,7 @@ const updatePerson = async (personId: PersonData["id"], updateData: UpdatePerson
         return { error: new Error(`updatePerson -> error: ${error}`) }
     }
 }
-const deletePerson = async (personId: PersonData['id']):Promise<OperationResponse> => {
+const deletePerson = async (personId: Person['id']):Promise<OperationResponse> => {
     console.log(`realtorMapService -> deletePerson personId: ${personId}`);
 
     try {
@@ -360,7 +358,7 @@ const deletePerson = async (personId: PersonData['id']):Promise<OperationRespons
         return { error: new Error(`deletePerson -> error: ${error}`) };
     }
 }
-const invalidatePersons = async (personIds: Array<PersonData["id"]>, timestamp: number): Promise<OperationResponse<Array<PersonData["id"]>>> => {
+const invalidatePersons = async (personIds: Array<Person["id"]>, timestamp: number): Promise<OperationResponse<Array<Person["id"]>>> => {
     console.log(`realtorMapService -> invalidatePersons - personIds: ${personIds} timestamp: ${timestamp}`);
 
     try {
@@ -373,7 +371,7 @@ const invalidatePersons = async (personIds: Array<PersonData["id"]>, timestamp: 
             return { error: new Error(`invalidatePersons -> error: ${response.status}`) }
         }
 
-        const { validIds } = await response.json() as { validIds: Array<PersonData["id"]> };
+        const { validIds } = await response.json() as { validIds: Array<Person["id"]> };
         return { data: validIds };
     } catch (error) {
         return { error: new Error(`invalidatePersons -> error: ${error}`) };
@@ -381,9 +379,9 @@ const invalidatePersons = async (personIds: Array<PersonData["id"]>, timestamp: 
 }
 
 const propertiesSubscribe = async (
-    newPropertyHandler: (newProperty: PropertyData) => void,
-    updatedPropertyHandler: (updatedProperty: PropertyData) => void,
-    deletedPropertyHandler: (deletedProperty: PropertyData) => void,
+    newPropertyHandler: (newProperty: Property) => void,
+    updatedPropertyHandler: (updatedProperty: Property) => void,
+    deletedPropertyHandler: (deletedProperty: Property) => void,
 ) => {
     console.log(`realtorMapService -> propertiesSubscribe`);
 
@@ -419,9 +417,9 @@ const propertiesUnsubscribe = () => {
 }
 
 const realtorsSubscribe = async (
-    newRealtorHandler: (newRealtor: RealtorData) => void,
-    updatedRealtorHandler: (updatedRealtor: RealtorData) => void,
-    deletedRealtorHandler: (deletedRealtor: RealtorData) => void,
+    newRealtorHandler: (newRealtor: Realtor) => void,
+    updatedRealtorHandler: (updatedRealtor: Realtor) => void,
+    deletedRealtorHandler: (deletedRealtor: Realtor) => void,
 ) => {
     console.log(`realtorMapService -> realtorsSubscribe`);
 
@@ -457,9 +455,9 @@ const realtorsUnsubscribe = () => {
 }
 
 const personsSubscribe = async (
-    newPersonHandler: (newPerson: PersonData) => void,
-    updatedPersonHandler: (updatedPerson: PersonData) => void,
-    deletedPersonHandler: (deletedPerson: PersonData) => void,
+    newPersonHandler: (newPerson: Person) => void,
+    updatedPersonHandler: (updatedPerson: Person) => void,
+    deletedPersonHandler: (deletedPerson: Person) => void,
 ) => {
     console.log(`realtorMapService -> personsSubscribe`);
 

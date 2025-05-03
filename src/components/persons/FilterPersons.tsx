@@ -1,13 +1,13 @@
 import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
 
-import { PersonFilterData } from "../../utils/domainSchemas";
 import FilterBaseData from "../FilterBaseData";
 import { DebouncedTextField } from "../DebouncedTextField";
+import { PersonFilter } from "../../utils/data-filter-schema";
 
 export interface FilterPersonsProps {
-  filter: PersonFilterData;
-  onChange: (newValue: PersonFilterData) => void;
+  filter: PersonFilter;
+  onChange: (newValue: PersonFilter) => void;
 }
 
 export function FilterPersons({ filter, onChange }: FilterPersonsProps) {
@@ -16,7 +16,7 @@ export function FilterPersons({ filter, onChange }: FilterPersonsProps) {
   );
 
   const setFilterValue = useCallback(
-    (value: Partial<PersonFilterData>) => {
+    (value: Partial<PersonFilter>) => {
       onChange({ ...filter, ...value });
     },
     [filter, onChange]

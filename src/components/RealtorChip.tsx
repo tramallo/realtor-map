@@ -1,14 +1,14 @@
 import { Chip, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 
-import { RealtorData } from "../utils/domainSchemas";
+import { Realtor } from "../utils/data-schema";
 import ViewRealtor from "./realtors/ViewRealtor";
 import { OperationResponse } from "../utils/helperFunctions";
 import CustomModal from "./CustomModal";
 import { useRealtorStore, fetchByIdSelector } from "../stores/realtorsStore";
 
 export interface RealtorChipProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
   onClose?: () => void;
 }
 

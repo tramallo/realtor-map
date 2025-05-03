@@ -9,20 +9,22 @@ import {
 
 import { OperationResponse } from "../utils/helperFunctions";
 import {
-  CreatePersonData,
-  CreatePropertyData,
-  CreateRealtorData,
-  PersonData,
-  PersonFilterData,
-  PropertyData,
-  PropertyFilterData,
-  RealtorData,
-  RealtorFilterData,
-  UpdatePersonData,
-  UpdatePropertyData,
-  UpdateRealtorData,
-} from "../utils/domainSchemas";
+  CreatePersonDTO,
+  CreatePropertyDTO,
+  CreateRealtorDTO,
+  Person,
+  Property,
+  Realtor,
+  UpdatePersonDTO,
+  UpdatePropertyDTO,
+  UpdateRealtorDTO,
+} from "../utils/data-schema";
 import { BackendApi } from "../utils/services-interface";
+import {
+  PersonFilter,
+  PropertyFilter,
+  RealtorFilter,
+} from "../utils/data-filter-schema";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -78,7 +80,7 @@ export const logout = async (): Promise<OperationResponse> => {
 const queryConstructor = {
   searchPropertyIdsQuery: (
     supabaseClient: SupabaseClient,
-    filter: PropertyFilterData
+    filter: PropertyFilter
   ) => {
     let query = supabaseClient.from("property").select("id");
 
@@ -134,7 +136,7 @@ const queryConstructor = {
   },
   searchRealtorIdsQuery: (
     supabaseClient: SupabaseClient,
-    filter: RealtorFilterData
+    filter: RealtorFilter
   ) => {
     let query = supabaseClient.from("realtor").select("id");
 
@@ -175,7 +177,7 @@ const queryConstructor = {
   },
   searchPersonIdsQuery: (
     supabseClient: SupabaseClient,
-    filter: PersonFilterData
+    filter: PersonFilter
   ) => {
     let query = supabseClient.from("person").select("id");
 
@@ -225,8 +227,8 @@ const queryConstructor = {
 // property
 let propertyChannel = undefined as RealtimeChannel | undefined;
 const searchPropertyIds = async (
-  filter: PropertyFilterData
-): Promise<OperationResponse<Array<PropertyData["id"]>>> => {
+  filter: PropertyFilter
+): Promise<OperationResponse<Array<Property["id"]>>> => {
   console.log(`supabaseService -> searchPropertyIds`);
   const query = queryConstructor.searchPropertyIdsQuery(client, filter);
   const { data, error } = await query;
@@ -239,8 +241,8 @@ const searchPropertyIds = async (
   return { data: propertyIds };
 };
 const getProperties = async (
-  propertyIds: Array<PropertyData["id"]>
-): Promise<OperationResponse<Array<PropertyData>>> => {
+  propertyIds: Array<Property["id"]>
+): Promise<OperationResponse<Array<Property>>> => {
   console.log(`supabaseService -> getProperties propertyIds: ${propertyIds}`);
   const { data, error } = await client
     .from("property")
@@ -254,7 +256,7 @@ const getProperties = async (
   return { data };
 };
 const createProperty = async (
-  newPropertyData: CreatePropertyData
+  newPropertyData: CreatePropertyDTO
 ): Promise<OperationResponse> => {
   console.log(`supabaseService -> createProperty ${newPropertyData.address}`);
   const { error } = await client.from("property").insert(newPropertyData);
@@ -266,8 +268,8 @@ const createProperty = async (
   return { data: undefined };
 };
 const updateProperty = async (
-  propertyId: PropertyData["id"],
-  updateData: UpdatePropertyData
+  propertyId: Property["id"],
+  updateData: UpdatePropertyDTO
 ): Promise<OperationResponse> => {
   console.log(`supabaseService -> updateProperty ${propertyId}`);
   const { error } = await client
@@ -282,7 +284,7 @@ const updateProperty = async (
   return { data: undefined };
 };
 const deleteProperty = async (
-  propertyId: PropertyData["id"]
+  propertyId: Property["id"]
 ): Promise<OperationResponse<undefined>> => {
   console.log(`supabaseService -> deleteProperty ${propertyId}`);
   const { data, error } = await client
@@ -298,9 +300,9 @@ const deleteProperty = async (
   return { data: data[0] };
 };
 const invalidateProperties = async (
-  propertyIds: Array<PropertyData["id"]>,
+  propertyIds: Array<Property["id"]>,
   timestamp: number
-): Promise<OperationResponse<Array<PropertyData["id"]>>> => {
+): Promise<OperationResponse<Array<Property["id"]>>> => {
   console.log(`supabaseService -> invalidateProperties ${propertyIds}`);
 
   if (propertyIds.length === 0) {
@@ -322,9 +324,9 @@ const invalidateProperties = async (
   return { data: validIds };
 };
 const propertiesSubscribe = async (
-  newPropertyHandler: (newProperty: PropertyData) => void,
-  updatedPropertyHandler: (updatedProperty: PropertyData) => void,
-  deletedPropertyHandler: (deletedProperty: PropertyData) => void
+  newPropertyHandler: (newProperty: Property) => void,
+  updatedPropertyHandler: (updatedProperty: Property) => void,
+  deletedPropertyHandler: (deletedProperty: Property) => void
 ): Promise<OperationResponse> => {
   console.log(`supabaseApi -> propertiesSubscribe`);
 
@@ -341,17 +343,17 @@ const propertiesSubscribe = async (
     .on(
       "postgres_changes",
       { event: "INSERT", table: "property", schema: "public" },
-      (payload) => newPropertyHandler(payload.new as PropertyData)
+      (payload) => newPropertyHandler(payload.new as Property)
     )
     .on(
       "postgres_changes",
       { event: "UPDATE", table: "property", schema: "public" },
-      (payload) => updatedPropertyHandler(payload.new as PropertyData)
+      (payload) => updatedPropertyHandler(payload.new as Property)
     )
     .on(
       "postgres_changes",
       { event: "DELETE", table: "property", schema: "public" },
-      (payload) => deletedPropertyHandler(payload.old as PropertyData)
+      (payload) => deletedPropertyHandler(payload.old as Property)
     );
 
   propertyChannel.subscribe((_status, err) => {
@@ -387,8 +389,8 @@ const propertiesUnsubscribe = async (): Promise<OperationResponse> => {
 // realtor
 let realtorChannel = undefined as RealtimeChannel | undefined;
 const searchRealtorIds = async (
-  filter: RealtorFilterData
-): Promise<OperationResponse<Array<RealtorData["id"]>>> => {
+  filter: RealtorFilter
+): Promise<OperationResponse<Array<Realtor["id"]>>> => {
   console.log(`supabaseService -> searchRealtorIds`);
   const query = queryConstructor.searchRealtorIdsQuery(client, filter);
   const { data, error } = await query;
@@ -401,8 +403,8 @@ const searchRealtorIds = async (
   return { data: realtorIds };
 };
 const getRealtors = async (
-  realtorIds: Array<RealtorData["id"]>
-): Promise<OperationResponse<Array<RealtorData>>> => {
+  realtorIds: Array<Realtor["id"]>
+): Promise<OperationResponse<Array<Realtor>>> => {
   console.log(`supabaseService -> getRealtors realtorIds: ${realtorIds}`);
   const { data, error } = await client
     .from("realtor")
@@ -416,7 +418,7 @@ const getRealtors = async (
   return { data };
 };
 const createRealtor = async (
-  newRealtorData: CreateRealtorData
+  newRealtorData: CreateRealtorDTO
 ): Promise<OperationResponse> => {
   console.log(`supabaseService -> createRealtor ${newRealtorData.name}`);
   const { error } = await client.from("realtor").insert(newRealtorData);
@@ -428,8 +430,8 @@ const createRealtor = async (
   return { data: undefined };
 };
 const updateRealtor = async (
-  realtorId: RealtorData["id"],
-  updateData: UpdateRealtorData
+  realtorId: Realtor["id"],
+  updateData: UpdateRealtorDTO
 ): Promise<OperationResponse> => {
   console.log(`supabaseService -> updateRealtor ${realtorId}`);
   const { error } = await client
@@ -444,7 +446,7 @@ const updateRealtor = async (
   return { data: undefined };
 };
 const deleteRealtor = async (
-  realtorId: RealtorData["id"]
+  realtorId: Realtor["id"]
 ): Promise<OperationResponse<undefined>> => {
   console.log(`supabaseService -> deleteRealtor ${realtorId}`);
   const { data, error } = await client
@@ -460,9 +462,9 @@ const deleteRealtor = async (
   return { data: data[0] };
 };
 const invalidateRealtors = async (
-  realtorIds: Array<RealtorData["id"]>,
+  realtorIds: Array<Realtor["id"]>,
   timestamp: number
-): Promise<OperationResponse<Array<RealtorData["id"]>>> => {
+): Promise<OperationResponse<Array<Realtor["id"]>>> => {
   console.log(`supabaseService -> invalidateRealtors ${realtorIds}`);
 
   if (realtorIds.length === 0) {
@@ -484,9 +486,9 @@ const invalidateRealtors = async (
   return { data: validIds };
 };
 const realtorsSubscribe = async (
-  newRealtorHandler: (newRealtor: RealtorData) => void,
-  updatedRealtorHandler: (updatedRealtor: RealtorData) => void,
-  deletedRealtorHandler: (deletedRealtor: RealtorData) => void
+  newRealtorHandler: (newRealtor: Realtor) => void,
+  updatedRealtorHandler: (updatedRealtor: Realtor) => void,
+  deletedRealtorHandler: (deletedRealtor: Realtor) => void
 ): Promise<OperationResponse> => {
   console.log(`supabaseApi -> realtorsSubscribe`);
 
@@ -503,17 +505,17 @@ const realtorsSubscribe = async (
     .on(
       "postgres_changes",
       { event: "INSERT", table: "realtor", schema: "public" },
-      (payload) => newRealtorHandler(payload.new as RealtorData)
+      (payload) => newRealtorHandler(payload.new as Realtor)
     )
     .on(
       "postgres_changes",
       { event: "UPDATE", table: "realtor", schema: "public" },
-      (payload) => updatedRealtorHandler(payload.new as RealtorData)
+      (payload) => updatedRealtorHandler(payload.new as Realtor)
     )
     .on(
       "postgres_changes",
       { event: "DELETE", table: "realtor", schema: "public" },
-      (payload) => deletedRealtorHandler(payload.old as RealtorData)
+      (payload) => deletedRealtorHandler(payload.old as Realtor)
     );
 
   realtorChannel.subscribe((_status, err) => {
@@ -549,8 +551,8 @@ const realtorsUnsubscribe = async (): Promise<OperationResponse> => {
 // person
 let personChannel = undefined as RealtimeChannel | undefined;
 const searchPersonIds = async (
-  filter: PersonFilterData
-): Promise<OperationResponse<Array<PersonData["id"]>>> => {
+  filter: PersonFilter
+): Promise<OperationResponse<Array<Person["id"]>>> => {
   console.log(`supabaseService -> searchPersonIds`);
   const query = queryConstructor.searchPersonIdsQuery(client, filter);
   const { data, error } = await query;
@@ -563,8 +565,8 @@ const searchPersonIds = async (
   return { data: personIds };
 };
 const getPersons = async (
-  personIds: Array<PersonData["id"]>
-): Promise<OperationResponse<Array<PersonData>>> => {
+  personIds: Array<Person["id"]>
+): Promise<OperationResponse<Array<Person>>> => {
   console.log(`supabaseService -> getPersons personIds: ${personIds}`);
   const { data, error } = await client
     .from("person")
@@ -578,7 +580,7 @@ const getPersons = async (
   return { data };
 };
 const createPerson = async (
-  newPersonData: CreatePersonData
+  newPersonData: CreatePersonDTO
 ): Promise<OperationResponse> => {
   console.log(`supabaseService -> createPerson ${newPersonData.name}`);
   const { error } = await client.from("person").insert(newPersonData);
@@ -590,8 +592,8 @@ const createPerson = async (
   return { data: undefined };
 };
 const updatePerson = async (
-  personId: PersonData["id"],
-  updateData: UpdatePersonData
+  personId: Person["id"],
+  updateData: UpdatePersonDTO
 ): Promise<OperationResponse> => {
   console.log(`supabaseService -> updatePerson ${personId}`);
   const { error } = await client
@@ -606,7 +608,7 @@ const updatePerson = async (
   return { data: undefined };
 };
 const deletePerson = async (
-  personId: PersonData["id"]
+  personId: Person["id"]
 ): Promise<OperationResponse<undefined>> => {
   console.log(`supabaseService -> deletePerson ${personId}`);
   const { data, error } = await client
@@ -622,9 +624,9 @@ const deletePerson = async (
   return { data: data[0] };
 };
 const invalidatePersons = async (
-  personIds: Array<PersonData["id"]>,
+  personIds: Array<Person["id"]>,
   timestamp: number
-): Promise<OperationResponse<Array<PersonData["id"]>>> => {
+): Promise<OperationResponse<Array<Person["id"]>>> => {
   console.log(`supabaseService -> invalidatePersons ${personIds}`);
 
   if (personIds.length === 0) {
@@ -646,9 +648,9 @@ const invalidatePersons = async (
   return { data: validIds };
 };
 const personsSubscribe = async (
-  newPersonHandler: (newPerson: PersonData) => void,
-  updatedPersonHandler: (updatedPerson: PersonData) => void,
-  deletedPersonHandler: (deletedPerson: PersonData) => void
+  newPersonHandler: (newPerson: Person) => void,
+  updatedPersonHandler: (updatedPerson: Person) => void,
+  deletedPersonHandler: (deletedPerson: Person) => void
 ): Promise<OperationResponse> => {
   console.log(`supabaseApi -> personsSubscribe`);
 
@@ -666,17 +668,17 @@ const personsSubscribe = async (
     .on(
       "postgres_changes",
       { event: "INSERT", table: "person", schema: "public" },
-      (payload) => newPersonHandler(payload.new as PersonData)
+      (payload) => newPersonHandler(payload.new as Person)
     )
     .on(
       "postgres_changes",
       { event: "UPDATE", table: "person", schema: "public" },
-      (payload) => updatedPersonHandler(payload.new as PersonData)
+      (payload) => updatedPersonHandler(payload.new as Person)
     )
     .on(
       "postgres_changes",
       { event: "DELETE", table: "person", schema: "public" },
-      (payload) => deletedPersonHandler(payload.old as PersonData)
+      (payload) => deletedPersonHandler(payload.old as Person)
     );
 
   personChannel.subscribe((_status, err) => {

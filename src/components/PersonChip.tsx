@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Chip, CircularProgress } from "@mui/material";
 
-import { PersonData } from "../utils/domainSchemas";
+import { Person } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import ViewPerson from "./persons/ViewPerson";
 import CustomModal from "./CustomModal";
 import { usePersonStore, fetchByIdSelector } from "../stores/personsStore";
 
 export interface PersonChipProps {
-  personId: PersonData["id"];
+  personId: Person["id"];
   onClose?: () => void;
 }
 

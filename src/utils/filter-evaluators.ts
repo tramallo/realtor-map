@@ -1,13 +1,13 @@
 import { 
     BaseData, 
     BaseFilterData, 
-    PersonData, 
+    Person, 
     PersonFilterData, 
-    PropertyData, 
+    Property, 
     PropertyFilterData, 
-    RealtorData,
+    Realtor,
     RealtorFilterData, 
-} from "./domainSchemas";
+} from "./data-schema";
 
 /** The logic on this evaluators must match the logic on backendApi search request.
  * Otherwise will cause that not all received data is shown, and incorrect data is shown from local storage 
@@ -26,7 +26,7 @@ export const dataCompliesFilter = (data: BaseData, filter: BaseFilterData): bool
     return true;
 }
 
-export const propertyCompliesFilter = (property: PropertyData, filter: PropertyFilterData): boolean => {
+export const propertyCompliesFilter = (property: Property, filter: PropertyFilterData): boolean => {
     if(!dataCompliesFilter(property, filter)) { return false }
     if (filter.address) {
         const lowercasePropertyAddress = (property.address ?? "").toLowerCase();
@@ -55,7 +55,7 @@ export const propertyCompliesFilter = (property: PropertyData, filter: PropertyF
     return true;
 }
 
-export const realtorCompliesFilter = (realtor: RealtorData, filter: RealtorFilterData): boolean => {
+export const realtorCompliesFilter = (realtor: Realtor, filter: RealtorFilterData): boolean => {
     if(!dataCompliesFilter(realtor, filter)) { return false }
     if (filter.name) {
         const lowercaseRealtorName = (realtor.name ?? "").toLowerCase();
@@ -71,7 +71,7 @@ export const realtorCompliesFilter = (realtor: RealtorData, filter: RealtorFilte
     return true;
 }
 
-export const personCompliesFilter = (person: PersonData, filter: PersonFilterData): boolean => {
+export const personCompliesFilter = (person: Person, filter: PersonFilterData): boolean => {
     if(!dataCompliesFilter(person, filter)) { return false }
     if (filter.name) {
         const lowercasePersonName = (person.name ?? "").toLowerCase();

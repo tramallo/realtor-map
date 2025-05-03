@@ -12,7 +12,7 @@ import {
   usePropertyStore,
   fetchByIdSelector,
 } from "../../stores/propertiesStore";
-import { PropertyData } from "../../utils/domainSchemas";
+import { Property } from "../../utils/data-schema";
 import ComponentsField from "../ComponentsField";
 import PersonChip from "../PersonChip";
 import RealtorChip from "../RealtorChip";
@@ -23,7 +23,7 @@ import {
 import { useAppContext } from "../AppContext";
 
 export interface DeletePropertyProps {
-  propertyId: PropertyData["id"];
+  propertyId: Property["id"];
   onSoftDelete?: () => void;
   onRestore?: () => void;
 }

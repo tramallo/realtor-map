@@ -12,7 +12,7 @@ import {
   usePropertyStore,
   fetchByIdSelector,
 } from "../../stores/propertiesStore";
-import { PropertyData } from "../../utils/domainSchemas";
+import { Property } from "../../utils/data-schema";
 import UpdateProperty from "./UpdateProperty";
 import RealtorChip from "../RealtorChip";
 import PersonChip from "../PersonChip";
@@ -23,7 +23,7 @@ import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 
 export interface ViewPropertyProps {
-  propertyId: PropertyData["id"];
+  propertyId: Property["id"];
 }
 
 export default function ViewProperty({ propertyId }: ViewPropertyProps) {

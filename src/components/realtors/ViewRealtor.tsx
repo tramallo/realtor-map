@@ -9,14 +9,14 @@ import {
 } from "@mui/material";
 
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
-import { RealtorData } from "../../utils/domainSchemas";
+import { Realtor } from "../../utils/data-schema";
 import DeleteRealtor from "./DeleteRealtor";
 import UpdateRealtor from "./UpdateRealtor";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 
 export interface ViewRealtorProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
 }
 
 export default function ViewRealtor({ realtorId }: ViewRealtorProps) {

@@ -1,11 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
-import {
-  CreateRealtorData,
-  createRealtorSchema,
-  CreateRealtorSchema,
-} from "../../utils/domainSchemas";
+import { CreateRealtorDTO, createRealtorSchema } from "../../utils/data-schema";
 import { dateToTimestamp } from "../../utils/helperFunctions";
 import { MemoForm } from "../form/Form";
 import FormTextField from "../form/FormTextField";
@@ -16,7 +12,7 @@ import { useRealtorStore } from "../../stores/realtorsStore";
 import { useAppContext } from "../AppContext";
 
 export interface CreateRealtorProps {
-  prefillRealtor?: Partial<CreateRealtorData>;
+  prefillRealtor?: Partial<CreateRealtorDTO>;
   onCreate?: () => void;
 }
 
@@ -40,7 +36,7 @@ export default function CreateRealtor({
   );
 
   const onSubmit = useCallback(
-    async (newRealtorData: CreateRealtorData) => {
+    async (newRealtorData: CreateRealtorDTO) => {
       setCreatingRealtor(true);
       const createResponse = await createRealtor(newRealtorData);
       setCreatingRealtor(false);
@@ -59,7 +55,7 @@ export default function CreateRealtor({
   );
 
   return (
-    <MemoForm<CreateRealtorSchema>
+    <MemoForm<typeof createRealtorSchema>
       schema={createRealtorSchema}
       prefillData={prefillData}
     >

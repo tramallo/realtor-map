@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Box } from "@mui/material";
 
-import { PersonData } from "../utils/domainSchemas";
+import { Person } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
 import PersonChip from "./PersonChip";
 import CustomModal from "./CustomModal";
@@ -9,8 +9,8 @@ import ListPersons from "./persons/ListPersons";
 
 export interface PersonFieldProps {
   label?: string;
-  selected: Array<PersonData["id"]>;
-  onSelect: (newValue: Array<PersonData["id"]>) => void;
+  selected: Array<Person["id"]>;
+  onSelect: (newValue: Array<Person["id"]>) => void;
   multiple?: boolean;
   errorMessage?: string;
   readOnly?: boolean;
@@ -27,18 +27,16 @@ export default function PersonField({
   const [selectPersonModalOpen, setSelectPersonModalOpen] = useState(false);
 
   const removeSelected = useCallback(
-    (personId: PersonData["id"]) => {
+    (personId: Person["id"]) => {
       onSelect(
-        selected.filter(
-          (selectedId: PersonData["id"]) => selectedId != personId
-        )
+        selected.filter((selectedId: Person["id"]) => selectedId != personId)
       );
     },
     [selected, onSelect]
   );
 
   const onPersonSelect = useCallback(
-    (newValue: Array<PersonData["id"]>) => {
+    (newValue: Array<Person["id"]>) => {
       onSelect(newValue);
       setSelectPersonModalOpen(false);
     },
@@ -54,15 +52,13 @@ export default function PersonField({
         onActionButtonClick={
           !readOnly ? () => setSelectPersonModalOpen(true) : undefined
         }
-        components={selected.map(
-          (personId: PersonData["id"], index: number) => (
-            <PersonChip
-              key={`chip-${personId}-${index}`}
-              personId={personId}
-              onClose={readOnly ? undefined : () => removeSelected(personId)}
-            />
-          )
-        )}
+        components={selected.map((personId: Person["id"], index: number) => (
+          <PersonChip
+            key={`chip-${personId}-${index}`}
+            personId={personId}
+            onClose={readOnly ? undefined : () => removeSelected(personId)}
+          />
+        ))}
       />
       <CustomModal
         title="Select person(s)"

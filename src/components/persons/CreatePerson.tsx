@@ -1,11 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
-import {
-  CreatePersonData,
-  CreatePersonSchema,
-  createPersonSchema,
-} from "../../utils/domainSchemas";
+import { CreatePersonDTO, createPersonSchema } from "../../utils/data-schema";
 import { MemoForm } from "../form/Form";
 import FormTextField from "../form/FormTextField";
 import FormDateField from "../form/FormDateField";
@@ -16,7 +12,7 @@ import { usePersonStore } from "../../stores/personsStore";
 import { useAppContext } from "../AppContext";
 
 export interface CreatePersonProps {
-  prefillPerson?: Partial<CreatePersonData>;
+  prefillPerson?: Partial<CreatePersonDTO>;
   onCreate?: () => void;
 }
 
@@ -40,7 +36,7 @@ export default function CreatePerson({
   );
 
   const onSubmit = useCallback(
-    async (newPersonData: CreatePersonData) => {
+    async (newPersonData: CreatePersonDTO) => {
       setCreatingPerson(true);
       const createResponse = await createPerson(newPersonData);
       setCreatingPerson(false);
@@ -59,7 +55,7 @@ export default function CreatePerson({
   );
 
   return (
-    <MemoForm<CreatePersonSchema>
+    <MemoForm<typeof createPersonSchema>
       schema={createPersonSchema}
       prefillData={prefillData}
     >

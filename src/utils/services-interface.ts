@@ -1,4 +1,4 @@
-import { CreatePersonData, CreatePropertyData, CreateRealtorData, PersonData, PersonFilterData, PropertyData, PropertyFilterData, RealtorData, RealtorFilterData, UpdatePersonData, UpdatePropertyData, UpdateRealtorData } from "./domainSchemas";
+import { CreatePersonDTO, CreatePropertyDTO, CreateRealtorDTO, Person, PersonFilterData, Property, PropertyFilterData, Realtor, RealtorFilterData, UpdatePersonDTO, UpdatePropertyDTO, UpdateRealtorDTO } from "./data-schema";
 import { OperationResponse } from "./helperFunctions";
 
 export enum BackendEvent {
@@ -16,42 +16,42 @@ export enum BackendEvent {
 }
 export interface BackendApi {
     //properties
-    getProperties: (propertyIds: Array<PropertyData['id']>) => Promise<OperationResponse<Array<PropertyData>>>;
-    searchPropertyIds: (filter: PropertyFilterData) => Promise<OperationResponse<Array<PropertyData['id']>>>;
-    createProperty: (newPropertyData: CreatePropertyData) => Promise<OperationResponse>;
-    updateProperty: (propertyId: PropertyData["id"], updateData: UpdatePropertyData) => Promise<OperationResponse>;
-    deleteProperty: (propertyId: PropertyData['id']) => Promise<OperationResponse>;
-    invalidateProperties: (propertyIds: Array<PropertyData["id"]>, timestamp: number) => Promise<OperationResponse<Array<PropertyData["id"]>>>
+    getProperties: (propertyIds: Array<Property['id']>) => Promise<OperationResponse<Array<Property>>>;
+    searchPropertyIds: (filter: PropertyFilterData) => Promise<OperationResponse<Array<Property['id']>>>;
+    createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
+    updateProperty: (propertyId: Property["id"], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
+    deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;
+    invalidateProperties: (propertyIds: Array<Property["id"]>, timestamp: number) => Promise<OperationResponse<Array<Property["id"]>>>
     propertiesSubscribe: (
-        newPropertyHandler: (newProperty: PropertyData) => void,
-        updatedPropertyHandler: (updatedProperty: PropertyData) => void,
-        deletedPropertyHandler: (deletedProperty: PropertyData) => void,
+        newPropertyHandler: (newProperty: Property) => void,
+        updatedPropertyHandler: (updatedProperty: Property) => void,
+        deletedPropertyHandler: (deletedProperty: Property) => void,
     ) => Promise<OperationResponse>;
     propertiesUnsubscribe: () => void;
     //realtors
-    getRealtors: (realtorIds: Array<RealtorData['id']>) => Promise<OperationResponse<Array<RealtorData>>>;
-    searchRealtorIds: (filter: RealtorFilterData) => Promise<OperationResponse<Array<RealtorData['id']>>>;
-    createRealtor: (newRealtorData: CreateRealtorData) => Promise<OperationResponse>;
-    updateRealtor: (realtorId: RealtorData["id"], updateData: UpdateRealtorData) => Promise<OperationResponse>;
-    deleteRealtor: (realtorId: RealtorData['id']) => Promise<OperationResponse>;
-    invalidateRealtors: (realtorIds: Array<RealtorData["id"]>, timestamp: number) => Promise<OperationResponse<Array<RealtorData["id"]>>>;
+    getRealtors: (realtorIds: Array<Realtor['id']>) => Promise<OperationResponse<Array<Realtor>>>;
+    searchRealtorIds: (filter: RealtorFilterData) => Promise<OperationResponse<Array<Realtor['id']>>>;
+    createRealtor: (newRealtorData: CreateRealtorDTO) => Promise<OperationResponse>;
+    updateRealtor: (realtorId: Realtor["id"], updateData: UpdateRealtorDTO) => Promise<OperationResponse>;
+    deleteRealtor: (realtorId: Realtor['id']) => Promise<OperationResponse>;
+    invalidateRealtors: (realtorIds: Array<Realtor["id"]>, timestamp: number) => Promise<OperationResponse<Array<Realtor["id"]>>>;
     realtorsSubscribe: (
-        newRealtorHandler: (newRealtor: RealtorData) => void,
-        updatedRealtorHandler: (updatedRealtor: RealtorData) => void,
-        deletedRealtorHandler: (deletedRealtor: RealtorData) => void,
+        newRealtorHandler: (newRealtor: Realtor) => void,
+        updatedRealtorHandler: (updatedRealtor: Realtor) => void,
+        deletedRealtorHandler: (deletedRealtor: Realtor) => void,
     ) => Promise<OperationResponse>;
     realtorsUnsubscribe: () => void;
     //persons
-    getPersons: (personIds: Array<PersonData['id']>) => Promise<OperationResponse<Array<PersonData>>>;
-    searchPersonIds: (filter: PersonFilterData) => Promise<OperationResponse<Array<PersonData['id']>>>;
-    createPerson: (newPersonData: CreatePersonData) => Promise<OperationResponse>;
-    updatePerson: (personId: PersonData["id"], updateData: UpdatePersonData) => Promise<OperationResponse>;
-    deletePerson: (personId: PersonData['id']) => Promise<OperationResponse>;
-    invalidatePersons: (personIds: Array<PersonData["id"]>, timestamp: number) => Promise<OperationResponse<Array<PersonData["id"]>>>;
+    getPersons: (personIds: Array<Person['id']>) => Promise<OperationResponse<Array<Person>>>;
+    searchPersonIds: (filter: PersonFilterData) => Promise<OperationResponse<Array<Person['id']>>>;
+    createPerson: (newPersonData: CreatePersonDTO) => Promise<OperationResponse>;
+    updatePerson: (personId: Person["id"], updateData: UpdatePersonDTO) => Promise<OperationResponse>;
+    deletePerson: (personId: Person['id']) => Promise<OperationResponse>;
+    invalidatePersons: (personIds: Array<Person["id"]>, timestamp: number) => Promise<OperationResponse<Array<Person["id"]>>>;
     personsSubscribe: (
-        newPersonHandler: (newPerson: PersonData) => void,
-        updatedPersonHandler: (updatedPerson: PersonData) => void,
-        deletedPersonHandler: (deletedPerson: PersonData) => void,
+        newPersonHandler: (newPerson: Person) => void,
+        updatedPersonHandler: (updatedPerson: Person) => void,
+        deletedPersonHandler: (deletedPerson: Person) => void,
     ) => Promise<OperationResponse>;
     personsUnsubscribe: () => void;
 }

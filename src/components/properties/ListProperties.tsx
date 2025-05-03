@@ -19,7 +19,7 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import { usePropertyStore } from "../../stores/propertiesStore";
-import { PropertyData, PropertyFilterData } from "../../utils/domainSchemas";
+import { Property } from "../../utils/data-schema";
 import {
   countDefinedAttributes,
   OperationResponse,
@@ -30,10 +30,11 @@ import { FilterProperties } from "./FilterProperties";
 import CustomModal from "../CustomModal";
 import CreateProperty from "./CreateProperty";
 import ViewProperty from "./ViewProperty";
+import { PropertyFilter } from "../../utils/data-filter-schema";
 
 interface ListPropertiesProps {
-  onSelect?: (propertyIds: Array<PropertyData["id"]>) => void;
-  defaultSelected?: Array<PropertyData["id"]>;
+  onSelect?: (propertyIds: Array<Property["id"]>) => void;
+  defaultSelected?: Array<Property["id"]>;
   multiple?: boolean;
 }
 
@@ -51,7 +52,7 @@ export default function ListProperties({
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [propertiesFilter, setPropertiesFilter] = useState({
     deleted: false,
-  } as PropertyFilterData);
+  } as PropertyFilter);
 
   const [searchingProperties, setSearchingProperties] = useState(false);
   const [searchPropertiesResponse, setSearchPropertiesResponse] = useState(
@@ -59,7 +60,7 @@ export default function ListProperties({
   );
 
   const [viewPropertyId, setViewPropertyId] = useState(
-    undefined as PropertyData["id"] | undefined
+    undefined as Property["id"] | undefined
   );
   const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
 
@@ -73,7 +74,7 @@ export default function ListProperties({
   );
 
   const togglePropertySelection = useCallback(
-    (propertyId: PropertyData["id"]) => {
+    (propertyId: Property["id"]) => {
       const alreadySelected = selectedProperties.some(
         (selectedId) => selectedId === propertyId
       );

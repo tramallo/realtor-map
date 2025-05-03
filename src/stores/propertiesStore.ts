@@ -1,21 +1,22 @@
 import { create } from "zustand";
 
-import { CreatePropertyData, PropertyData, PropertyFilterData, UpdatePropertyData } from "../utils/domainSchemas";
+import { CreatePropertyDTO, Property, UpdatePropertyDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { BackendEvent } from "../utils/services-interface";
+import { PropertyFilter } from "../utils/data-filter-schema";
 
 export interface PropertyStore {
-    properties: Record<PropertyData["id"], PropertyData>;
-    fetchProperty: (propertyId: PropertyData["id"]) => Promise<OperationResponse>;
-    searchProperties: (filter: PropertyFilterData) => Promise<OperationResponse>;
-    createProperty: (newPropertyData: CreatePropertyData) => Promise<OperationResponse>;
-    updateProperty: (propertyId: PropertyData['id'], updateData: UpdatePropertyData) => Promise<OperationResponse>;
-    deleteProperty: (propertyId: PropertyData['id']) => Promise<OperationResponse>;
+    properties: Record<Property["id"], Property>;
+    fetchProperty: (propertyId: Property["id"]) => Promise<OperationResponse>;
+    searchProperties: (filter: PropertyFilter) => Promise<OperationResponse>;
+    createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
+    updateProperty: (propertyId: Property['id'], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
+    deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;
 }
 
 const PROPERTIES_LOCAL_STORAGE_KEY = "properties-store";
-const fetchLocalStorageProperties = (): OperationResponse<Record<PropertyData["id"], PropertyData> | undefined> => {
+const fetchLocalStorageProperties = (): OperationResponse<Record<Property["id"], Property> | undefined> => {
     console.log(`propertiesStorage -> fetchLocalStorageProperties`);
 
     const rawLocalStorageData = localStorage.getItem(PROPERTIES_LOCAL_STORAGE_KEY);
@@ -35,7 +36,7 @@ const fetchLocalStorageProperties = (): OperationResponse<Record<PropertyData["i
 export const usePropertyStore = create<PropertyStore>((set, get) => {
     console.log(`propertiesStore -> create`);
 
-    const storeProperties = (properties: PropertyData[]) => {
+    const storeProperties = (properties: Property[]) => {
         const { properties: propertiesCache } = get();
         const cacheCopy = { ...propertiesCache };
 
@@ -45,7 +46,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
     
         set({ properties: cacheCopy });
     };
-    const removeProperties = (propertyIds: Array<PropertyData['id']>) => {
+    const removeProperties = (propertyIds: Array<Property['id']>) => {
             const { properties: storedProperties } = get();
             const storedPropertiesCopy = { ...storedProperties };
             
@@ -56,15 +57,15 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             set({ properties: storedPropertiesCopy });
     };
 
-    const newPropertyHandler = (newProperty: PropertyData) => {
+    const newPropertyHandler = (newProperty: Property) => {
         console.log(`event -> [${BackendEvent.NewProperty}] ${newProperty.address} `);
         storeProperties([newProperty]);
     }
-    const updatedPropertyHandler = (updatedProperty: PropertyData) => {
+    const updatedPropertyHandler = (updatedProperty: Property) => {
         console.log(`event -> [${BackendEvent.UpdatedProperty}] ${updatedProperty.address} `);
         storeProperties([updatedProperty]);
     }
-    const deletedPropertyHandler = (deletedProperty: PropertyData) => {
+    const deletedPropertyHandler = (deletedProperty: Property) => {
         console.log(`event -> [${BackendEvent.DeletedProperty}] ${deletedProperty.address}`);
         removeProperties([deletedProperty.id]);
     }
@@ -85,7 +86,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return;
         }
     
-        const localStoragePropertyIds = Object.keys(localStorageProperties!) as unknown as Array<PropertyData["id"]>;
+        const localStoragePropertyIds = Object.keys(localStorageProperties!) as unknown as Array<Property["id"]>;
     
         if (localStoragePropertyIds.length == 0) {
             return;
@@ -98,7 +99,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return;
         }
     
-        const validProperties: Record<PropertyData["id"], PropertyData> = {};
+        const validProperties: Record<Property["id"], Property> = {};
         validIds.forEach((validId) => {
             validProperties[validId] = localStorageProperties![validId];
         })
@@ -109,7 +110,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
 
     return {
         properties: {},
-        fetchProperty: async (propertyId: PropertyData["id"]) => {
+        fetchProperty: async (propertyId: Property["id"]) => {
             console.log(`propertyStore -> fetchProperty - propertyId: ${propertyId}`)
 
             const { properties: storedProperties } = get();
@@ -197,7 +198,7 @@ usePropertyStore.subscribe((state) => {
     localStorage.setItem(PROPERTIES_LOCAL_STORAGE_KEY, JSON.stringify(state.properties));
 })
 
-export const fetchByIdSelector = (propertyId: PropertyData["id"]) => {
+export const fetchByIdSelector = (propertyId: Property["id"]) => {
     return (store: PropertyStore) => store.properties[propertyId];
 }
 

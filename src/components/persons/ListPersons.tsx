@@ -24,17 +24,18 @@ import {
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { personCompliesFilter } from "../../utils/filter-evaluators";
-import { PersonData, PersonFilterData } from "../../utils/domainSchemas";
+import { Person } from "../../utils/data-schema";
 import ViewPerson from "./ViewPerson";
 import CreatePerson from "./CreatePerson";
 import { FilterPersons } from "./FilterPersons";
 import CustomModal from "../CustomModal";
 import ComponentsField from "../ComponentsField";
 import PersonChip from "../PersonChip";
+import { PersonFilter } from "../../utils/data-filter-schema";
 
 interface ListPersonsProps {
-  onSelect?: (personIds: Array<PersonData["id"]>) => void;
-  defaultSelected?: Array<PersonData["id"]>;
+  onSelect?: (personIds: Array<Person["id"]>) => void;
+  defaultSelected?: Array<Person["id"]>;
   multiple?: boolean;
 }
 
@@ -50,7 +51,7 @@ export default function ListPersons({
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [personsFilter, setPersonsFilter] = useState({
     deleted: false,
-  } as PersonFilterData);
+  } as PersonFilter);
 
   const [searchingPersons, setSearchingPersons] = useState(false);
   const [searchPersonsResponse, setSearchPersonsResponse] = useState(
@@ -58,7 +59,7 @@ export default function ListPersons({
   );
 
   const [viewPersonId, setViewPersonId] = useState(
-    undefined as PersonData["id"] | undefined
+    undefined as Person["id"] | undefined
   );
   const [createPersonModalOpen, setCreatePersonModalOpen] = useState(false);
 
@@ -72,7 +73,7 @@ export default function ListPersons({
   );
 
   const togglePersonSelection = useCallback(
-    (personId: PersonData["id"]) => {
+    (personId: Person["id"]) => {
       const alreadySelected = selectedPersons.some(
         (selectedId) => selectedId === personId
       );

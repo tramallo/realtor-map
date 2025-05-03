@@ -9,14 +9,14 @@ import {
 } from "@mui/material";
 
 import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
-import { PersonData } from "../../utils/domainSchemas";
+import { Person } from "../../utils/data-schema";
 import DeletePerson from "./DeletePerson";
 import UpdatePerson from "./UpdatePerson";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 
 export interface ViewPersonProps {
-  personId: PersonData["id"];
+  personId: Person["id"];
 }
 
 export default function ViewPerson({ personId }: ViewPersonProps) {

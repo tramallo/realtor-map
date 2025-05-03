@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
-import { PersonData } from "../../utils/domainSchemas";
+import { Person } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
@@ -17,7 +17,7 @@ import {
 import { useAppContext } from "../AppContext";
 
 export interface DeletePersonProps {
-  personId: PersonData["id"];
+  personId: Person["id"];
   onSoftDelete?: () => void;
   onRestore?: () => void;
 }

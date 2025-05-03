@@ -8,20 +8,20 @@ import {
 } from "@mui/material";
 
 import {
-  PropertyFilterData,
   PropertyState,
   propertyStates,
   PropertyType,
   propertyTypes,
-} from "../../utils/domainSchemas";
+} from "../../utils/data-schema";
 import PersonField from "../PersonField";
 import RealtorField from "../RealtorField";
 import FilterBaseData from "../FilterBaseData";
 import { DebouncedTextField } from "../DebouncedTextField";
+import { PropertyFilter } from "../../utils/data-filter-schema";
 
 export interface FilterPropertiesProps {
-  filter: PropertyFilterData;
-  onChange: (newValue: PropertyFilterData) => void;
+  filter: PropertyFilter;
+  onChange: (newValue: PropertyFilter) => void;
 }
 
 export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
@@ -30,7 +30,7 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
   );
 
   const setFilterValue = useCallback(
-    (value: Partial<PropertyFilterData>) => {
+    (value: Partial<PropertyFilter>) => {
       onChange({ ...filter, ...value });
     },
     [filter, onChange]
