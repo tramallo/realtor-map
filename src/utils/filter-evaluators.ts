@@ -9,6 +9,9 @@ import {
     RealtorFilterData, 
 } from "./domainSchemas";
 
+/** The logic on this evaluators must match the logic on backendApi search request.
+ * Otherwise will cause that not all received data is shown, and incorrect data is shown from local storage 
+ */
 export const dataCompliesFilter = (data: BaseData, filter: BaseFilterData): boolean => {
     if(filter.idEq && data.id != filter.idEq) { return false }
     if(filter.idNot && (data.id ? filter.idNot.includes(data.id) : true)) { return false }
