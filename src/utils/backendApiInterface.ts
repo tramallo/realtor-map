@@ -22,7 +22,7 @@ export interface BackendApi {
     createProperty: (newPropertyData: CreatePropertyData) => Promise<OperationResponse>;
     updateProperty: (propertyId: PropertyData["id"], updateData: UpdatePropertyData) => Promise<OperationResponse>;
     deleteProperty: (propertyId: PropertyData['id']) => Promise<OperationResponse>;
-    invalidateProperties: (propertyIds: Array<PropertyData["id"]>, timestamp: number) => Promise<OperationResponse<Array<PropertyData["id"]>>> =>
+    invalidateProperties: (propertyIds: Array<PropertyData["id"]>, timestamp: number) => Promise<OperationResponse<Array<PropertyData["id"]>>>
     propertiesSubscribe: (
         newPropertyHandler: (newProperty: PropertyData) => void,
         updatedPropertyHandler: (updatedProperty: PropertyData) => void,

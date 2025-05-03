@@ -15,6 +15,7 @@ import {
     UpdateRealtorData 
 } from "./domainSchemas";
 import { OperationResponse } from "./helperFunctions";
+import { BackendApi, BackendEvent } from "./backendApiInterface";
 
 const realtorMapServiceUrl = import.meta.env.VITE_REALTOR_MAP_SERVICE_URL;
 
@@ -22,21 +23,7 @@ const propertiesConnection: Socket = io(`${realtorMapServiceUrl}/properties`, { 
 const realtorsConnection: Socket = io(`${realtorMapServiceUrl}/realtors`, { autoConnect: false });
 const personsConnection: Socket = io(`${realtorMapServiceUrl}/persons`, { autoConnect: false });
 
-export enum WsEvent {
-    Connect = "connect",
-    Disconnect = "disconnect",
-    NewProperty = "new-property",
-    UpdatedProperty = "updated-property",
-    DeletedProperty = "deleted-property",
-    NewRealtor = "new-realtor",
-    UpdatedRealtor = "updated-realtor",
-    DeletedRealtor = "deleted-realtor",
-    NewPerson = "new-person",
-    UpdatedPerson = "updated-person",
-    DeletedPerson = "deleted-person",
-}
-
-export const getProperties = async (propertyIds: Array<PropertyData['id']>): Promise<OperationResponse<Array<PropertyData>>> => {
+const getProperties = async (propertyIds: Array<PropertyData['id']>): Promise<OperationResponse<Array<PropertyData>>> => {
     console.log(`realtorMapService -> getProperties - propertyIds: ${propertyIds}`);
 
     try {
@@ -55,7 +42,7 @@ export const getProperties = async (propertyIds: Array<PropertyData['id']>): Pro
         return { error: new Error(`getProperties -> error: ${error}`) };
     }
 }
-export const searchPropertyIds = async (filter: PropertyFilterData): Promise<OperationResponse<Array<PropertyData['id']>>> => {
+const searchPropertyIds = async (filter: PropertyFilterData): Promise<OperationResponse<Array<PropertyData['id']>>> => {
     console.log(`realtorMapService -> searchPropertyIds - filter: ${JSON.stringify(filter)}`);
 
     try {
@@ -74,7 +61,7 @@ export const searchPropertyIds = async (filter: PropertyFilterData): Promise<Ope
         return { error: new Error(`searchPropertyIds -> error: ${error}`) };
     }
 }
-export const createProperty = async (newPropertyData: CreatePropertyData): Promise<OperationResponse> => {
+const createProperty = async (newPropertyData: CreatePropertyData): Promise<OperationResponse> => {
     console.log(`realtorMapService -> createProperty - propertyData: ${newPropertyData.address}`);
 
     try {
@@ -95,7 +82,7 @@ export const createProperty = async (newPropertyData: CreatePropertyData): Promi
         return { error: new Error(`createProperty -> error: ${error}`) };
     }
 }
-export const updateProperty = async (propertyId: PropertyData["id"], updateData: UpdatePropertyData): Promise<OperationResponse> => {
+const updateProperty = async (propertyId: PropertyData["id"], updateData: UpdatePropertyData): Promise<OperationResponse> => {
     console.log(`realtorMapService -> updateProperty - propertyId: ${propertyId} updateData: ${JSON.stringify(updateData)}`);
 
     try {
@@ -116,7 +103,7 @@ export const updateProperty = async (propertyId: PropertyData["id"], updateData:
         return { error: new Error(`updateProperty -> error: ${error}`) };
     }
 }
-export const deleteProperty = async (propertyId: PropertyData['id']):Promise<OperationResponse> => {
+const deleteProperty = async (propertyId: PropertyData['id']):Promise<OperationResponse> => {
     console.log(`realtorMapService -> deleteProperty propertyId: ${propertyId}`);
 
     try {
@@ -135,7 +122,7 @@ export const deleteProperty = async (propertyId: PropertyData['id']):Promise<Ope
         return { error: new Error(`deleteProperty -> error: ${error}`) };
     }
 }
-export const invalidateProperties = async (propertyIds: Array<PropertyData["id"]>, timestamp: number): Promise<OperationResponse<Array<PropertyData["id"]>>> => {
+const invalidateProperties = async (propertyIds: Array<PropertyData["id"]>, timestamp: number): Promise<OperationResponse<Array<PropertyData["id"]>>> => {
     console.log(`realtorMapService -> invalidateProperties - propertyIds: ${propertyIds} timestamp: ${timestamp}`);
 
     try {
@@ -155,7 +142,7 @@ export const invalidateProperties = async (propertyIds: Array<PropertyData["id"]
     }
 }
 
-export const getRealtors = async (realtorIds: Array<RealtorData['id']>): Promise<OperationResponse<Array<RealtorData>>> => {
+const getRealtors = async (realtorIds: Array<RealtorData['id']>): Promise<OperationResponse<Array<RealtorData>>> => {
     console.log(`realtorMapService -> getRealtors - realtorIds: ${realtorIds}`);
 
     try {
@@ -174,7 +161,7 @@ export const getRealtors = async (realtorIds: Array<RealtorData['id']>): Promise
         return { error: new Error(`getRealtors -> error: ${error}`) };
     }
 }
-export const searchRealtorIds = async (filter: RealtorFilterData): Promise<OperationResponse<Array<RealtorData['id']>>> => {
+const searchRealtorIds = async (filter: RealtorFilterData): Promise<OperationResponse<Array<RealtorData['id']>>> => {
     console.log(`realtorMapService -> searchRealtorIds - filter: ${JSON.stringify(filter)}`);
 
     try {
@@ -193,7 +180,7 @@ export const searchRealtorIds = async (filter: RealtorFilterData): Promise<Opera
         return { error: new Error(`searchRealtorIds -> error: ${error}`) };
     }
 }
-export const createRealtor = async (newRealtorData: CreateRealtorData): Promise<OperationResponse> => {
+const createRealtor = async (newRealtorData: CreateRealtorData): Promise<OperationResponse> => {
     console.log(`realtorMapService -> createRealtor - realtorData: ${newRealtorData.name}`);
 
     try {
@@ -214,7 +201,7 @@ export const createRealtor = async (newRealtorData: CreateRealtorData): Promise<
         return { error: new Error(`createRealtor -> error: ${error}`) };
     }
 }
-export const updateRealtor = async (realtorId: RealtorData["id"], updateData: UpdateRealtorData): Promise<OperationResponse> => {
+const updateRealtor = async (realtorId: RealtorData["id"], updateData: UpdateRealtorData): Promise<OperationResponse> => {
     console.log(`realtorMapService -> updateRealtor - realtorId: ${realtorId} updateData: ${JSON.stringify(updateData)}`);
 
     try {
@@ -235,7 +222,7 @@ export const updateRealtor = async (realtorId: RealtorData["id"], updateData: Up
         return { error: new Error(`updateRealtor -> error: ${error}`) };
     }
 }
-export const deleteRealtor = async (realtorId: RealtorData['id']):Promise<OperationResponse> => {
+const deleteRealtor = async (realtorId: RealtorData['id']):Promise<OperationResponse> => {
     console.log(`realtorMapService -> deleteRealtor realtorId: ${realtorId}`);
 
     try {
@@ -254,7 +241,7 @@ export const deleteRealtor = async (realtorId: RealtorData['id']):Promise<Operat
         return { error: new Error(`deleteRealtor -> error: ${error}`) };
     }
 }
-export const invalidateRealtors = async (realtorIds: Array<RealtorData["id"]>, timestamp: number): Promise<OperationResponse<Array<RealtorData["id"]>>> => {
+const invalidateRealtors = async (realtorIds: Array<RealtorData["id"]>, timestamp: number): Promise<OperationResponse<Array<RealtorData["id"]>>> => {
     console.log(`realtorMapService -> invalidateRealtors - realtorIds: ${realtorIds} timestamp: ${timestamp}`);
 
     try {
@@ -274,7 +261,7 @@ export const invalidateRealtors = async (realtorIds: Array<RealtorData["id"]>, t
     }
 }
 
-export const getPersons = async (personIds: Array<PersonData['id']>): Promise<OperationResponse<Array<PersonData>>> => {
+const getPersons = async (personIds: Array<PersonData['id']>): Promise<OperationResponse<Array<PersonData>>> => {
     console.log(`realtorMapService -> getPersons - personIds: ${personIds}`);
 
     try {
@@ -293,7 +280,7 @@ export const getPersons = async (personIds: Array<PersonData['id']>): Promise<Op
         return { error: new Error(`getPersons -> error: ${error}`) };
     }
 }
-export const searchPersonIds = async (filter: PersonFilterData): Promise<OperationResponse<Array<PersonData['id']>>> => {
+const searchPersonIds = async (filter: PersonFilterData): Promise<OperationResponse<Array<PersonData['id']>>> => {
     console.log(`realtorMapService -> searchPersonIds - filter: ${JSON.stringify(filter)}`);
 
     try {
@@ -312,7 +299,7 @@ export const searchPersonIds = async (filter: PersonFilterData): Promise<Operati
         return { error: new Error(`searchPersonIds -> error: ${error}`) }
     }
 }
-export const createPerson = async (newPersonData: CreatePersonData): Promise<OperationResponse> => {
+const createPerson = async (newPersonData: CreatePersonData): Promise<OperationResponse> => {
     console.log(`realtorMapService -> createPerson - personData: ${newPersonData.name}`);
 
     try {
@@ -333,7 +320,7 @@ export const createPerson = async (newPersonData: CreatePersonData): Promise<Ope
         return { error: new Error(`createPerson -> error: ${error}`) };
     }
 }
-export const updatePerson = async (personId: PersonData["id"], updateData: UpdatePersonData): Promise<OperationResponse> => {
+const updatePerson = async (personId: PersonData["id"], updateData: UpdatePersonData): Promise<OperationResponse> => {
     console.log(`realtorMapService -> updatePerson - personId: ${personId} updateData: ${JSON.stringify(updateData)}`);
 
     try {
@@ -354,7 +341,7 @@ export const updatePerson = async (personId: PersonData["id"], updateData: Updat
         return { error: new Error(`updatePerson -> error: ${error}`) }
     }
 }
-export const deletePerson = async (personId: PersonData['id']):Promise<OperationResponse> => {
+const deletePerson = async (personId: PersonData['id']):Promise<OperationResponse> => {
     console.log(`realtorMapService -> deletePerson personId: ${personId}`);
 
     try {
@@ -373,7 +360,7 @@ export const deletePerson = async (personId: PersonData['id']):Promise<Operation
         return { error: new Error(`deletePerson -> error: ${error}`) };
     }
 }
-export const invalidatePersons = async (personIds: Array<PersonData["id"]>, timestamp: number): Promise<OperationResponse<Array<PersonData["id"]>>> => {
+const invalidatePersons = async (personIds: Array<PersonData["id"]>, timestamp: number): Promise<OperationResponse<Array<PersonData["id"]>>> => {
     console.log(`realtorMapService -> invalidatePersons - personIds: ${personIds} timestamp: ${timestamp}`);
 
     try {
@@ -393,7 +380,7 @@ export const invalidatePersons = async (personIds: Array<PersonData["id"]>, time
     }
 }
 
-export const propertiesSubscribe = (
+const propertiesSubscribe = async (
     newPropertyHandler: (newProperty: PropertyData) => void,
     updatedPropertyHandler: (updatedProperty: PropertyData) => void,
     deletedPropertyHandler: (deletedProperty: PropertyData) => void,
@@ -402,22 +389,24 @@ export const propertiesSubscribe = (
 
     if(propertiesConnection.connected) {
         console.log(`realtorMapService -> already subscribed`);
-        return;
+        return { data: undefined };
     }
 
-    propertiesConnection.on(WsEvent.Connect, () => {
+    propertiesConnection.on(BackendEvent.Connect, () => {
         console.log(`realtorMapService -> ws connected to /properties with id: ${propertiesConnection.id}`);
     })
-    propertiesConnection.on(WsEvent.Disconnect, () => {
+    propertiesConnection.on(BackendEvent.Disconnect, () => {
         console.log(`realtorMapService -> ws id: ${propertiesConnection.id} disconnected from /properties`);
     })
 
-    propertiesConnection.on(WsEvent.NewProperty, newPropertyHandler);
-    propertiesConnection.on(WsEvent.UpdatedProperty, updatedPropertyHandler);
-    propertiesConnection.on(WsEvent.DeletedProperty, deletedPropertyHandler);
+    propertiesConnection.on(BackendEvent.NewProperty, newPropertyHandler);
+    propertiesConnection.on(BackendEvent.UpdatedProperty, updatedPropertyHandler);
+    propertiesConnection.on(BackendEvent.DeletedProperty, deletedPropertyHandler);
     propertiesConnection.connect();
+
+    return { data: undefined };
 }
-export const propertiesUnsubscribe = () => {
+const propertiesUnsubscribe = () => {
     console.log(`realtorMapService -> propertiesUnsubscribe`);
 
     if(!propertiesConnection.connected) {
@@ -429,7 +418,7 @@ export const propertiesUnsubscribe = () => {
     propertiesConnection.removeAllListeners();
 }
 
-export const realtorsSubscribe = (
+const realtorsSubscribe = async (
     newRealtorHandler: (newRealtor: RealtorData) => void,
     updatedRealtorHandler: (updatedRealtor: RealtorData) => void,
     deletedRealtorHandler: (deletedRealtor: RealtorData) => void,
@@ -438,22 +427,24 @@ export const realtorsSubscribe = (
 
     if(realtorsConnection.connected) {
         console.log(`realtorMapService -> already subscribed`);
-        return;
+        return { data: undefined };
     }
 
-    realtorsConnection.on(WsEvent.Connect, () => {
+    realtorsConnection.on(BackendEvent.Connect, () => {
         console.log(`realtorMapService -> ws connected to /realtors with id: ${realtorsConnection.id}`);
     })
-    realtorsConnection.on(WsEvent.Disconnect, () => {
+    realtorsConnection.on(BackendEvent.Disconnect, () => {
         console.log(`realtorMapService -> ws id: ${propertiesConnection.id} disconnected form /realtors`);
     })
 
-    realtorsConnection.on(WsEvent.NewRealtor, newRealtorHandler);
-    realtorsConnection.on(WsEvent.UpdatedRealtor, updatedRealtorHandler);
-    realtorsConnection.on(WsEvent.DeletedRealtor, deletedRealtorHandler);
+    realtorsConnection.on(BackendEvent.NewRealtor, newRealtorHandler);
+    realtorsConnection.on(BackendEvent.UpdatedRealtor, updatedRealtorHandler);
+    realtorsConnection.on(BackendEvent.DeletedRealtor, deletedRealtorHandler);
     realtorsConnection.connect();
+
+    return { data: undefined };
 }
-export const realtorsUnsubscribe = () => {
+const realtorsUnsubscribe = () => {
     console.log(`realtorMapService -> realtorsUnsubscribe`);
 
     if(!realtorsConnection.connected) {
@@ -465,7 +456,7 @@ export const realtorsUnsubscribe = () => {
     realtorsConnection.removeAllListeners();
 }
 
-export const personsSubscribe = (
+const personsSubscribe = async (
     newPersonHandler: (newPerson: PersonData) => void,
     updatedPersonHandler: (updatedPerson: PersonData) => void,
     deletedPersonHandler: (deletedPerson: PersonData) => void,
@@ -474,22 +465,24 @@ export const personsSubscribe = (
 
     if(personsConnection.connected) {
         console.log(`realtorMapService -> already subscribed`);
-        return;
+        return { data: undefined };
     }
 
-    personsConnection.on(WsEvent.Connect, () => {
+    personsConnection.on(BackendEvent.Connect, () => {
         console.log(`realtorMapService -> ws connected to /persons with id: ${personsConnection.id}`);
     })
-    personsConnection.on(WsEvent.Disconnect, () => {
+    personsConnection.on(BackendEvent.Disconnect, () => {
         console.log(`realtorMapService -> ws id: ${personsConnection.id} disconnected from /persons`);
     })
 
-    personsConnection.on(WsEvent.NewPerson, newPersonHandler);
-    personsConnection.on(WsEvent.UpdatedPerson, updatedPersonHandler);
-    personsConnection.on(WsEvent.DeletedPerson, deletedPersonHandler);
+    personsConnection.on(BackendEvent.NewPerson, newPersonHandler);
+    personsConnection.on(BackendEvent.UpdatedPerson, updatedPersonHandler);
+    personsConnection.on(BackendEvent.DeletedPerson, deletedPersonHandler);
     personsConnection.connect();
+
+    return { data: undefined };
 }
-export const personsUnsubscribe = () => {
+const personsUnsubscribe = () => {
     console.log(`realtorMapService -> personsUnsubscribe`);
 
     if(!personsConnection.connected) {
@@ -499,4 +492,34 @@ export const personsUnsubscribe = () => {
 
     personsConnection.disconnect();
     personsConnection.removeAllListeners();
+}
+
+export const realtorMapApi: BackendApi = {
+    //property
+    getProperties,
+    searchPropertyIds,
+    createProperty,
+    updateProperty,
+    deleteProperty,
+    invalidateProperties,
+    propertiesSubscribe,
+    propertiesUnsubscribe,
+    //person
+    getPersons,
+    searchPersonIds,
+    createPerson,
+    updatePerson,
+    deletePerson,
+    invalidatePersons,
+    personsSubscribe,
+    personsUnsubscribe,
+    //realtor
+    getRealtors,
+    searchRealtorIds,
+    createRealtor,
+    updateRealtor,
+    deleteRealtor,
+    invalidateRealtors,
+    realtorsSubscribe,
+    realtorsUnsubscribe,
 }
