@@ -2,11 +2,11 @@ import { useFormContext } from "react-hook-form";
 import { Button, FormGroup, Stack } from "@mui/material";
 
 import FormTextField from "./FormTextField";
-import { Location } from "../../utils/mapServicesSchemas";
+import { Location } from "../../utils/services-interface";
 import { useCallback, useState } from "react";
 import AddressSearch from "../AddressSearch";
-import { googleGeocodingService } from "../../utils/googleApi";
-import { osmMapTilesService } from "../../utils/nominatimOSMApi";
+import { googleGeocodingService } from "../../services/googleApi";
+import { osmMapTilesService } from "../../services/nominatimOSMApi";
 import CustomModal from "../CustomModal";
 
 export interface FormLocationFieldProps {

@@ -1,22 +1,16 @@
-/** This file exposes a Geocoding & a MapTiles services provided by google cloud
- * 
- * google MapTiles api requires a session to request tiles, so if there's no session,
- * a new session must be created when consumers require the mapTilesUrl
- */
 import { createElement } from "react";
 
 import {
   Location,
   GeocodingService,
   MapTilesService,
-} from "./mapServicesSchemas";
-import { OperationResponse } from "./helperFunctions";
+} from "../utils/services-interface";
+import { OperationResponse } from "../utils/helperFunctions";
 
 const geocodingApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const geocodingApiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
 
-/** Following interfaces describes google geocoding responses
- */
+// GEOCODING
 interface GoogleLocationComponent {
   long_name: string;
   short_name: string;
@@ -39,11 +33,6 @@ interface GoogleAddressSearchResponse {
   results: GoogleLocation[];
 }
 
-/** Converts location object returned by google api to a local type Location
- * 
- * @param googleLocation: address object returned by google
- * @returns: Location object
- */
 const googleLocationToLocation = (
   googleLocation: GoogleLocation
 ): Location => {
@@ -56,11 +45,6 @@ const googleLocationToLocation = (
   } as Location;
 };
 
-/** Performs a geocoding request to google geocoding service and returns the results mapped to Location
- * 
- * @param searchValue: address to geocode
- * @returns: an array containing all locations related to the seach parameter
- */
 const searchAddress = async (searchValue: string): Promise<OperationResponse<Location[]>> => {
   return { data: [{ address: 'liber seregni 2401', coordinates: { lat: -31.3641713, lng: -57.95752539999999 } }] }
 
@@ -94,29 +78,20 @@ const searchAddress = async (searchValue: string): Promise<OperationResponse<Loc
   }
 };
 
+// MAP TILES
 const mapTilesApiKey = import.meta.env.VITE_GOOGLE_MAPS_TILES_API_KEY;
 
 const createMapTilesSessionUrl = `https://tile.googleapis.com/v1/createSession?key=${mapTilesApiKey}`;
 const mapTilesSessionTokenName = "mapTilesSessionToken";
 
-/** Describes the info saved on local storage for the session token 
- */
 interface MapTilesSessionToken {
   expiration: number;
   value: string;
 }
 
-/** Saves a session token on local storage
- * 
- * @param newToken: Token value & expiration date to save
- */
 const storeMapTilesSessionToken = (newToken: MapTilesSessionToken) => {
   localStorage.setItem(mapTilesSessionTokenName, JSON.stringify(newToken));
 };
-/** Retrieves the session token saved on local storage
- * 
- * @returns: the token value & expiration date
- */
 const retrieveMapTilesSessionToken = (): MapTilesSessionToken | undefined => {
   const tokenString = localStorage.getItem(mapTilesSessionTokenName);
 
@@ -126,7 +101,6 @@ const retrieveMapTilesSessionToken = (): MapTilesSessionToken | undefined => {
   const token = JSON.parse(tokenString);
   return token;
 };
-
 /** Retrieves the saved session token and evaluates expiration date to check validity
  * 
  * @returns true if session still valid
@@ -212,7 +186,7 @@ const getMapTilesUrl = async (): Promise<OperationResponse<string>> => {
   return { data: `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${sessionToken.value}&key=${mapTilesApiKey}`};
 };
 
-// export services
+// EXPORTS
 export const googleGeocodingService: GeocodingService = {
   searchAddress: searchAddress,
   attribution: createElement(

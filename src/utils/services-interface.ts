@@ -14,7 +14,6 @@ export enum BackendEvent {
     UpdatedPerson = "updated-person",
     DeletedPerson = "deleted-person",
 }
-
 export interface BackendApi {
     //properties
     getProperties: (propertyIds: Array<PropertyData['id']>) => Promise<OperationResponse<Array<PropertyData>>>;
@@ -55,4 +54,18 @@ export interface BackendApi {
         deletedPersonHandler: (deletedPerson: PersonData) => void,
     ) => Promise<OperationResponse>;
     personsUnsubscribe: () => void;
+}
+
+export type Location = {
+    address: string;
+    coordinates: { lat: number; lng: number };
+}
+export interface GeocodingService {
+    searchAddress: (searchValue: string) => Promise<OperationResponse<Location[]>>;
+    attribution: React.ReactElement
+}
+
+export interface MapTilesService {
+    getMapTilesUrl: () => Promise<OperationResponse<string>>;
+    attribution: string
 }

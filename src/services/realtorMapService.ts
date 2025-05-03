@@ -13,9 +13,9 @@ import {
     UpdatePersonData, 
     UpdatePropertyData, 
     UpdateRealtorData 
-} from "./domainSchemas";
-import { OperationResponse } from "./helperFunctions";
-import { BackendApi, BackendEvent } from "./backendApiInterface";
+} from "../utils/domainSchemas";
+import { OperationResponse } from "../utils/helperFunctions";
+import { BackendApi, BackendEvent } from "../utils/services-interface";
 
 const realtorMapServiceUrl = import.meta.env.VITE_REALTOR_MAP_SERVICE_URL;
 

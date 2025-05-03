@@ -2,8 +2,8 @@ import { create } from "zustand";
 
 import { CreatePersonData, PersonData, PersonFilterData, UpdatePersonData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { BackendEvent } from "../utils/backendApiInterface";
-import { realtorMapApi as backendApi } from "../utils/realtorMapService";
+import { BackendEvent } from "../utils/services-interface";
+import { realtorMapApi as backendApi } from "../services/realtorMapService";
 
 export interface PersonStore {
     persons: Record<PersonData["id"], PersonData>;

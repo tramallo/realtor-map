@@ -1,3 +1,5 @@
+/** Custom react-hook-form resolver that strips empty values before submitting
+ */
 import { Resolver, zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, ResolverOptions } from "react-hook-form";
 import { ZodSchema, TypeOf as ZTypeOf } from "zod";

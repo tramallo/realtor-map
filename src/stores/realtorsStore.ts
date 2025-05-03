@@ -2,8 +2,8 @@ import { create } from "zustand";
 
 import { CreateRealtorData, RealtorData, RealtorFilterData, UpdateRealtorData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { realtorMapApi as backendApi } from "../utils/realtorMapService";
-import { BackendEvent } from "../utils/backendApiInterface";
+import { realtorMapApi as backendApi } from "../services/realtorMapService";
+import { BackendEvent } from "../utils/services-interface";
 
 const REALTORS_LOCAL_STORAGE_KEY = "realtors-store";
 const fetchLocalStorageRealtors = (): OperationResponse<Record<RealtorData["id"], RealtorData> | undefined> => {

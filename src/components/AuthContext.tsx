@@ -12,7 +12,7 @@ import {
   logout,
   onAuthStateChange,
   signInWithPassword,
-} from "../utils/supabaseApi";
+} from "../services/supabaseApi";
 import { OperationResponse } from "../utils/helperFunctions";
 
 type AuthContext = {

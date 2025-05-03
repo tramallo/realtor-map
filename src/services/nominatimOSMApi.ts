@@ -1,13 +1,9 @@
-/** This file exposes a GeocodingService and a MapTilesService that are provided by Nominatim & OpenStreetMaps respectively
+/** Nominatim + OSM services (geocoding & map tiles respectively)
  */
 import { createElement } from "react";
 
-import {
-  Location,
-  GeocodingService,
-  MapTilesService,
-} from "./mapServicesSchemas";
-import { OperationResponse } from "./helperFunctions";
+import { OperationResponse } from "../utils/helperFunctions";
+import { GeocodingService, MapTilesService, Location } from "../utils/services-interface";
 
 const nominatimApiUrl = "https://nominatim.openstreetmap.org/search";
 
@@ -48,11 +44,7 @@ interface NominatimLocation {
   };
 }
 
-/** Converts a location object returned by nominatim api to Location type 
- * 
- * @param nominatimLocation: location returned by nominatim (NominatimLocation)
- * @returns: Location
- */
+// transform NominatimLocation to Location
 const nominatimLocationToLocation = (
   nominatimLocation: NominatimLocation
 ): Location => {
@@ -62,11 +54,6 @@ const nominatimLocationToLocation = (
   } as Location;
 };
 
-/** Peforms a geocode request to nominatim api and returns the results mapped to Location
- * 
- * @param searchValue: address to geocode
- * @returns: an array containing all locations related to the seach parameter
- */
 const searchAddress = async (searchValue: string): Promise<OperationResponse<Location[]>> => {
   const searchParams = new URLSearchParams({
     q: searchValue,
@@ -97,15 +84,11 @@ const searchAddress = async (searchValue: string): Promise<OperationResponse<Loc
   }
 };
 
-/** Returns the url for openstreetmaps tiles api
- * 
- * @returns string url
- */
 const getMapTilesUrl = async (): Promise<OperationResponse<string>> => {
   return { data: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png` };
 };
 
-// export services
+// EXPORTS
 export const nominatimGeocodingService: GeocodingService = {
   searchAddress: searchAddress,
   attribution: createElement(

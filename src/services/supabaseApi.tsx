@@ -5,13 +5,14 @@ import {
   Subscription,
 } from "@supabase/supabase-js";
 
-import { OperationResponse } from "./helperFunctions";
+import { OperationResponse } from "../utils/helperFunctions";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const client = createClient(supabaseUrl, key);
 
+// AUTH
 export const getSession = async (): Promise<OperationResponse<Session>> => {
   const { data, error } = await client.auth.getSession();
 

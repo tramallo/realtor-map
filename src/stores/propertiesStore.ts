@@ -2,8 +2,8 @@ import { create } from "zustand";
 
 import { CreatePropertyData, PropertyData, PropertyFilterData, UpdatePropertyData } from "../utils/domainSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
-import { realtorMapApi as backendApi } from "../utils/realtorMapService";
-import { BackendEvent } from "../utils/backendApiInterface";
+import { realtorMapApi as backendApi } from "../services/realtorMapService";
+import { BackendEvent } from "../utils/services-interface";
 
 export interface PropertyStore {
     properties: Record<PropertyData["id"], PropertyData>;

@@ -16,7 +16,7 @@ import { propertyCompliesFilter } from "../../utils/filter-evaluators";
 import CreateProperty from "./CreateProperty";
 import ViewProperty from "./ViewProperty";
 import { MemoMap } from "../Map";
-import { osmMapTilesService } from "../../utils/nominatimOSMApi";
+import { osmMapTilesService } from "../../services/nominatimOSMApi";
 import { getIconForProperty } from "../../utils/mapMarkerIcons";
 import { MemoFilterProperties } from "./FilterProperties";
 import {
