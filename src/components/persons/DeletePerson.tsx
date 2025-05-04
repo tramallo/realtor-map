@@ -101,7 +101,7 @@ export default function DeletePerson({
   }, [personId, fetchPerson]);
 
   return (
-    <Stack spacing={1} padding={1}>
+    <Stack spacing={2} padding={1}>
       {fetchingPerson && (
         <Typography align="center">
           <CircularProgress />
@@ -129,6 +129,7 @@ export default function DeletePerson({
               label="Name"
               value={cachedPerson.name ?? ""}
               fullWidth
+              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
           {cachedPerson.mobile && (
@@ -137,6 +138,7 @@ export default function DeletePerson({
               label="Mobile"
               value={cachedPerson.mobile ?? ""}
               fullWidth
+              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
           {cachedPerson.email && (
@@ -145,6 +147,7 @@ export default function DeletePerson({
               label="Email"
               value={cachedPerson.email ?? ""}
               fullWidth
+              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
         </>

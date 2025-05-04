@@ -44,7 +44,7 @@ export default function PersonField({
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box>
       <ComponentsField
         label={label}
         readOnly={readOnly}

@@ -60,6 +60,7 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
             onChange={(e) =>
               setFilterValue({ state: e.target.value as PropertyState })
             }
+            sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
           >
             <MenuItem value={undefined}>_</MenuItem>
             {propertyStates.map((propertyState, index) => (
@@ -84,6 +85,7 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
             onChange={(e) =>
               setFilterValue({ type: e.target.value as PropertyType })
             }
+            sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
           >
             <MenuItem value={undefined}>_</MenuItem>
             {propertyTypes.map((propertyType, index) => (

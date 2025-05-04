@@ -53,7 +53,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
   }, [propertyId, fetchProperty]);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} padding={1}>
       {fetchingProperty && (
         <Typography align="center">
           <CircularProgress />
@@ -81,7 +81,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               value={cachedProperty.address ?? ""}
               label="Address"
               fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
           {cachedProperty.type && (
@@ -90,7 +90,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               value={cachedProperty.type ?? ""}
               label="Type"
               fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
           {cachedProperty.state && (
@@ -99,7 +99,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               value={cachedProperty.state ?? ""}
               label="State"
               fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
           {cachedProperty.ownerId && (
@@ -146,7 +146,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               label="Description"
               fullWidth
               multiline
-              slotProps={{ input: { readOnly: true } }}
+              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
           {cachedProperty.createdBy && (

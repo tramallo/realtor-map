@@ -101,7 +101,7 @@ export default function DeleteRealtor({
   }, [realtorId, fetchRealtor]);
 
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={2} padding={1}>
       {fetchingRealtor && (
         <Typography align="center">
           <CircularProgress />
@@ -128,6 +128,7 @@ export default function DeleteRealtor({
             label="Name"
             value={cachedRealtor.name ?? ""}
             fullWidth
+            slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
           />
         </>
       )}

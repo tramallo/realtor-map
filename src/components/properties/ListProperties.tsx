@@ -121,8 +121,14 @@ export default function ListProperties({
       boxSizing="border-box"
       overflow="hidden"
       justifyContent="space-between"
+      sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Box overflow="auto">
+      <Box 
+        overflow="auto" 
+        border="2px solid black" 
+        borderRadius={1}
+        sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
+      >
         {searchPropertiesResponse?.error && (
           <Typography variant="h6" align="center" color="error">
             {searchPropertiesResponse.error.message}

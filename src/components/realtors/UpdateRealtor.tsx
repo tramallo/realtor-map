@@ -88,7 +88,7 @@ export default function UpdateRealtor({
 
   return (
     <MemoForm schema={updateRealtorSchema} prefillData={prefillData}>
-      <Stack spacing={2}>
+      <Stack spacing={2} padding={1}>
         {fetchingRealtor && (
           <Typography align="center">
             <CircularProgress />

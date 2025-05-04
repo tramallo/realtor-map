@@ -73,6 +73,7 @@ export default function MapProperties() {
       width="100%"
       height="100%"
       position="relative"
+      sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
       <MemoMap mapTilesService={osmMapTilesService}>
         <MemoMapComponent position="topright" customMargin="4px">
@@ -92,7 +93,7 @@ export default function MapProperties() {
             <Collapse
               in={showFiltersPane}
               sx={(theme) => ({
-                backgroundColor: theme.palette.background.default,
+                backgroundColor: theme.palette.grey[500],
               })}
             >
               <Box padding={1}>

@@ -44,7 +44,7 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
   }, [realtorId, fetchRealtor]);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} padding={1}>
       {fetchingRealtor && (
         <Typography align="center">
           <CircularProgress />
@@ -72,7 +72,7 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
               value={cachedRealtor.name ?? ""}
               label="Name"
               fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
             />
           )}
 

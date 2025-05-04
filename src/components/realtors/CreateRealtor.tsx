@@ -59,7 +59,7 @@ export default function CreateRealtor({
       schema={createRealtorSchema}
       prefillData={prefillData}
     >
-      <Stack direction="column" spacing={1} padding={1}>
+      <Stack direction="column" spacing={2} padding={1}>
         <FormTextField fieldName="name" label="Name" />
         <FormPersonField fieldName="createdBy" label="Created by" readOnly />
         <FormDateField fieldName="createdAt" label="Created at" readOnly />

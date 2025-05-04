@@ -59,7 +59,7 @@ export default function CreatePerson({
       schema={createPersonSchema}
       prefillData={prefillData}
     >
-      <Stack direction="column" spacing={1}>
+      <Stack spacing={2} padding={1}>
         <FormTextField fieldName="name" label="Name" />
         <FormTextField fieldName="mobile" label="Mobile" />
         <FormTextField fieldName="email" label="Email" />

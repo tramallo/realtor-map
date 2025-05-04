@@ -120,8 +120,14 @@ export default function ListPersons({
       boxSizing="border-box"
       overflow="hidden"
       justifyContent="space-between"
+      sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Box overflow="auto">
+      <Box 
+        overflow="auto"
+        borderRadius={1}
+        border="1px solid black"
+        sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
+      >
         {searchPersonsResponse?.error && (
           <Typography variant="h6" align="center" color="error">
             {searchPersonsResponse.error.message}

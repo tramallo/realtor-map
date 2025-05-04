@@ -73,7 +73,7 @@ export default function CreateProperty({
       schema={createPropertySchema}
       prefillData={prefillData}
     >
-      <Stack direction="column" spacing={2}>
+      <Stack spacing={2} padding={1}>
         <FormLocationField
           addressFieldName="address"
           coordinatesFieldName="coordinates"

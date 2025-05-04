@@ -86,7 +86,7 @@ export default function UpdatePerson({
 
   return (
     <MemoForm schema={updatePersonSchema} prefillData={prefillData}>
-      <Stack spacing={2}>
+      <Stack spacing={2} padding={1}>
         {fetchingPerson && (
           <Typography align="center">
             <CircularProgress />

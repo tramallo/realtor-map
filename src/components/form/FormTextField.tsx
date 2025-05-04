@@ -51,7 +51,7 @@ export default function FormTextField({
           minRows={multiline ? 3 : undefined}
           size={size}
           sx={sx}
-          slotProps={{ input: { readOnly: readOnly } }}
+          slotProps={{ input: { readOnly: readOnly, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
         />
       )}
     />

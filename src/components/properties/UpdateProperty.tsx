@@ -99,7 +99,7 @@ export default function UpdateProperty({
 
   return (
     <MemoForm schema={updatePropertySchema} prefillData={prefillData}>
-      <Stack spacing={2}>
+      <Stack spacing={2} padding={1}>
         {fetchingProperty && (
           <Typography align="center">
             <CircularProgress />

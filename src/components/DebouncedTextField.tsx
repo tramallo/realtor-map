@@ -37,5 +37,12 @@ export function DebouncedTextField({
     return () => clearTimeout(timeoutRef.current);
   }, []);
 
-  return <TextField value={inputValue} onChange={onInputChange} {...props} />;
+  return (
+    <TextField 
+      value={inputValue} 
+      onChange={onInputChange} 
+      slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }} 
+      {...props} 
+    />
+  )
 }

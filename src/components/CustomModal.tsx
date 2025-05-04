@@ -7,7 +7,6 @@ import {
   DialogTitle,
   Divider,
   Slide,
-  Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -33,12 +32,13 @@ export default function CustomModal({
           timeout: 400,
         },
         paper: {
-          sx: {
-            width: "90%",
+          sx: () => ({
+            boxSizing: "border-box",
             maxWidth: "100%",
-            maxHeight: "95%",
+            maxHeight: "100%",
             margin: 0,
-          },
+            border: "2px solid black"
+          }),
         },
       }}
     >
@@ -46,7 +46,11 @@ export default function CustomModal({
         display="flex"
         alignItems="end"
         justifyContent="space-between"
-        sx={{ padding: 1 }}
+        sx={(theme) => ({ 
+          padding: 1, 
+          color: theme.palette.primary.main, 
+          backgroundColor: theme.palette.grey[400],
+        })}
       >
         {title}
         <Button
@@ -58,11 +62,16 @@ export default function CustomModal({
           <CloseIcon />
         </Button>
       </DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Stack direction="column" width="100%">
-          {children}
-        </Stack>
+      <DialogContent
+        sx={(theme) => ({ 
+          padding: 0, 
+          boxSizing: "border-box", 
+          width: "90svw",
+          height: "85svh",
+          backgroundColor: theme.palette.grey[500],
+        })}
+      >
+        {children}
       </DialogContent>
     </Dialog>
   );

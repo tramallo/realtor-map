@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 import { Grid2, Switch } from "@mui/material";
 
-import { BaseFilterData } from "../utils/data-schema";
+import { BaseDataFilter } from "../utils/data-filter-schema";
 import PersonField from "./PersonField";
 import ComponentsField from "./ComponentsField";
 import DateField from "./DateField";
 
 export interface FilterBaseDataProps {
-  filter: BaseFilterData;
-  onChange: (newValue: BaseFilterData) => void;
+  filter: BaseDataFilter;
+  onChange: (newValue: BaseDataFilter) => void;
 }
 
 export default function FilterBaseData({
@@ -16,7 +16,7 @@ export default function FilterBaseData({
   onChange,
 }: FilterBaseDataProps) {
   const setFilterValue = useCallback(
-    (value: Partial<BaseFilterData>) => {
+    (value: Partial<BaseDataFilter>) => {
       onChange({ ...filter, ...value });
     },
     [filter, onChange]

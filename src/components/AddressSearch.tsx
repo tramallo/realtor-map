@@ -14,7 +14,7 @@ import {
   Location,
   GeocodingService,
   MapTilesService,
-} from "../utils/mapServicesSchemas";
+} from "../utils/services-interface";
 import { DebouncedTextField } from "./DebouncedTextField";
 import { OperationResponse } from "../utils/helperFunctions";
 
@@ -53,7 +53,7 @@ export default function AddressSearch({
   }, [searchValue, geocodingService]);
 
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1} padding={1}>
       <DebouncedTextField
         label="Search address"
         value={searchValue}
