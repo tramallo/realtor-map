@@ -1,4 +1,5 @@
-import { CreatePersonDTO, CreatePropertyDTO, CreateRealtorDTO, Person, PersonFilterData, Property, PropertyFilterData, Realtor, RealtorFilterData, UpdatePersonDTO, UpdatePropertyDTO, UpdateRealtorDTO } from "./data-schema";
+import { PersonFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
+import { CreatePersonDTO, CreatePropertyDTO, CreateRealtorDTO, Person, Property, Realtor, UpdatePersonDTO, UpdatePropertyDTO, UpdateRealtorDTO } from "./data-schema";
 import { OperationResponse } from "./helperFunctions";
 
 export enum BackendEvent {
@@ -17,7 +18,7 @@ export enum BackendEvent {
 export interface BackendApi {
     //properties
     getProperties: (propertyIds: Array<Property['id']>) => Promise<OperationResponse<Array<Property>>>;
-    searchPropertyIds: (filter: PropertyFilterData) => Promise<OperationResponse<Array<Property['id']>>>;
+    searchPropertyIds: (filter: PropertyFilter) => Promise<OperationResponse<Array<Property['id']>>>;
     createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
     updateProperty: (propertyId: Property["id"], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
     deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;
@@ -30,7 +31,7 @@ export interface BackendApi {
     propertiesUnsubscribe: () => void;
     //realtors
     getRealtors: (realtorIds: Array<Realtor['id']>) => Promise<OperationResponse<Array<Realtor>>>;
-    searchRealtorIds: (filter: RealtorFilterData) => Promise<OperationResponse<Array<Realtor['id']>>>;
+    searchRealtorIds: (filter: RealtorFilter) => Promise<OperationResponse<Array<Realtor['id']>>>;
     createRealtor: (newRealtorData: CreateRealtorDTO) => Promise<OperationResponse>;
     updateRealtor: (realtorId: Realtor["id"], updateData: UpdateRealtorDTO) => Promise<OperationResponse>;
     deleteRealtor: (realtorId: Realtor['id']) => Promise<OperationResponse>;
@@ -43,7 +44,7 @@ export interface BackendApi {
     realtorsUnsubscribe: () => void;
     //persons
     getPersons: (personIds: Array<Person['id']>) => Promise<OperationResponse<Array<Person>>>;
-    searchPersonIds: (filter: PersonFilterData) => Promise<OperationResponse<Array<Person['id']>>>;
+    searchPersonIds: (filter: PersonFilter) => Promise<OperationResponse<Array<Person['id']>>>;
     createPerson: (newPersonData: CreatePersonDTO) => Promise<OperationResponse>;
     updatePerson: (personId: Person["id"], updateData: UpdatePersonDTO) => Promise<OperationResponse>;
     deletePerson: (personId: Person['id']) => Promise<OperationResponse>;

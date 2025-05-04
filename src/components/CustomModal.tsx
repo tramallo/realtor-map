@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogProps,
   DialogTitle,
-  Divider,
   Slide,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -37,7 +36,8 @@ export default function CustomModal({
             maxWidth: "100%",
             maxHeight: "100%",
             margin: 0,
-            border: "2px solid black"
+            border: "2px solid black",
+            borderRadius: 2,
           }),
         },
       }}
@@ -46,9 +46,9 @@ export default function CustomModal({
         display="flex"
         alignItems="end"
         justifyContent="space-between"
-        sx={(theme) => ({ 
-          padding: 1, 
-          color: theme.palette.primary.main, 
+        sx={(theme) => ({
+          padding: 1,
+          color: theme.palette.primary.main,
           backgroundColor: theme.palette.grey[400],
         })}
       >
@@ -63,9 +63,9 @@ export default function CustomModal({
         </Button>
       </DialogTitle>
       <DialogContent
-        sx={(theme) => ({ 
-          padding: 0, 
-          boxSizing: "border-box", 
+        sx={(theme) => ({
+          padding: 0,
+          boxSizing: "border-box",
           width: "90svw",
           height: "85svh",
           backgroundColor: theme.palette.grey[500],

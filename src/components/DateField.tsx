@@ -37,7 +37,11 @@ export default function DateField({
           fullWidth: true,
           error: !!errorMessage,
           helperText: errorMessage,
-          sx: (theme) => ({ '& .MuiOutlinedInput-root': { backgroundColor: theme.palette.grey[200] } })
+          sx: (theme) => ({
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: theme.palette.grey[200],
+            },
+          }),
         },
         openPickerButton: { disabled: readOnly },
       }}

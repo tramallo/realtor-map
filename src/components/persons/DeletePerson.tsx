@@ -13,8 +13,8 @@ import { Person } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
+  useAppContext,
 } from "../../utils/helperFunctions";
-import { useAppContext } from "../AppContext";
 
 export interface DeletePersonProps {
   personId: Person["id"];
@@ -129,7 +129,11 @@ export default function DeletePerson({
               label="Name"
               value={cachedPerson.name ?? ""}
               fullWidth
-              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
           {cachedPerson.mobile && (
@@ -138,7 +142,11 @@ export default function DeletePerson({
               label="Mobile"
               value={cachedPerson.mobile ?? ""}
               fullWidth
-              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
           {cachedPerson.email && (
@@ -147,7 +155,11 @@ export default function DeletePerson({
               label="Email"
               value={cachedPerson.email ?? ""}
               fullWidth
-              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
         </>

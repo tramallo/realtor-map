@@ -22,9 +22,9 @@ import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
+  useAppContext,
 } from "../../utils/helperFunctions";
 import FormLocationField from "../form/FormLocationField";
-import { useAppContext } from "../AppContext";
 
 export interface UpdatePropertyProps {
   propertyId: Property["id"];

@@ -72,7 +72,12 @@ export default function ViewPerson({ personId }: ViewPersonProps) {
               value={cachedPerson.name ?? ""}
               label="Name"
               fullWidth
-              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
           {cachedPerson.mobile && (
@@ -81,7 +86,12 @@ export default function ViewPerson({ personId }: ViewPersonProps) {
               value={cachedPerson.mobile ?? ""}
               label="Mobile"
               fullWidth
-              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
           {cachedPerson.email && (
@@ -90,7 +100,12 @@ export default function ViewPerson({ personId }: ViewPersonProps) {
               value={cachedPerson.email ?? ""}
               label="Email"
               fullWidth
-              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
 

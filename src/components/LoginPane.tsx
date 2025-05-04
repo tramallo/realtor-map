@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useAuthContext } from "./AuthContext";
+import { useAuthContext } from "../utils/helperFunctions";
 
 export function LoginPane() {
   const { startSession } = useAuthContext();

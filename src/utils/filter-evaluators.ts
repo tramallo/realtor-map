@@ -1,18 +1,15 @@
+import { BaseDataFilter, PersonFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
 import { 
     BaseData, 
-    BaseFilterData, 
     Person, 
-    PersonFilterData, 
     Property, 
-    PropertyFilterData, 
     Realtor,
-    RealtorFilterData, 
 } from "./data-schema";
 
 /** The logic on this evaluators must match the logic on backendApi search request.
  * Otherwise will cause that not all received data is shown, and incorrect data is shown from local storage 
  */
-export const dataCompliesFilter = (data: BaseData, filter: BaseFilterData): boolean => {
+export const dataCompliesFilter = (data: BaseData, filter: BaseDataFilter): boolean => {
     if(filter.idEq && data.id != filter.idEq) { return false }
     if(filter.idNot && (data.id ? filter.idNot.includes(data.id) : true)) { return false }
     if(filter.createdBy && data.createdBy != filter.createdBy) { return false }
@@ -26,7 +23,7 @@ export const dataCompliesFilter = (data: BaseData, filter: BaseFilterData): bool
     return true;
 }
 
-export const propertyCompliesFilter = (property: Property, filter: PropertyFilterData): boolean => {
+export const propertyCompliesFilter = (property: Property, filter: PropertyFilter): boolean => {
     if(!dataCompliesFilter(property, filter)) { return false }
     if (filter.address) {
         const lowercasePropertyAddress = (property.address ?? "").toLowerCase();
@@ -55,7 +52,7 @@ export const propertyCompliesFilter = (property: Property, filter: PropertyFilte
     return true;
 }
 
-export const realtorCompliesFilter = (realtor: Realtor, filter: RealtorFilterData): boolean => {
+export const realtorCompliesFilter = (realtor: Realtor, filter: RealtorFilter): boolean => {
     if(!dataCompliesFilter(realtor, filter)) { return false }
     if (filter.name) {
         const lowercaseRealtorName = (realtor.name ?? "").toLowerCase();
@@ -71,7 +68,7 @@ export const realtorCompliesFilter = (realtor: Realtor, filter: RealtorFilterDat
     return true;
 }
 
-export const personCompliesFilter = (person: Person, filter: PersonFilterData): boolean => {
+export const personCompliesFilter = (person: Person, filter: PersonFilter): boolean => {
     if(!dataCompliesFilter(person, filter)) { return false }
     if (filter.name) {
         const lowercasePersonName = (person.name ?? "").toLowerCase();

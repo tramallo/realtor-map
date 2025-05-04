@@ -122,7 +122,7 @@ export default function ListPersons({
       justifyContent="space-between"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Box 
+      <Box
         overflow="auto"
         borderRadius={1}
         border="1px solid black"

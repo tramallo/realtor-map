@@ -123,9 +123,9 @@ export default function ListProperties({
       justifyContent="space-between"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Box 
-        overflow="auto" 
-        border="2px solid black" 
+      <Box
+        overflow="auto"
+        border="2px solid black"
         borderRadius={1}
         sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
       >

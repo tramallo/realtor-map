@@ -13,8 +13,8 @@ import { Realtor } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
+  useAppContext,
 } from "../../utils/helperFunctions";
-import { useAppContext } from "../AppContext";
 
 export interface DeleteRealtorProps {
   realtorId: Realtor["id"];
@@ -128,7 +128,11 @@ export default function DeleteRealtor({
             label="Name"
             value={cachedRealtor.name ?? ""}
             fullWidth
-            slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+            slotProps={{
+              input: {
+                sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+              },
+            }}
           />
         </>
       )}

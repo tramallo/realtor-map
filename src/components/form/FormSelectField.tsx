@@ -45,9 +45,11 @@ export default function FormSelectField({
             disabled={readOnly}
             error={!!fieldState?.error}
             helperText={fieldState?.error?.message}
-            slotProps={{ 
-              input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) },
-              select: { multiple: multiple }
+            slotProps={{
+              input: {
+                sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+              },
+              select: { multiple: multiple },
             }}
             sx={{ flex: 9 }}
           >

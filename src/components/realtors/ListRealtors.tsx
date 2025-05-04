@@ -123,7 +123,7 @@ export default function ListRealtors({
       justifyContent="space-between"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Box 
+      <Box
         overflow="auto"
         border="2px solid black"
         borderRadius={1}

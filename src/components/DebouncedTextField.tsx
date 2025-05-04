@@ -38,11 +38,15 @@ export function DebouncedTextField({
   }, []);
 
   return (
-    <TextField 
-      value={inputValue} 
-      onChange={onInputChange} 
-      slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }} 
-      {...props} 
+    <TextField
+      value={inputValue}
+      onChange={onInputChange}
+      slotProps={{
+        input: {
+          sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+        },
+      }}
+      {...props}
     />
-  )
+  );
 }

@@ -5,9 +5,9 @@ import Navigation, { NavigationSlide } from "./components/Navigation";
 import ListPersons from "./components/persons/ListPersons";
 import ListRealtors from "./components/realtors/ListRealtors";
 import ListProperties from "./components/properties/ListProperties";
-import Test from "./layouts/Test";
+//import Test from "./layouts/Test";
 import { Button } from "@mui/material";
-import { useAuthContext } from "./components/AuthContext";
+import { useAuthContext } from "./utils/helperFunctions";
 
 export function App() {
   const { endSession } = useAuthContext();

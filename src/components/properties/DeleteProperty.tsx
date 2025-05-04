@@ -19,8 +19,8 @@ import RealtorChip from "../RealtorChip";
 import {
   dateToTimestamp,
   OperationResponse,
+  useAppContext,
 } from "../../utils/helperFunctions";
-import { useAppContext } from "../AppContext";
 
 export interface DeletePropertyProps {
   propertyId: Property["id"];
@@ -134,14 +134,22 @@ export default function DeleteProperty({
             label="address"
             value={cachedProperty.address ?? ""}
             fullWidth
-            slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+            slotProps={{
+              input: {
+                sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+              },
+            }}
           />
           <TextField
             variant="outlined"
             label="type"
             value={cachedProperty.type}
             fullWidth
-            slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+            slotProps={{
+              input: {
+                sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+              },
+            }}
           />
           {cachedProperty.ownerId && (
             <ComponentsField
@@ -173,7 +181,11 @@ export default function DeleteProperty({
               label="state"
               value={cachedProperty.state ?? ""}
               fullWidth
-              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
           {cachedProperty.description && (
@@ -183,7 +195,11 @@ export default function DeleteProperty({
               value={cachedProperty.description ?? ""}
               fullWidth
               multiline
-              slotProps={{ input: { sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
         </>

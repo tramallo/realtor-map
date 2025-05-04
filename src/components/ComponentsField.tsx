@@ -32,7 +32,10 @@ export default function ComponentsField({
         },
         inputLabel: { shrink: !!chips.length },
         input: {
-          sx: (theme) => onActionButtonClick ? ({ paddingRight: 0, backgroundColor: theme.palette.grey[200] }) : ({ backgroundColor: theme.palette.grey[200] }),
+          sx: (theme) =>
+            onActionButtonClick
+              ? { paddingRight: 0, backgroundColor: theme.palette.grey[200] }
+              : { backgroundColor: theme.palette.grey[200] },
           startAdornment: (
             <InputAdornment
               position="start"

@@ -6,10 +6,9 @@ import { MemoForm } from "../form/Form";
 import FormTextField from "../form/FormTextField";
 import FormDateField from "../form/FormDateField";
 import { MemoSubmitButton } from "../form/SubmitButton";
-import { dateToTimestamp } from "../../utils/helperFunctions";
+import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
 import FormPersonField from "../form/FormPersonField";
 import { usePersonStore } from "../../stores/personsStore";
-import { useAppContext } from "../AppContext";
 
 export interface CreatePersonProps {
   prefillPerson?: Partial<CreatePersonDTO>;

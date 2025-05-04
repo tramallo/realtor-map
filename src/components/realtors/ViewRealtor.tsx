@@ -72,7 +72,12 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
               value={cachedRealtor.name ?? ""}
               label="Name"
               fullWidth
-              slotProps={{ input: { readOnly: true, sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }) } }}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+                },
+              }}
             />
           )}
 

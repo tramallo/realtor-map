@@ -14,10 +14,9 @@ import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
 import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
-import { dateToTimestamp } from "../../utils/helperFunctions";
+import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
 import FormLocationField from "../form/FormLocationField";
 import { usePropertyStore } from "../../stores/propertiesStore";
-import { useAppContext } from "../AppContext";
 
 export interface CreatePropertyProps {
   prefillProperty?: Partial<CreatePropertyDTO>;

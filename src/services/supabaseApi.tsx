@@ -82,7 +82,7 @@ const queryConstructor = {
     supabaseClient: SupabaseClient,
     filter: PropertyFilter
   ) => {
-    let query = supabaseClient.from("property").select("id");
+    const query = supabaseClient.from("property").select("id");
 
     if (filter.idEq) {
       query.eq("id", filter.idEq);
@@ -138,7 +138,7 @@ const queryConstructor = {
     supabaseClient: SupabaseClient,
     filter: RealtorFilter
   ) => {
-    let query = supabaseClient.from("realtor").select("id");
+    const query = supabaseClient.from("realtor").select("id");
 
     if (filter.idEq) {
       query.eq("id", filter.idEq);
@@ -179,7 +179,7 @@ const queryConstructor = {
     supabseClient: SupabaseClient,
     filter: PersonFilter
   ) => {
-    let query = supabseClient.from("person").select("id");
+    const query = supabseClient.from("person").select("id");
 
     if (filter.idEq) {
       query.eq("id", filter.idEq);

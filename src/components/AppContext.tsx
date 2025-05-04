@@ -1,23 +1,9 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { ReactNode, useCallback, useState } from "react";
 
 import CustomSnackbar from "./CustomSnackbar";
 import { LoginPane } from "./LoginPane";
 import CustomModal from "./CustomModal";
-import { useAuthContext } from "./AuthContext";
-
-type AppContext = {
-  notifyUser: (message: string) => void;
-};
-
-const appContext = createContext<AppContext | undefined>({
-  notifyUser: () => undefined,
-});
+import { appContext, useAuthContext } from "../utils/helperFunctions";
 
 export interface AppContenxtProviderProps {
   children: ReactNode;
@@ -45,12 +31,4 @@ export function AppContextProvider({ children }: AppContenxtProviderProps) {
       </CustomModal>
     </appContext.Provider>
   );
-}
-
-export function useAppContext() {
-  const context = useContext(appContext);
-  if (context === undefined) {
-    throw new Error("useAppContext must be used within an AppContextProvider");
-  }
-  return context;
 }

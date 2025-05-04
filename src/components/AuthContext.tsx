@@ -1,11 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import {
   getSession,
@@ -13,19 +6,7 @@ import {
   onAuthStateChange,
   signInWithPassword,
 } from "../services/supabaseApi";
-import { OperationResponse } from "../utils/helperFunctions";
-
-type AuthContext = {
-  userSession: Session | undefined;
-  startSession: (email: string, password: string) => Promise<OperationResponse>;
-  endSession: () => Promise<OperationResponse>;
-};
-
-const authContext = createContext<AuthContext | undefined>({
-  userSession: undefined,
-  startSession: async () => ({ error: new Error("not implemented") }),
-  endSession: async () => ({ error: new Error("not implemented") }),
-});
+import { authContext, OperationResponse } from "../utils/helperFunctions";
 
 export interface AuthContextProviderProps {
   children: ReactNode;
@@ -81,14 +62,4 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       {children}
     </authContext.Provider>
   );
-}
-
-export function useAuthContext() {
-  const context = useContext(authContext);
-  if (context === undefined) {
-    throw new Error(
-      "useAuthContext must be used within an AuthContextProvider"
-    );
-  }
-  return context;
 }
