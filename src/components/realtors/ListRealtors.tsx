@@ -175,11 +175,6 @@ export default function ListRealtors({
                 ))}
               </List>
             )}
-            {searchingRealtors && (
-              <Typography padding={1} align="center">
-                <CircularProgress />
-              </Typography>
-            )}
           </>
         )}
       </Box>
@@ -188,7 +183,14 @@ export default function ListRealtors({
         <Stack spacing={filtersVisible ? 1 : 0}>
           <Divider>
             <Chip
-              label={`Filters (${countDefinedAttributes(realtorsFilter)})`}
+              icon={
+                searchingRealtors ? <CircularProgress size="1em" /> : undefined
+              }
+              label={
+                searchingRealtors
+                  ? undefined
+                  : `Filters (${countDefinedAttributes(realtorsFilter)})`
+              }
               color="primary"
               onClick={toggleFiltersVisibility}
               size="small"

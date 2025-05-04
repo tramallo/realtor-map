@@ -177,11 +177,6 @@ export default function ListProperties({
                 ))}
               </List>
             )}
-            {searchingProperties && (
-              <Typography padding={1} align="center">
-                <CircularProgress />
-              </Typography>
-            )}
           </>
         )}
       </Box>
@@ -190,7 +185,16 @@ export default function ListProperties({
         <Stack spacing={filtersVisible ? 1 : 0}>
           <Divider>
             <Chip
-              label={`Filters (${countDefinedAttributes(propertiesFilter)})`}
+              icon={
+                searchingProperties ? (
+                  <CircularProgress size="1em" />
+                ) : undefined
+              }
+              label={
+                searchingProperties
+                  ? undefined
+                  : `Filters (${countDefinedAttributes(propertiesFilter)})`
+              }
               color="primary"
               onClick={toggleFiltersVisibility}
               size="small"

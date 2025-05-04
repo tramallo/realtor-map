@@ -174,11 +174,6 @@ export default function ListPersons({
                 ))}
               </List>
             )}
-            {searchingPersons && (
-              <Typography padding={1} align="center">
-                <CircularProgress />
-              </Typography>
-            )}
           </>
         )}
       </Box>
@@ -187,7 +182,15 @@ export default function ListPersons({
         <Stack spacing={filtersVisible ? 1 : 0}>
           <Divider>
             <Chip
-              label={`Filters (${countDefinedAttributes(personsFilter)})`}
+              icon={
+                searchingPersons ? <CircularProgress size="1em" /> : undefined
+              }
+              label={
+                searchingPersons
+                  ? undefined
+                  : `Filters (${countDefinedAttributes(personsFilter)})`
+              }
+              disabled={searchingPersons}
               color="primary"
               onClick={toggleFiltersVisibility}
               size="small"
