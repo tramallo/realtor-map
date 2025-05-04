@@ -92,7 +92,7 @@ export default function MapProperties() {
               disabled={searchingProperties}
             >
               {searchingProperties ? (
-                <CircularProgress size="1.4em" />
+                <CircularProgress size="2em" />
               ) : (
                 `Filters (${countDefinedAttributes(propertiesFilter)})`
               )}
