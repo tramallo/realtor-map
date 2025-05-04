@@ -33,12 +33,17 @@ export function LoginPane() {
   }, [email, password, startSession]);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} padding={1}>
       <TextField
         label="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={startingSession}
+        slotProps={{
+          input: {
+            sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+          },
+        }}
       />
       <TextField
         label="Password"
@@ -46,6 +51,11 @@ export function LoginPane() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         disabled={startingSession}
+        slotProps={{
+          input: {
+            sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
+          },
+        }}
       />
       {signInError && (
         <Typography color="error">{signInError.message}</Typography>
