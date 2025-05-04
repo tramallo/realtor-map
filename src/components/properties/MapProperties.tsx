@@ -89,7 +89,14 @@ export default function MapProperties() {
             <Button
               variant="contained"
               onClick={() => setShowFiltersPane(!showFiltersPane)}
-            >{`Filters (${countDefinedAttributes(propertiesFilter)})`}</Button>
+              disabled={searchingProperties}
+            >
+              {searchingProperties ? (
+                <CircularProgress size="1.4em" />
+              ) : (
+                `Filters (${countDefinedAttributes(propertiesFilter)})`
+              )}
+            </Button>
             <Collapse
               in={showFiltersPane}
               sx={(theme) => ({
@@ -126,7 +133,7 @@ export default function MapProperties() {
           </Marker>
         ))}
       </MemoMap>
-      {(searchingProperties || searchPropertiesResponse?.error) && (
+      {searchPropertiesResponse?.error && (
         <Stack
           position="absolute"
           boxSizing="border-box"
@@ -140,13 +147,9 @@ export default function MapProperties() {
           alignItems="center"
           justifyContent="center"
         >
-          {searchPropertiesResponse?.error ? (
-            <Typography variant="h6" color="error">
-              {searchPropertiesResponse?.error.message}
-            </Typography>
-          ) : (
-            <CircularProgress size="20svw" />
-          )}
+          <Typography variant="h6" color="error">
+            {searchPropertiesResponse?.error.message}
+          </Typography>
         </Stack>
       )}
       <CustomModal
