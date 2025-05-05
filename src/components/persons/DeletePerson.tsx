@@ -4,7 +4,6 @@ import {
   Chip,
   CircularProgress,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 
@@ -15,6 +14,7 @@ import {
   OperationResponse,
   useAppContext,
 } from "../../utils/helperFunctions";
+import { CustomTextField } from "../CustomTextField";
 
 export interface DeletePersonProps {
   personId: Person["id"];
@@ -121,46 +121,16 @@ export default function DeletePerson({
       {!fetchingPerson && cachedPerson && (
         <>
           {cachedPerson.deleted && (
-            <Chip label="Deleted person" color="error" variant="outlined" />
+            <Chip label="Deleted" color="error" variant="outlined" />
           )}
           {cachedPerson.name && (
-            <TextField
-              variant="outlined"
-              label="Name"
-              value={cachedPerson.name ?? ""}
-              fullWidth
-              slotProps={{
-                input: {
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField label="Name" value={cachedPerson.name ?? ""} />
           )}
           {cachedPerson.mobile && (
-            <TextField
-              variant="outlined"
-              label="Mobile"
-              value={cachedPerson.mobile ?? ""}
-              fullWidth
-              slotProps={{
-                input: {
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField label="Mobile" value={cachedPerson.mobile ?? ""} />
           )}
           {cachedPerson.email && (
-            <TextField
-              variant="outlined"
-              label="Email"
-              value={cachedPerson.email ?? ""}
-              fullWidth
-              slotProps={{
-                input: {
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField label="Email" value={cachedPerson.email ?? ""} />
           )}
         </>
       )}

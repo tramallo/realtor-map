@@ -4,7 +4,6 @@ import {
   Chip,
   CircularProgress,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 
@@ -14,6 +13,7 @@ import DeleteRealtor from "./DeleteRealtor";
 import UpdateRealtor from "./UpdateRealtor";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
+import { CustomTextField } from "../CustomTextField";
 
 export interface ViewRealtorProps {
   realtorId: Realtor["id"];
@@ -64,21 +64,10 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
       {!fetchingRealtor && cachedRealtor && (
         <>
           {cachedRealtor.deleted && (
-            <Chip label="Deleted realtor" color="error" variant="outlined" />
+            <Chip label="Deleted" color="error" variant="outlined" />
           )}
           {cachedRealtor.name && (
-            <TextField
-              variant="outlined"
-              value={cachedRealtor.name ?? ""}
-              label="Name"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField value={cachedRealtor.name ?? ""} label="Name" />
           )}
 
           <Stack

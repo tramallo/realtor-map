@@ -16,7 +16,7 @@ import {
 import PersonField from "../PersonField";
 import RealtorField from "../RealtorField";
 import FilterBaseData from "../FilterBaseData";
-import { DebouncedTextField } from "../DebouncedTextField";
+import { CustomTextField } from "../CustomTextField";
 import { PropertyFilter } from "../../utils/data-filter-schema";
 
 export interface FilterPropertiesProps {
@@ -39,10 +39,11 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
   return (
     <Grid2 container spacing={1}>
       <Grid2 size={6}>
-        <DebouncedTextField
+        <CustomTextField
           label="Address"
           variant="outlined"
           value={filter.address || ""}
+          delay={500}
           onChange={(value) => setFilterValue({ address: value || undefined })}
           fullWidth
         />

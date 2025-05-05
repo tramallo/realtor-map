@@ -4,7 +4,6 @@ import {
   Chip,
   CircularProgress,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 
@@ -14,6 +13,7 @@ import DeletePerson from "./DeletePerson";
 import UpdatePerson from "./UpdatePerson";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
+import { CustomTextField } from "../CustomTextField";
 
 export interface ViewPersonProps {
   personId: Person["id"];
@@ -64,49 +64,16 @@ export default function ViewPerson({ personId }: ViewPersonProps) {
       {!fetchingPerson && cachedPerson && (
         <>
           {cachedPerson.deleted && (
-            <Chip label="Deleted person" color="error" variant="outlined" />
+            <Chip label="Deleted" color="error" variant="outlined" />
           )}
           {cachedPerson.name && (
-            <TextField
-              variant="outlined"
-              value={cachedPerson.name ?? ""}
-              label="Name"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField value={cachedPerson.name ?? ""} label="Name" />
           )}
           {cachedPerson.mobile && (
-            <TextField
-              variant="outlined"
-              value={cachedPerson.mobile ?? ""}
-              label="Mobile"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField value={cachedPerson.mobile ?? ""} label="Mobile" />
           )}
           {cachedPerson.email && (
-            <TextField
-              variant="outlined"
-              value={cachedPerson.email ?? ""}
-              label="Email"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField value={cachedPerson.email ?? ""} label="Email" />
           )}
 
           <Stack

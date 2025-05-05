@@ -41,6 +41,11 @@ export default function DateField({
             "& .MuiOutlinedInput-root": {
               backgroundColor: theme.palette.grey[200],
             },
+            "& .MuiInputLabel-root": {
+              backgroundColor: theme.palette.grey[200],
+              borderRadius: 3,
+              paddingInline: 1,
+            },
           }),
         },
         openPickerButton: { disabled: readOnly },

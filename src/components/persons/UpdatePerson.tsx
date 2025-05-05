@@ -10,13 +10,13 @@ import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
 import FormDateField from "../form/FormDateField";
 import FormPersonField from "../form/FormPersonField";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
 } from "../../utils/helperFunctions";
+import { FormTextField } from "../form/FormTextField";
 
 export interface UpdatePersonProps {
   personId: Person["id"];

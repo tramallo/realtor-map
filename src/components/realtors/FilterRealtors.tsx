@@ -2,7 +2,7 @@ import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
 
 import FilterBaseData from "../FilterBaseData";
-import { DebouncedTextField } from "../DebouncedTextField";
+import { CustomTextField } from "../CustomTextField";
 import { RealtorFilter } from "../../utils/data-filter-schema";
 
 export interface FilterRealtorsProps {
@@ -25,10 +25,11 @@ export function FilterRealtors({ filter, onChange }: FilterRealtorsProps) {
   return (
     <Grid2 container spacing={1}>
       <Grid2 size={12}>
-        <DebouncedTextField
+        <CustomTextField
           label="Name"
           variant="outlined"
           value={filter.name || ""}
+          delay={500}
           onChange={(value) => setFilterValue({ name: value || undefined })}
           fullWidth
         />

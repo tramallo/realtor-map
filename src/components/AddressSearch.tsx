@@ -15,7 +15,7 @@ import {
   GeocodingService,
   MapTilesService,
 } from "../utils/services-interface";
-import { DebouncedTextField } from "./DebouncedTextField";
+import { CustomTextField } from "./CustomTextField";
 import { OperationResponse } from "../utils/helperFunctions";
 
 export interface AddressSearchProps {
@@ -54,7 +54,7 @@ export default function AddressSearch({
 
   return (
     <Stack spacing={1} padding={1}>
-      <DebouncedTextField
+      <CustomTextField
         label="Search address"
         value={searchValue}
         onChange={setSearchValue}

@@ -17,7 +17,6 @@ import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
 import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
@@ -25,6 +24,7 @@ import {
   useAppContext,
 } from "../../utils/helperFunctions";
 import FormLocationField from "../form/FormLocationField";
+import { FormTextField } from "../form/FormTextField";
 
 export interface UpdatePropertyProps {
   propertyId: Property["id"];

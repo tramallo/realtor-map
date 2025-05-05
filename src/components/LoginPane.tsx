@@ -1,13 +1,8 @@
 import { useCallback, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, CircularProgress, Stack, Typography } from "@mui/material";
 
 import { useAuthContext } from "../utils/helperFunctions";
+import { CustomTextField } from "./CustomTextField";
 
 export function LoginPane() {
   const { startSession } = useAuthContext();
@@ -34,28 +29,23 @@ export function LoginPane() {
 
   return (
     <Stack spacing={2} padding={1}>
-      <TextField
+      <CustomTextField
         label="Email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={setEmail}
         disabled={startingSession}
-        slotProps={{
-          input: {
-            sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-          },
-        }}
       />
-      <TextField
+      <CustomTextField
         label="Password"
         type="password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={setPassword}
         disabled={startingSession}
-        slotProps={{
+        /* slotProps={{
           input: {
             sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
           },
-        }}
+        }} */
       />
       {signInError && (
         <Typography color="error">{signInError.message}</Typography>

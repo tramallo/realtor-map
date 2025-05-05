@@ -4,7 +4,6 @@ import {
   Chip,
   CircularProgress,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 
@@ -21,6 +20,7 @@ import {
   OperationResponse,
   useAppContext,
 } from "../../utils/helperFunctions";
+import { CustomTextField } from "../CustomTextField";
 
 export interface DeletePropertyProps {
   propertyId: Property["id"];
@@ -127,30 +127,13 @@ export default function DeleteProperty({
       {!fetchingProperty && cachedProperty && (
         <>
           {cachedProperty.deleted && (
-            <Chip label="Deleted property" color="error" variant="outlined" />
+            <Chip label="Deleted" color="error" variant="outlined" />
           )}
-          <TextField
-            variant="outlined"
+          <CustomTextField
             label="address"
             value={cachedProperty.address ?? ""}
-            fullWidth
-            slotProps={{
-              input: {
-                sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-              },
-            }}
           />
-          <TextField
-            variant="outlined"
-            label="type"
-            value={cachedProperty.type}
-            fullWidth
-            slotProps={{
-              input: {
-                sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-              },
-            }}
-          />
+          <CustomTextField label="type" value={cachedProperty.type} />
           {cachedProperty.ownerId && (
             <ComponentsField
               label="owner"
@@ -176,30 +159,13 @@ export default function DeleteProperty({
             />
           )}
           {cachedProperty.state && (
-            <TextField
-              variant="outlined"
-              label="state"
-              value={cachedProperty.state ?? ""}
-              fullWidth
-              slotProps={{
-                input: {
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField label="state" value={cachedProperty.state ?? ""} />
           )}
           {cachedProperty.description && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               label="description"
               value={cachedProperty.description ?? ""}
-              fullWidth
               multiline
-              slotProps={{
-                input: {
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
             />
           )}
         </>

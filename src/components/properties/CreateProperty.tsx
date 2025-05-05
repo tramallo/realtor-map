@@ -12,11 +12,11 @@ import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
 import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
 import FormLocationField from "../form/FormLocationField";
 import { usePropertyStore } from "../../stores/propertiesStore";
+import { FormTextField } from "../form/FormTextField";
 
 export interface CreatePropertyProps {
   prefillProperty?: Partial<CreatePropertyDTO>;
@@ -107,7 +107,7 @@ export default function CreateProperty({
         <FormTextField
           fieldName="description"
           label="Description"
-          readOnly={creatingProperty}
+          disabled={creatingProperty}
           multiline
         />
         <FormRealtorField

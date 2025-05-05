@@ -1,13 +1,13 @@
 import { useFormContext } from "react-hook-form";
 import { Button, FormGroup, Stack } from "@mui/material";
 
-import FormTextField from "./FormTextField";
 import { Location } from "../../utils/services-interface";
 import { useCallback, useState } from "react";
 import AddressSearch from "../AddressSearch";
 import { googleGeocodingService } from "../../services/googleApi";
 import { osmMapTilesService } from "../../services/nominatimOSMApi";
 import CustomModal from "../CustomModal";
+import { FormTextField } from "./FormTextField";
 
 export interface FormLocationFieldProps {
   addressFieldName: string;
@@ -52,7 +52,7 @@ export default function FormLocationField({
           fieldName={addressFieldName}
           label={label}
           defaultValue={defaultValue?.address}
-          readOnly
+          disabled={readOnly}
           fullWidth={false}
           sx={{ flex: 1 }}
         />

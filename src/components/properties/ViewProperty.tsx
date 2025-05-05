@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Button,
   Stack,
-  TextField,
   Chip,
   CircularProgress,
   Typography,
@@ -21,6 +20,7 @@ import DeleteProperty from "./DeleteProperty";
 import DateField from "../DateField";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
+import { CustomTextField } from "../CustomTextField";
 
 export interface ViewPropertyProps {
   propertyId: Property["id"];
@@ -73,49 +73,19 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
       {!fetchingProperty && cachedProperty && (
         <>
           {cachedProperty.deleted && (
-            <Chip label="Deleted property" color="error" variant="outlined" />
+            <Chip label="Deleted" color="error" variant="outlined" />
           )}
           {cachedProperty.address && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedProperty.address ?? ""}
               label="Address"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
             />
           )}
           {cachedProperty.type && (
-            <TextField
-              variant="outlined"
-              value={cachedProperty.type ?? ""}
-              label="Type"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField value={cachedProperty.type ?? ""} label="Type" />
           )}
           {cachedProperty.state && (
-            <TextField
-              variant="outlined"
-              value={cachedProperty.state ?? ""}
-              label="State"
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
-            />
+            <CustomTextField value={cachedProperty.state ?? ""} label="State" />
           )}
           {cachedProperty.ownerId && (
             <ComponentsField
@@ -155,18 +125,10 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
             />
           )}
           {cachedProperty.description && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedProperty.description ?? ""}
               label="Description"
-              fullWidth
               multiline
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  sx: (theme) => ({ backgroundColor: theme.palette.grey[200] }),
-                },
-              }}
             />
           )}
           {cachedProperty.createdBy && (
