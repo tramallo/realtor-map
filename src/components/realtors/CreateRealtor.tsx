@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
-import { CreateRealtorDTO, createRealtorSchema } from "../../utils/data-schema";
+import { CreateRealtorDTO, createRealtorDTO } from "../../utils/data-schema";
 import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
 import { MemoForm } from "../form/Form";
 import FormPersonField from "../form/FormPersonField";
@@ -54,8 +54,8 @@ export default function CreateRealtor({
   );
 
   return (
-    <MemoForm<typeof createRealtorSchema>
-      schema={createRealtorSchema}
+    <MemoForm<typeof createRealtorDTO>
+      schema={createRealtorDTO}
       prefillData={prefillData}
     >
       <Stack direction="column" spacing={2} padding={1}>

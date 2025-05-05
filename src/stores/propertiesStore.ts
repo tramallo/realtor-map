@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { CreatePropertyDTO, Property, UpdatePropertyDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
-import { BackendEvent } from "../utils/services-interface";
 import { PropertyFilter } from "../utils/data-filter-schema";
 
 export interface PropertyStore {
@@ -17,7 +16,7 @@ export interface PropertyStore {
 
 const PROPERTIES_LOCAL_STORAGE_KEY = "properties-store";
 const fetchLocalStorageProperties = (): OperationResponse<Record<Property["id"], Property> | undefined> => {
-    console.log(`propertiesStorage -> fetchLocalStorageProperties`);
+    console.log(`propertiesStore -> fetchLocalStorageProperties`);
 
     const rawLocalStorageData = localStorage.getItem(PROPERTIES_LOCAL_STORAGE_KEY);
 
@@ -58,15 +57,15 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
     };
 
     const newPropertyHandler = (newProperty: Property) => {
-        console.log(`event -> [${BackendEvent.NewProperty}] ${newProperty.address} `);
+        console.log(`event -> [new-property] ${newProperty.address} `);
         storeProperties([newProperty]);
     }
     const updatedPropertyHandler = (updatedProperty: Property) => {
-        console.log(`event -> [${BackendEvent.UpdatedProperty}] ${updatedProperty.address} `);
+        console.log(`event -> [updated-property] ${updatedProperty.address} `);
         storeProperties([updatedProperty]);
     }
     const deletedPropertyHandler = (deletedProperty: Property) => {
-        console.log(`event -> [${BackendEvent.DeletedProperty}] ${deletedProperty.address}`);
+        console.log(`event -> [deleted-property] ${deletedProperty.address}`);
         removeProperties([deletedProperty.id]);
     }
     backendApi.propertiesSubscribe(newPropertyHandler, updatedPropertyHandler, deletedPropertyHandler);

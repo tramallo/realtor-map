@@ -6,7 +6,10 @@ import { usePersonStore } from "../stores/personsStore";
 import { SelectPerson } from "../components/persons/SelectPerson";
 import RealtorField from "../components/RealtorField";
 import { useState } from "react"; */
-import ListProperties from "../components/properties/ListProperties";
+import CreateContract from "../components/contracts/CreateContract";
+import ListContracts from "../components/contracts/ListContracts";
+import ViewContract from "../components/contracts/ViewContract";
+//import ListProperties from "../components/properties/ListProperties";
 
 export default function Test() {
   console.log(`Test -> render`);
@@ -23,7 +26,7 @@ export default function Test() {
         <TextField key={index} value={person.name} />
       ))}
     </Stack> */}
-      <ListProperties onSelect={alert} multiple />
+      <ListContracts />
     </>
   );
 }

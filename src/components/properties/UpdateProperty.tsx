@@ -6,7 +6,7 @@ import {
   propertyStates,
   propertyTypes,
   UpdatePropertyDTO,
-  updatePropertySchema,
+  updatePropertyDTO,
 } from "../../utils/data-schema";
 import {
   usePropertyStore,
@@ -98,7 +98,7 @@ export default function UpdateProperty({
   }, [propertyId, fetchProperty]);
 
   return (
-    <MemoForm schema={updatePropertySchema} prefillData={prefillData}>
+    <MemoForm schema={updatePropertyDTO} prefillData={prefillData}>
       <Stack spacing={2} padding={1}>
         {fetchingProperty && (
           <Typography align="center">

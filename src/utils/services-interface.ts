@@ -1,20 +1,7 @@
-import { PersonFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
-import { CreatePersonDTO, CreatePropertyDTO, CreateRealtorDTO, Person, Property, Realtor, UpdatePersonDTO, UpdatePropertyDTO, UpdateRealtorDTO } from "./data-schema";
+import { ContractFilter, PersonFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
+import { Contract, CreateContractDTO, CreatePersonDTO, CreatePropertyDTO, CreateRealtorDTO, Person, Property, Realtor, UpdateContractDTO, UpdatePersonDTO, UpdatePropertyDTO, UpdateRealtorDTO } from "./data-schema";
 import { OperationResponse } from "./helperFunctions";
 
-export enum BackendEvent {
-    Connect = "connect",
-    Disconnect = "disconnect",
-    NewProperty = "new-property",
-    UpdatedProperty = "updated-property",
-    DeletedProperty = "deleted-property",
-    NewRealtor = "new-realtor",
-    UpdatedRealtor = "updated-realtor",
-    DeletedRealtor = "deleted-realtor",
-    NewPerson = "new-person",
-    UpdatedPerson = "updated-person",
-    DeletedPerson = "deleted-person",
-}
 export interface BackendApi {
     //properties
     getProperties: (propertyIds: Array<Property['id']>) => Promise<OperationResponse<Array<Property>>>;
@@ -55,6 +42,19 @@ export interface BackendApi {
         deletedPersonHandler: (deletedPerson: Person) => void,
     ) => Promise<OperationResponse>;
     personsUnsubscribe: () => void;
+    // contracts
+    getContracts: (contractIds: Array<Contract['id']>) => Promise<OperationResponse<Array<Contract>>>;
+    searchContractIds: (filter: ContractFilter) => Promise<OperationResponse<Array<Contract['id']>>>;
+    createContract: (newContractData: CreateContractDTO) => Promise<OperationResponse>;
+    updateContract: (contractId: Contract["id"], updateData: UpdateContractDTO) => Promise<OperationResponse>;
+    deleteContract: (contractId: Contract['id']) => Promise<OperationResponse>;
+    invalidateContracts: (contractIds: Array<Contract["id"]>, timestamp: number) => Promise<OperationResponse<Array<Contract["id"]>>>;
+    contractsSubscribe: (
+        newContractHandler: (newContract: Contract) => void,
+        updatedContractHandler: (updatedContract: Contract) => void,
+        deletedContractHandler: (deletedContract: Contract) => void,
+    ) => Promise<OperationResponse>;
+    contractsUnsubscribe: () => void;
 }
 
 export type Location = {

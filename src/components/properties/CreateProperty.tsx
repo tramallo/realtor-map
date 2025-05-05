@@ -3,7 +3,7 @@ import { Stack } from "@mui/material";
 
 import {
   CreatePropertyDTO,
-  createPropertySchema,
+  createPropertyDTO,
   propertyStates,
   propertyTypes,
 } from "../../utils/data-schema";
@@ -68,8 +68,8 @@ export default function CreateProperty({
   );
 
   return (
-    <MemoForm<typeof createPropertySchema>
-      schema={createPropertySchema}
+    <MemoForm<typeof createPropertyDTO>
+      schema={createPropertyDTO}
       prefillData={prefillData}
     >
       <Stack spacing={2} padding={1}>

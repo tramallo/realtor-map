@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { CreateRealtorDTO, Realtor, UpdateRealtorDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
-import { BackendEvent } from "../utils/services-interface";
 import { RealtorFilter } from "../utils/data-filter-schema";
 
 const REALTORS_LOCAL_STORAGE_KEY = "realtors-store";
@@ -58,15 +57,15 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
     };
 
     const newRealtorHandler = (newRealtor: Realtor) => {
-        console.log(`event -> [${BackendEvent.NewRealtor}] ${newRealtor.name} `);
+        console.log(`event -> [new-realtor] ${newRealtor.name} `);
         storeRealtors([newRealtor]);
     }
     const updatedRealtorHandler = (updatedRealtor: Realtor) => {
-        console.log(`event -> [${BackendEvent.UpdatedRealtor}] ${updatedRealtor.name} `);
+        console.log(`event -> [updated-realtor] ${updatedRealtor.name} `);
         storeRealtors([updatedRealtor]);
     }
     const deletedRealtorHandler = (deletedRealtor: Realtor) => {
-        console.log(`event -> [${BackendEvent.DeletedRealtor}] ${deletedRealtor.name}`);
+        console.log(`event -> [deleted-realtor] ${deletedRealtor.name}`);
         removeRealtors([deletedRealtor.id]);
     }
     backendApi.realtorsSubscribe(newRealtorHandler, updatedRealtorHandler, deletedRealtorHandler);

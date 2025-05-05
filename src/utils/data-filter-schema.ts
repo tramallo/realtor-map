@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-import { idSchema, propertyStates, propertyTypes, timestampSchema } from "./data-schema";
+import { entryId, propertyStates, propertyTypes, timestampSchema } from "./data-schema";
 
 export const baseDataFilterSchema = z.object({
-    idEq: idSchema.optional(),
-    idNot: idSchema.array().optional(),
-    createdBy: idSchema.optional(),
+    idEq: entryId.optional(),
+    idNot: entryId.array().optional(),
+    createdBy: entryId.optional(),
     createdAtBefore: timestampSchema.optional(),
     createdAtAfter: timestampSchema.optional(),
-    updatedBy: idSchema.optional(),
+    updatedBy: entryId.optional(),
     updatedAtBefore: timestampSchema.optional(),
     updatedAtAfter: timestampSchema.optional(),
     deleted: z.boolean().optional(),
@@ -28,12 +28,22 @@ export const propertyFilterSchema = baseDataFilterSchema.extend({
     address: z.string().optional(),
     type: z.enum(propertyTypes).optional(),
     state: z.enum(propertyStates).optional(),
-    ownerId: idSchema.optional(),
-    relatedRealtorIds: idSchema.array().optional(),
-    exclusiveRealtorId: idSchema.optional(),
+    ownerId: entryId.optional(),
+    relatedRealtorIds: entryId.array().optional(),
+    exclusiveRealtorId: entryId.optional(),
+})
+
+export const contractFilterSchema = baseDataFilterSchema.extend({
+    client: entryId.optional(),
+    property: entryId.optional(),
+    startBefore: timestampSchema.optional(),
+    startAfter: timestampSchema.optional(),
+    endBefore: timestampSchema.optional(),
+    endAfter: timestampSchema.optional(),
 })
 
 export type BaseDataFilter = z.infer<typeof baseDataFilterSchema>;
 export type PropertyFilter = z.infer<typeof propertyFilterSchema>;
 export type PersonFilter = z.infer<typeof personFilterSchema>;
 export type RealtorFilter = z.infer<typeof realtorFilterSchema>;
+export type ContractFilter = z.infer<typeof contractFilterSchema>;

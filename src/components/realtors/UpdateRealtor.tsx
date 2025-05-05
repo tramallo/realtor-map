@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Realtor,
   UpdateRealtorDTO,
-  updateRealtorSchema,
+  updateRealtorDTO,
 } from "../../utils/data-schema";
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
 import FormDateField from "../form/FormDateField";
@@ -87,7 +87,7 @@ export default function UpdateRealtor({
   }, [realtorId, fetchRealtor]);
 
   return (
-    <MemoForm schema={updateRealtorSchema} prefillData={prefillData}>
+    <MemoForm schema={updateRealtorDTO} prefillData={prefillData}>
       <Stack spacing={2} padding={1}>
         {fetchingRealtor && (
           <Typography align="center">

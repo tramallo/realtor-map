@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Person,
   UpdatePersonDTO,
-  updatePersonSchema,
+  updatePersonDTO,
 } from "../../utils/data-schema";
 import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
 import FormDateField from "../form/FormDateField";
@@ -85,7 +85,7 @@ export default function UpdatePerson({
   }, [personId, fetchPerson]);
 
   return (
-    <MemoForm schema={updatePersonSchema} prefillData={prefillData}>
+    <MemoForm schema={updatePersonDTO} prefillData={prefillData}>
       <Stack spacing={2} padding={1}>
         {fetchingPerson && (
           <Typography align="center">

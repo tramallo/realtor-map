@@ -2,7 +2,6 @@ import { create } from "zustand";
 
 import { CreatePersonDTO, Person, UpdatePersonDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
-import { BackendEvent } from "../utils/services-interface";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { PersonFilter } from "../utils/data-filter-schema";
 
@@ -17,7 +16,7 @@ export interface PersonStore {
 
 const PERSONS_LOCAL_STORAGE_KEY = "persons-store";
 const fetchLocalStoragePersons = (): OperationResponse<Record<Person["id"], Person> | undefined> => {
-    console.log(`personsStorage -> fetchLocalStoragePersons`);
+    console.log(`personsStore -> fetchLocalStoragePersons`);
 
     const rawLocalStorageData = localStorage.getItem(PERSONS_LOCAL_STORAGE_KEY);
 
@@ -58,15 +57,15 @@ export const usePersonStore = create<PersonStore>((set, get) => {
     }
 
     const newPersonHandler = (newPerson: Person) => {
-        console.log(`event -> [${BackendEvent.NewPerson}] ${newPerson.name} `);
+        console.log(`event -> [new-person] ${newPerson.name} `);
         storePersons([newPerson]);
     }
     const updatedPersonHandler = (updatedPerson: Person) => {
-        console.log(`event -> [${BackendEvent.UpdatedPerson}] ${updatedPerson.name} `);
+        console.log(`event -> [updated-person] ${updatedPerson.name} `);
         storePersons([updatedPerson]);
     }
     const deletedPersonHandler = (deletedPerson: Person) => {
-        console.log(`event -> [${BackendEvent.DeletedPerson}] ${deletedPerson.name}`);
+        console.log(`event -> [deleted-person] ${deletedPerson.name}`);
         removePersons([deletedPerson.id]);
     }
     backendApi.personsSubscribe(newPersonHandler, updatedPersonHandler, deletedPersonHandler);

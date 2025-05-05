@@ -1,108 +1,111 @@
-/** This file exposes data schemas used by the bussiness
- * and a custom resolver that helps input data gathering & validation
- * 
- * Such schemas have validation rules attached, provided by zod validator (https://zod.dev)
+/** Schema of the domain data and dto's 
  */
 import { z } from "zod";
 
-/** Base schemas, describes base data used by the system "as saved in database"
- */
+// helpers
 export const propertyTypes = ['house', 'apartment'] as const;
 export const propertyStates = ['rented', 'available', 'reserved'] as const
-
-export const idSchema = z.number().int().positive().finite();
+export const entryId = z.number().int().positive().finite();
 export const timestampSchema = z.number().int().positive().finite();
-
+export const coordinatesSchema = z.object({
+    lat: z.coerce.number().finite().safe(),
+    lng: z.coerce.number().finite().safe()
+})
 export const baseDataSchema = z.object({
-    id: idSchema,
-    createdBy: idSchema,
+    id: entryId,
+    createdBy: z.string().uuid(),
     createdAt: timestampSchema,
-    updatedBy: idSchema.optional(),
+    updatedBy: z.string().uuid().optional(),
     updatedAt: timestampSchema.optional(),
     deleted: z.boolean().optional(),
 })
+export const PropertyTypesSchema = z.enum(propertyTypes);
+export const PropertyStatesSchema = z.enum(propertyStates);
 
+// entities
 export const personSchema = baseDataSchema.extend({
     name: z.string(),
     mobile: z.string().optional(),
     email: z.string().email().optional()
 })
-
 export const realtorSchema = baseDataSchema.extend({
     name: z.string()
 })
-
-export const coordinatesSchema = z.object({
-    lat: z.coerce.number().finite().safe(),
-    lng: z.coerce.number().finite().safe()
-})
-
 export const propertySchema = baseDataSchema.extend({
     address: z.string(),
     coordinates: coordinatesSchema,
     type: z.enum(propertyTypes),
     state: z.enum(propertyStates).optional(),
-    ownerId: idSchema.optional(),
-    relatedRealtorIds: idSchema.array().optional(),
-    exclusiveRealtorId: idSchema.optional(),
+    ownerId: entryId.optional(),
+    relatedRealtorIds: entryId.array().optional(),
+    exclusiveRealtorId: entryId.optional(),
+    description: z.string().optional(),
+})
+export const contractSchema = baseDataSchema.extend({
+    property: entryId,
+    client: entryId,
+    start: timestampSchema,
+    end: timestampSchema,
     description: z.string().optional(),
 })
 
-export const PropertyTypesSchema = z.enum(propertyTypes);
-export const PropertyStatesSchema = z.enum(propertyStates);
-
-export type BaseData = z.infer<typeof baseDataSchema>;
-export type Person = z.infer<typeof personSchema>;
-export type Realtor = z.infer<typeof realtorSchema>;
-export type Coordinates = z.infer<typeof coordinatesSchema>;
-export type Property = z.infer<typeof propertySchema>;
-export type PropertyType = z.infer<typeof PropertyTypesSchema>;
-export type PropertyState = z.infer<typeof PropertyStatesSchema>;
-
-/** Variation schemas, some operations use only parts of the data
- * 
- * ex: when creating new data, ids are not provided by user, if not specified, zod will expect & and validate an id,
- * so this shcemas are used on that scenarios 
- */
-export const createPropertySchema = propertySchema.omit({
+// dto's
+export const createPropertyDTO = propertySchema.omit({
     id: true,
     updatedBy: true,
     updatedAt: true,
 })
-
-export const updatePropertySchema = propertySchema.omit({
+export const updatePropertyDTO = propertySchema.omit({
     id: true,
     createdBy: true,
     createdAt: true
 }).partial()
-
-export const createPersonSchema = personSchema.omit({
+export const createPersonDTO = personSchema.omit({
     id: true,
     updatedBy: true,
     updatedAt: true,
 })
-
-export const updatePersonSchema = personSchema.omit({
+export const updatePersonDTO = personSchema.omit({
     id: true,
     createdBy: true,
     createdAt: true
 }).partial()
-
-export const createRealtorSchema = realtorSchema.omit({
+export const createRealtorDTO = realtorSchema.omit({
     id: true,
     updatedBy: true,
     updatedAt: true,
 })
-
-export const updateRealtorSchema = realtorSchema.omit({
+export const updateRealtorDTO = realtorSchema.omit({
     id: true,
     createdBy: true,
     createdAt: true,
 }).partial()
+export const createContractDTO = contractSchema.omit({
+    id: true,
+    updatedBy: true,
+    updatedAt: true,
+})
+export const updateContractDTO = contractSchema.omit({
+    id: true,
+    updatedBy: true,
+    updatedAt: true,
+}).partial()
 
-export type CreatePropertyDTO = z.infer<typeof createPropertySchema>;
-export type UpdatePropertyDTO = z.infer<typeof updatePropertySchema>;
-export type CreatePersonDTO = z.infer<typeof createPersonSchema>;
-export type UpdatePersonDTO = z.infer<typeof updatePersonSchema>
-export type CreateRealtorDTO = z.infer<typeof createRealtorSchema>;
-export type UpdateRealtorDTO = z.infer<typeof updateRealtorSchema>;
+export type PropertyType = z.infer<typeof PropertyTypesSchema>;
+export type PropertyState = z.infer<typeof PropertyStatesSchema>;
+export type Coordinates = z.infer<typeof coordinatesSchema>;
+
+export type BaseData = z.infer<typeof baseDataSchema>;
+export type Person = z.infer<typeof personSchema>;
+export type Realtor = z.infer<typeof realtorSchema>;
+export type Property = z.infer<typeof propertySchema>;
+export type Contract = z.infer<typeof contractSchema>;
+
+export type CreatePropertyDTO = z.infer<typeof createPropertyDTO>;
+export type UpdatePropertyDTO = z.infer<typeof updatePropertyDTO>;
+export type CreatePersonDTO = z.infer<typeof createPersonDTO>;
+export type UpdatePersonDTO = z.infer<typeof updatePersonDTO>
+export type CreateRealtorDTO = z.infer<typeof createRealtorDTO>;
+export type UpdateRealtorDTO = z.infer<typeof updateRealtorDTO>;
+export type CreateContractDTO = z.infer<typeof createContractDTO>;
+export type UpdateContractDTO = z.infer<typeof updateContractDTO>;

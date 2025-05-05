@@ -9,18 +9,22 @@ import {
 
 import { OperationResponse } from "../utils/helperFunctions";
 import {
+  Contract,
+  CreateContractDTO,
   CreatePersonDTO,
   CreatePropertyDTO,
   CreateRealtorDTO,
   Person,
   Property,
   Realtor,
+  UpdateContractDTO,
   UpdatePersonDTO,
   UpdatePropertyDTO,
   UpdateRealtorDTO,
 } from "../utils/data-schema";
 import { BackendApi } from "../utils/services-interface";
 import {
+  ContractFilter,
   PersonFilter,
   PropertyFilter,
   RealtorFilter,
@@ -222,6 +226,61 @@ const queryConstructor = {
 
     return query;
   },
+  searchContractIdsQuery: (
+    supabaseClient: SupabaseClient,
+    filter: ContractFilter
+  ) => {
+    const query = supabaseClient.from("contract").select("id");
+
+    if (filter.idEq) {
+      query.eq("id", filter.idEq);
+    }
+    if (filter.idNot) {
+      query.not("id", "in", `${filter.idNot.join(",")}`);
+    }
+    if (filter.createdBy) {
+      query.eq("createdBy", filter.createdBy);
+    }
+    if (filter.createdAtAfter) {
+      query.gte("createdAt", filter.createdAtAfter);
+    }
+    if (filter.createdAtBefore) {
+      query.lte("createdAt", filter.createdAtBefore);
+    }
+    if (filter.updatedBy) {
+      query.eq("updatedBy", filter.updatedBy);
+    }
+    if (filter.updatedAtAfter) {
+      query.gte("updatedAt", filter.updatedAtAfter);
+    }
+    if (filter.updatedAtBefore) {
+      query.lte("updatedAt", filter.updatedAtBefore);
+    }
+    if (filter.deleted != undefined) {
+      query.eq("deleted", filter.deleted);
+    }
+
+    if (filter.property) {
+      query.eq("property", filter.property);
+    }
+    if (filter.client) {
+      query.eq("client", filter.client);
+    }
+    if (filter.startAfter) {
+      query.gte("start", filter.startAfter);
+    }
+    if (filter.startBefore) {
+      query.lte("start", filter.startBefore);
+    }
+    if (filter.endAfter) {
+      query.gte("end", filter.endAfter);
+    }
+    if (filter.endBefore) {
+      query.lte("end", filter.endBefore);
+    }
+
+    return query;
+  },
 };
 
 // property
@@ -285,19 +344,15 @@ const updateProperty = async (
 };
 const deleteProperty = async (
   propertyId: Property["id"]
-): Promise<OperationResponse<undefined>> => {
+): Promise<OperationResponse> => {
   console.log(`supabaseService -> deleteProperty ${propertyId}`);
-  const { data, error } = await client
-    .from("property")
-    .delete()
-    .eq("id", propertyId)
-    .select();
+  const { error } = await client.from("property").delete().eq("id", propertyId);
 
   if (error) {
     return { error };
   }
 
-  return { data: data[0] };
+  return { data: undefined };
 };
 const invalidateProperties = async (
   propertyIds: Array<Property["id"]>,
@@ -447,19 +502,15 @@ const updateRealtor = async (
 };
 const deleteRealtor = async (
   realtorId: Realtor["id"]
-): Promise<OperationResponse<undefined>> => {
+): Promise<OperationResponse> => {
   console.log(`supabaseService -> deleteRealtor ${realtorId}`);
-  const { data, error } = await client
-    .from("realtor")
-    .delete()
-    .eq("id", realtorId)
-    .select();
+  const { error } = await client.from("realtor").delete().eq("id", realtorId);
 
   if (error) {
     return { error };
   }
 
-  return { data: data[0] };
+  return { data: undefined };
 };
 const invalidateRealtors = async (
   realtorIds: Array<Realtor["id"]>,
@@ -609,19 +660,15 @@ const updatePerson = async (
 };
 const deletePerson = async (
   personId: Person["id"]
-): Promise<OperationResponse<undefined>> => {
+): Promise<OperationResponse> => {
   console.log(`supabaseService -> deletePerson ${personId}`);
-  const { data, error } = await client
-    .from("person")
-    .delete()
-    .eq("id", personId)
-    .select();
+  const { error } = await client.from("person").delete().eq("id", personId);
 
   if (error) {
     return { error };
   }
 
-  return { data: data[0] };
+  return { data: undefined };
 };
 const invalidatePersons = async (
   personIds: Array<Person["id"]>,
@@ -711,6 +758,166 @@ const personsUnsubscribe = async (): Promise<OperationResponse> => {
   return { data: undefined };
 };
 
+// contract
+let contractChannel = undefined as RealtimeChannel | undefined;
+const searchContractIds = async (
+  filter: ContractFilter
+): Promise<OperationResponse<Array<Contract["id"]>>> => {
+  console.log(`supabaseService -> searchContractIds`);
+  const query = queryConstructor.searchContractIdsQuery(client, filter);
+  const { data, error } = await query;
+
+  if (error) {
+    return { error };
+  }
+
+  const contractIds = data.map((idObj) => idObj.id);
+  return { data: contractIds };
+};
+const getContracts = async (
+  contractIds: Array<Contract["id"]>
+): Promise<OperationResponse<Array<Contract>>> => {
+  console.log(`supabaseService -> getContracts contractIds: ${contractIds}`);
+  const { data, error } = await client
+    .from("contract")
+    .select()
+    .in("id", contractIds);
+
+  if (error) {
+    return { error };
+  }
+
+  return { data };
+};
+const createContract = async (
+  newContractData: CreateContractDTO
+): Promise<OperationResponse> => {
+  console.log(
+    `supabaseService -> createContract property: ${newContractData.property} client: ${newContractData.client}`
+  );
+  const { error } = await client.from("contract").insert(newContractData);
+
+  if (error) {
+    return { error };
+  }
+
+  return { data: undefined };
+};
+const updateContract = async (
+  contractId: Contract["id"],
+  updateData: UpdateContractDTO
+): Promise<OperationResponse> => {
+  console.log(`supabaseService -> updateContract ${contractId}`);
+  const { error } = await client
+    .from("contract")
+    .update(updateData)
+    .eq("id", contractId);
+
+  if (error) {
+    return { error };
+  }
+
+  return { data: undefined };
+};
+const deleteContract = async (
+  contractId: Contract["id"]
+): Promise<OperationResponse> => {
+  console.log(`supabaseService -> deleteContract ${contractId}`);
+  const { error } = await client.from("contract").delete().eq("id", contractId);
+
+  if (error) {
+    return { error };
+  }
+
+  return { data: undefined };
+};
+const invalidateContracts = async (
+  contractIds: Array<Contract["id"]>,
+  timestamp: number
+): Promise<OperationResponse<Array<Contract["id"]>>> => {
+  console.log(`supabaseService -> invalidateContracts ${contractIds}`);
+
+  if (contractIds.length === 0) {
+    return { data: [] };
+  }
+
+  const { data, error } = await client
+    .from("contract")
+    .select("id")
+    .in("id", contractIds)
+    .or(`updatedAt.is.NULL,updatedAt.lt.${timestamp}`);
+
+  if (error) {
+    console.error(`supabaseService -> invalidateContracts: `, error);
+    return { error };
+  }
+
+  const validIds = data.map((contract) => contract.id);
+  return { data: validIds };
+};
+const contractsSubscribe = async (
+  newContractHandler: (newContract: Contract) => void,
+  updatedContractHandler: (updatedContract: Contract) => void,
+  deletedContractHandler: (deletedContract: Contract) => void
+): Promise<OperationResponse> => {
+  console.log(`supabaseApi -> contractsSubscribe`);
+
+  if (contractChannel) {
+    console.log(`Already subscribed -> unsubscribing first`);
+    const { error } = await contractsUnsubscribe();
+    if (error) {
+      return { error: new Error(`contractsSubscribe -> error: ${error}`) };
+    }
+  }
+
+  contractChannel = client
+    .channel("realtime-contracts")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", table: "contract", schema: "public" },
+      (payload) => newContractHandler(payload.new as Contract)
+    )
+    .on(
+      "postgres_changes",
+      { event: "UPDATE", table: "contract", schema: "public" },
+      (payload) => updatedContractHandler(payload.new as Contract)
+    )
+    .on(
+      "postgres_changes",
+      { event: "DELETE", table: "contract", schema: "public" },
+      (payload) => deletedContractHandler(payload.old as Contract)
+    );
+
+  contractChannel.subscribe((_status, err) => {
+    if (err) {
+      contractChannel = undefined;
+      return { error: new Error(`contractsSubscribe -> error: ${err}`) };
+    }
+  });
+
+  return { data: undefined };
+};
+const contractsUnsubscribe = async (): Promise<OperationResponse> => {
+  console.log(`supabaseApi -> contractsUnsubscribe`);
+
+  if (!contractChannel) {
+    console.log(`contractsUnsubscribe -> Already unsubscribed`);
+    return { data: undefined };
+  }
+
+  client
+    .removeChannel(contractChannel)
+    .then(() => {
+      contractChannel = undefined;
+      return { data: undefined };
+    })
+    .catch((err) => {
+      return { error: new Error(`contractsUnsubscribe -> error: ${err}`) };
+    });
+
+  return { data: undefined };
+};
+
 export const supabaseApi: BackendApi = {
   //person
   searchPersonIds,
@@ -739,4 +946,13 @@ export const supabaseApi: BackendApi = {
   invalidateProperties,
   propertiesSubscribe,
   propertiesUnsubscribe,
+  //contract
+  searchContractIds,
+  getContracts,
+  createContract,
+  updateContract,
+  deleteContract,
+  invalidateContracts,
+  contractsSubscribe,
+  contractsUnsubscribe,
 };

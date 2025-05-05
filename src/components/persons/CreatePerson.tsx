@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
-import { CreatePersonDTO, createPersonSchema } from "../../utils/data-schema";
+import { CreatePersonDTO, createPersonDTO } from "../../utils/data-schema";
 import { MemoForm } from "../form/Form";
 import FormDateField from "../form/FormDateField";
 import { MemoSubmitButton } from "../form/SubmitButton";
@@ -54,8 +54,8 @@ export default function CreatePerson({
   );
 
   return (
-    <MemoForm<typeof createPersonSchema>
-      schema={createPersonSchema}
+    <MemoForm<typeof createPersonDTO>
+      schema={createPersonDTO}
       prefillData={prefillData}
     >
       <Stack spacing={2} padding={1}>
