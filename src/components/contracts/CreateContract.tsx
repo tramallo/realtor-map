@@ -32,11 +32,12 @@ export default function CreateContract({
   const [creatingContract, setCreatingContract] = useState(false);
 
   const prefillData = useMemo(
-    () => ({
-      ...prefillContract,
-      createdBy: userSession?.user.id,
-      createdAt: dateToTimestamp(new Date()),
-    }),
+    () =>
+      ({
+        ...prefillContract,
+        createdBy: userSession?.user.id,
+        createdAt: dateToTimestamp(new Date()),
+      } as CreateContractDTO),
     [prefillContract, userSession]
   );
 
@@ -87,9 +88,6 @@ export default function CreateContract({
           multiline
           disabled={creatingContract}
         />
-
-        <FormPersonField fieldName="createdBy" label="Created By" readOnly />
-        <FormDateField fieldName="createdAt" label="Created At" readOnly />
 
         <Stack direction="row" spacing={2} justifyContent="end">
           <MemoSubmitButton

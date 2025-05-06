@@ -8,11 +8,12 @@ import {
 } from "@mui/material";
 
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
-import { Realtor } from "../../utils/data-schema";
+import { Realtor, UpdateRealtorDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
+  useAuthContext,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
 
@@ -29,6 +30,7 @@ export default function DeleteRealtor({
 }: DeleteRealtorProps) {
   console.log(`DeleteRealtor -> render`);
 
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
   const updateRealtor = useRealtorStore((store) => store.updateRealtor);
@@ -48,11 +50,10 @@ export default function DeleteRealtor({
 
     setSoftDeletingRealtor(true);
     const softDeleteResponse = await updateRealtor(realtorId, {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
       deleted: true,
-    });
+    } as UpdateRealtorDTO);
     setSoftDeletingRealtor(false);
 
     if (softDeleteResponse.error) {
@@ -64,18 +65,17 @@ export default function DeleteRealtor({
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [realtorId, updateRealtor, notifyUser, onSoftDelete]);
+  }, [realtorId, updateRealtor, notifyUser, onSoftDelete, userSession]);
 
   const restoreRealtor = useCallback(async () => {
     console.log(`DeleteRealtor -> restoreRealtor ${realtorId}`);
 
     setRestoringRealtor(true);
     const restoreResponse = await updateRealtor(realtorId, {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
       deleted: false,
-    });
+    } as UpdateRealtorDTO);
     setRestoringRealtor(false);
 
     if (restoreResponse.error) {
@@ -87,7 +87,7 @@ export default function DeleteRealtor({
     if (onRestore) {
       onRestore();
     }
-  }, [realtorId, updateRealtor, notifyUser, onRestore]);
+  }, [realtorId, updateRealtor, notifyUser, onRestore, userSession]);
 
   // fetchRealtor effect
   useEffect(() => {

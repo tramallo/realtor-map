@@ -14,6 +14,7 @@ import UpdatePerson from "./UpdatePerson";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import { CustomTextField } from "../CustomTextField";
+import DateField from "../DateField";
 
 export interface ViewPersonProps {
   personId: Person["id"];
@@ -74,6 +75,24 @@ export default function ViewPerson({ personId }: ViewPersonProps) {
           )}
           {cachedPerson.email && (
             <CustomTextField value={cachedPerson.email ?? ""} label="Email" />
+          )}
+          {cachedPerson.createdBy && (
+            <CustomTextField
+              label="Created by"
+              value={cachedPerson.createdBy}
+            />
+          )}
+          {cachedPerson.createdAt && (
+            <DateField label="Created at" value={cachedPerson.createdAt} />
+          )}
+          {cachedPerson.updatedBy && (
+            <CustomTextField
+              label="Updated by"
+              value={cachedPerson.updatedBy}
+            />
+          )}
+          {cachedPerson.updatedAt && (
+            <DateField label="Updated at" value={cachedPerson.updatedAt} />
           )}
 
           <Stack

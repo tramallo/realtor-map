@@ -8,11 +8,12 @@ import {
 } from "@mui/material";
 
 import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
-import { Person } from "../../utils/data-schema";
+import { Person, UpdatePersonDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
+  useAuthContext,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
 
@@ -29,6 +30,7 @@ export default function DeletePerson({
 }: DeletePersonProps) {
   console.log(`DeletePerson -> render`);
 
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchPerson = usePersonStore((store) => store.fetchPerson);
   const updatePerson = usePersonStore((store) => store.updatePerson);
@@ -48,11 +50,10 @@ export default function DeletePerson({
 
     setSoftDeletingPerson(true);
     const softDeleteResponse = await updatePerson(personId, {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
       deleted: true,
-    });
+    } as UpdatePersonDTO);
     setSoftDeletingPerson(false);
 
     if (softDeleteResponse.error) {
@@ -64,18 +65,17 @@ export default function DeletePerson({
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [updatePerson, personId, notifyUser, onSoftDelete]);
+  }, [updatePerson, personId, notifyUser, onSoftDelete, userSession]);
 
   const restorePerson = useCallback(async () => {
     console.log(`DeletePerson -> restorePerson ${personId}`);
 
     setRestoringPerson(true);
     const restoreResponse = await updatePerson(personId, {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
       deleted: false,
-    });
+    } as UpdatePersonDTO);
     setRestoringPerson(false);
 
     if (restoreResponse.error) {
@@ -83,11 +83,11 @@ export default function DeletePerson({
       return;
     }
 
-    notifyUser("Person restored");
+    notifyUser("Person restored.");
     if (onRestore) {
       onRestore();
     }
-  }, [personId, updatePerson, notifyUser, onRestore]);
+  }, [personId, updatePerson, notifyUser, onRestore, userSession]);
 
   //fetchPerson effect
   useEffect(() => {

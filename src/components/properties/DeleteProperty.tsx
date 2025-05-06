@@ -11,7 +11,7 @@ import {
   usePropertyStore,
   fetchByIdSelector,
 } from "../../stores/propertiesStore";
-import { Property } from "../../utils/data-schema";
+import { Property, UpdatePropertyDTO } from "../../utils/data-schema";
 import ComponentsField from "../ComponentsField";
 import PersonChip from "../PersonChip";
 import RealtorChip from "../RealtorChip";
@@ -19,6 +19,7 @@ import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
+  useAuthContext,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
 
@@ -35,6 +36,7 @@ export default function DeleteProperty({
 }: DeletePropertyProps) {
   console.log(`DeleteProperty -> render`);
 
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
   const updateProperty = usePropertyStore((store) => store.updateProperty);
@@ -54,11 +56,10 @@ export default function DeleteProperty({
 
     setSoftDeletingProperty(true);
     const deleteResponse = await updateProperty(propertyId, {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
       deleted: true,
-    });
+    } as UpdatePropertyDTO);
     setSoftDeletingProperty(false);
 
     if (deleteResponse.error) {
@@ -70,18 +71,17 @@ export default function DeleteProperty({
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [propertyId, updateProperty, notifyUser, onSoftDelete]);
+  }, [propertyId, updateProperty, notifyUser, onSoftDelete, userSession]);
 
   const restoreProperty = useCallback(async () => {
     console.log(`DeleteProperty -> restoreProperty ${propertyId}`);
 
     setRestoringProperty(true);
     const restoreResponse = await updateProperty(propertyId, {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
       deleted: false,
-    });
+    } as UpdatePropertyDTO);
     setRestoringProperty(false);
 
     if (restoreResponse.error) {
@@ -93,7 +93,7 @@ export default function DeleteProperty({
     if (onRestore) {
       onRestore();
     }
-  }, [propertyId, updateProperty, notifyUser, onRestore]);
+  }, [propertyId, updateProperty, notifyUser, onRestore, userSession]);
 
   //fetchProperty effect
   useEffect(() => {

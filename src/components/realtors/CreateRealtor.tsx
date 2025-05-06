@@ -2,10 +2,12 @@ import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
 import { CreateRealtorDTO, createRealtorDTO } from "../../utils/data-schema";
-import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
+import {
+  dateToTimestamp,
+  useAppContext,
+  useAuthContext,
+} from "../../utils/helperFunctions";
 import { MemoForm } from "../form/Form";
-import FormPersonField from "../form/FormPersonField";
-import FormDateField from "../form/FormDateField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import { useRealtorStore } from "../../stores/realtorsStore";
 import { FormTextField } from "../form/FormTextField";
@@ -19,19 +21,20 @@ export default function CreateRealtor({
   prefillRealtor,
   onCreate,
 }: CreateRealtorProps) {
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createRealtor = useRealtorStore((store) => store.createRealtor);
 
   const [creatingRealtor, setCreatingRealtor] = useState(false);
 
   const prefillData = useMemo(
-    () => ({
-      //TODO: use logged in user id
-      ...prefillRealtor,
-      createdBy: 3,
-      createdAt: dateToTimestamp(new Date()),
-    }),
-    [prefillRealtor]
+    () =>
+      ({
+        ...prefillRealtor,
+        createdBy: userSession?.user.id,
+        createdAt: dateToTimestamp(new Date()),
+      } as CreateRealtorDTO),
+    [prefillRealtor, userSession]
   );
 
   const onSubmit = useCallback(
@@ -60,8 +63,6 @@ export default function CreateRealtor({
     >
       <Stack direction="column" spacing={2} padding={1}>
         <FormTextField fieldName="name" label="Name" />
-        <FormPersonField fieldName="createdBy" label="Created by" readOnly />
-        <FormDateField fieldName="createdAt" label="Created at" readOnly />
 
         <Stack
           direction="row"

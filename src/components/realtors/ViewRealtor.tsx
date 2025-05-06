@@ -14,6 +14,7 @@ import UpdateRealtor from "./UpdateRealtor";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import { CustomTextField } from "../CustomTextField";
+import DateField from "../DateField";
 
 export interface ViewRealtorProps {
   realtorId: Realtor["id"];
@@ -68,6 +69,34 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
           )}
           {cachedRealtor.name && (
             <CustomTextField value={cachedRealtor.name ?? ""} label="Name" />
+          )}
+          {cachedRealtor.createdBy && (
+            <CustomTextField
+              label="Created by"
+              value={cachedRealtor.createdBy}
+              disabled
+            />
+          )}
+          {cachedRealtor.createdAt && (
+            <DateField
+              label="Created at"
+              value={cachedRealtor.createdAt}
+              disabled
+            />
+          )}
+          {cachedRealtor.updatedBy && (
+            <CustomTextField
+              label="Updated by"
+              value={cachedRealtor.updatedBy}
+              disabled
+            />
+          )}
+          {cachedRealtor.updatedAt && (
+            <DateField
+              label="Updated at"
+              value={cachedRealtor.updatedAt}
+              disabled
+            />
           )}
 
           <Stack

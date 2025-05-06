@@ -3,10 +3,12 @@ import { Stack } from "@mui/material";
 
 import { CreatePersonDTO, createPersonDTO } from "../../utils/data-schema";
 import { MemoForm } from "../form/Form";
-import FormDateField from "../form/FormDateField";
 import { MemoSubmitButton } from "../form/SubmitButton";
-import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
-import FormPersonField from "../form/FormPersonField";
+import {
+  dateToTimestamp,
+  useAppContext,
+  useAuthContext,
+} from "../../utils/helperFunctions";
 import { usePersonStore } from "../../stores/personsStore";
 import { FormTextField } from "../form/FormTextField";
 
@@ -19,19 +21,20 @@ export default function CreatePerson({
   prefillPerson,
   onCreate,
 }: CreatePersonProps) {
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createPerson = usePersonStore((store) => store.createPerson);
 
   const [creatingPerson, setCreatingPerson] = useState(false);
 
   const prefillData = useMemo(
-    () => ({
-      //TODO: use logged in user id
-      ...prefillPerson,
-      createdBy: 3,
-      createdAt: dateToTimestamp(new Date()),
-    }),
-    [prefillPerson]
+    () =>
+      ({
+        ...prefillPerson,
+        createdBy: userSession?.user.id,
+        createdAt: dateToTimestamp(new Date()),
+      } as CreatePersonDTO),
+    [prefillPerson, userSession]
   );
 
   const onSubmit = useCallback(
@@ -62,8 +65,6 @@ export default function CreatePerson({
         <FormTextField fieldName="name" label="Name" />
         <FormTextField fieldName="mobile" label="Mobile" />
         <FormTextField fieldName="email" label="Email" />
-        <FormPersonField fieldName="createdBy" label="Created by" readOnly />
-        <FormDateField fieldName="createdAt" label="Created at" readOnly />
 
         <Stack
           direction="row"

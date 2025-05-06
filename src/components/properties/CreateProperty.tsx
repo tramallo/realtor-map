@@ -7,13 +7,16 @@ import {
   propertyStates,
   propertyTypes,
 } from "../../utils/data-schema";
-import FormDateField from "../form/FormDateField";
 import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
 import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
-import { dateToTimestamp, useAppContext } from "../../utils/helperFunctions";
+import {
+  dateToTimestamp,
+  useAppContext,
+  useAuthContext,
+} from "../../utils/helperFunctions";
 import FormLocationField from "../form/FormLocationField";
 import { usePropertyStore } from "../../stores/propertiesStore";
 import { FormTextField } from "../form/FormTextField";
@@ -29,19 +32,20 @@ export default function CreateProperty({
 }: CreatePropertyProps) {
   console.log(`CreateProperty -> render`);
 
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createProperty = usePropertyStore((store) => store.createProperty);
 
   const [creatingProperty, setCreatingProperty] = useState(false);
 
   const prefillData = useMemo(
-    () => ({
-      //TODO: use logged in user id
-      ...prefillProperty,
-      createdBy: 3,
-      createdAt: dateToTimestamp(new Date()),
-    }),
-    [prefillProperty]
+    () =>
+      ({
+        ...prefillProperty,
+        createdBy: userSession?.user.id,
+        createdAt: dateToTimestamp(new Date()),
+      } as CreatePropertyDTO),
+    [prefillProperty, userSession]
   );
 
   const submitProperty = useCallback(
@@ -121,8 +125,6 @@ export default function CreateProperty({
           readOnly={creatingProperty}
           multiple
         />
-        <FormPersonField fieldName="createdBy" label="Created by" readOnly />
-        <FormDateField fieldName="createdAt" label="Created at" readOnly />
 
         <Stack
           direction="row"

@@ -57,6 +57,7 @@ export default function AddressSearch({
       <CustomTextField
         label="Search address"
         value={searchValue}
+        delay={500}
         onChange={setSearchValue}
       />
       <Box boxSizing="border-box" height="70svh" position="relative">

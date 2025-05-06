@@ -93,6 +93,24 @@ export default function ViewContract({ contractId }: ViewContractProps) {
               multiline
             />
           )}
+          {cachedContract.createdBy && (
+            <CustomTextField
+              label="Created by"
+              value={cachedContract.createdBy}
+            />
+          )}
+          {cachedContract.createdAt && (
+            <DateField label="Created at" value={cachedContract.createdAt} />
+          )}
+          {cachedContract.updatedBy && (
+            <CustomTextField
+              label="Updated by"
+              value={cachedContract.updatedBy}
+            />
+          )}
+          {cachedContract.updatedAt && (
+            <DateField label="Updated at" value={cachedContract.updatedAt} />
+          )}
 
           <Stack
             direction="row"

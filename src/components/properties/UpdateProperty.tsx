@@ -1,4 +1,4 @@
-import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -12,7 +12,6 @@ import {
   usePropertyStore,
   fetchByIdSelector,
 } from "../../stores/propertiesStore";
-import FormDateField from "../form/FormDateField";
 import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
 import FormRealtorField from "../form/FormRealtorField";
@@ -22,6 +21,7 @@ import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
+  useAuthContext,
 } from "../../utils/helperFunctions";
 import FormLocationField from "../form/FormLocationField";
 import { FormTextField } from "../form/FormTextField";
@@ -35,6 +35,7 @@ export default function UpdateProperty({
   propertyId,
   onUpdate,
 }: UpdatePropertyProps) {
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
   const updateProperty = usePropertyStore((store) => store.updateProperty);
@@ -50,15 +51,14 @@ export default function UpdateProperty({
 
   const prefillData = useMemo(() => {
     const updateMetadata = {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
     } as UpdatePropertyDTO;
 
     return cachedProperty
       ? { ...cachedProperty, ...updateMetadata }
       : updateMetadata;
-  }, [cachedProperty]);
+  }, [cachedProperty, userSession]);
 
   const submitUpdate = useCallback(
     async (updatePropertyData: UpdatePropertyDTO) => {
@@ -118,13 +118,6 @@ export default function UpdateProperty({
         )}
         {!fetchingProperty && cachedProperty && (
           <>
-            {cachedProperty.deleted && (
-              <Chip
-                label="This property is deleted"
-                color="error"
-                variant="filled"
-              />
-            )}
             <FormLocationField
               label="Address"
               addressFieldName="address"
@@ -161,12 +154,6 @@ export default function UpdateProperty({
               label="Associated realtors"
               multiple
             />
-            <FormPersonField
-              fieldName="updatedBy"
-              label="Updated by"
-              readOnly
-            />
-            <FormDateField fieldName="updatedAt" label="Updated at" readOnly />
           </>
         )}
 

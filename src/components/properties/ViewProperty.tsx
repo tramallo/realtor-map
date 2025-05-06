@@ -132,29 +132,31 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
             />
           )}
           {cachedProperty.createdBy && (
-            <ComponentsField
+            <CustomTextField
               label="Created by"
-              components={[<PersonChip personId={cachedProperty.createdBy} />]}
+              value={cachedProperty.createdBy}
+              disabled
             />
           )}
           {cachedProperty.createdAt && (
             <DateField
               label="Created at"
               value={cachedProperty.createdAt}
-              readOnly
+              disabled
             />
           )}
           {cachedProperty.updatedBy && (
-            <ComponentsField
+            <CustomTextField
               label="Updated by"
-              components={[<PersonChip personId={cachedProperty.updatedBy} />]}
+              value={cachedProperty.updatedBy}
+              disabled
             />
           )}
           {cachedProperty.updatedAt && (
             <DateField
               label="Updated at"
               value={cachedProperty.updatedAt}
-              readOnly
+              disabled
             />
           )}
           <Stack

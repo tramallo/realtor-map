@@ -1,4 +1,4 @@
-import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -7,14 +7,13 @@ import {
   updateRealtorDTO,
 } from "../../utils/data-schema";
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
-import FormDateField from "../form/FormDateField";
-import FormPersonField from "../form/FormPersonField";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
+  useAuthContext,
 } from "../../utils/helperFunctions";
 import { FormTextField } from "../form/FormTextField";
 
@@ -27,6 +26,7 @@ export default function UpdateRealtor({
   realtorId,
   onUpdate,
 }: UpdateRealtorProps) {
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
   const updateRealtor = useRealtorStore((store) => store.updateRealtor);
@@ -42,15 +42,14 @@ export default function UpdateRealtor({
 
   const prefillData = useMemo(() => {
     const updateMetadata = {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
     } as UpdateRealtorDTO;
 
     return cachedRealtor
       ? { ...cachedRealtor, ...updateMetadata }
       : updateMetadata;
-  }, [cachedRealtor]);
+  }, [cachedRealtor, userSession]);
 
   const submitUpdate = useCallback(
     async (updateRealtorData: UpdateRealtorDTO) => {
@@ -107,20 +106,7 @@ export default function UpdateRealtor({
         )}
         {!fetchingRealtor && cachedRealtor && (
           <>
-            {cachedRealtor.deleted && (
-              <Chip
-                label="This realtor is deleted"
-                color="error"
-                variant="filled"
-              />
-            )}
             <FormTextField fieldName="name" label="Name" />
-            <FormPersonField
-              fieldName="updatedBy"
-              label="Updated by"
-              readOnly
-            />
-            <FormDateField fieldName="updatedAt" label="Updated at" readOnly />
           </>
         )}
 

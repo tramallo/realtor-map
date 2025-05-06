@@ -1,4 +1,4 @@
-import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -7,14 +7,13 @@ import {
   updatePersonDTO,
 } from "../../utils/data-schema";
 import { usePersonStore, fetchByIdSelector } from "../../stores/personsStore";
-import FormDateField from "../form/FormDateField";
-import FormPersonField from "../form/FormPersonField";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
   useAppContext,
+  useAuthContext,
 } from "../../utils/helperFunctions";
 import { FormTextField } from "../form/FormTextField";
 
@@ -27,6 +26,7 @@ export default function UpdatePerson({
   personId,
   onUpdate,
 }: UpdatePersonProps) {
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchPerson = usePersonStore((store) => store.fetchPerson);
   const updatePerson = usePersonStore((store) => store.updatePerson);
@@ -42,15 +42,14 @@ export default function UpdatePerson({
 
   const prefillData = useMemo(() => {
     const updateMetadata = {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
     } as UpdatePersonDTO;
 
     return cachedPerson
       ? { ...cachedPerson, ...updateMetadata }
       : updateMetadata;
-  }, [cachedPerson]);
+  }, [cachedPerson, userSession]);
 
   const submitUpdate = useCallback(
     async (updatePersonData: UpdatePersonDTO) => {
@@ -105,18 +104,9 @@ export default function UpdatePerson({
         )}
         {!fetchingPerson && cachedPerson && (
           <>
-            {cachedPerson.deleted && (
-              <Chip label="Deleted person" color="error" variant="outlined" />
-            )}
             <FormTextField fieldName="name" label="Name" />
             <FormTextField fieldName="mobile" label="Mobile" />
             <FormTextField fieldName="email" label="Email" />
-            <FormPersonField
-              fieldName="updatedBy"
-              label="Updated by"
-              readOnly
-            />
-            <FormDateField fieldName="updatedAt" label="Updated at" readOnly />
           </>
         )}
 
