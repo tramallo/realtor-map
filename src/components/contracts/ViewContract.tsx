@@ -12,10 +12,10 @@ import {
   fetchByIdSelector,
 } from "../../stores/contractsStore";
 import { Contract } from "../../utils/data-schema";
-//import DeleteContract from "./DeleteContract";
-//import UpdateContract from "./UpdateContract";
+import DeleteContract from "./DeleteContract";
+import UpdateContract from "./UpdateContract";
 import { OperationResponse } from "../../utils/helperFunctions";
-//import CustomModal from "../CustomModal";
+import CustomModal from "../CustomModal";
 import { CustomTextField } from "../CustomTextField";
 import PropertyField from "../PropretyField";
 import PersonField from "../PersonField";
@@ -135,7 +135,7 @@ export default function ViewContract({ contractId }: ViewContractProps) {
               </Button>
             )}
           </Stack>
-          {/* <CustomModal
+          <CustomModal
             title={`Delete Contract: ${contractId}`}
             open={deleteContractModalOpen}
             onClose={() => setDeleteContractModalOpen(false)}
@@ -155,7 +155,7 @@ export default function ViewContract({ contractId }: ViewContractProps) {
               contractId={contractId}
               onUpdate={() => setUpdateContractModalOpen(false)}
             />
-          </CustomModal> */}
+          </CustomModal>
         </>
       )}
     </Stack>
