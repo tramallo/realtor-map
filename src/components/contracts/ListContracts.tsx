@@ -17,21 +17,24 @@ import {
   Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import { Contract } from "../../utils/data-schema";
 import { useContractStore } from "../../stores/contractsStore";
 import {
   countDefinedAttributes,
   OperationResponse,
+  timestampToDDMMYYString,
 } from "../../utils/helperFunctions";
 import { contractCompliesFilter } from "../../utils/filter-evaluators";
 import ComponentsField from "../ComponentsField";
 import { FilterContracts } from "./FilterContracts";
 import CustomModal from "../CustomModal";
-//import CreateContract from "./CreateContract";
 import ViewContract from "./ViewContract";
 import ContractChip from "../ContractChip";
 import { ContractFilter } from "../../utils/data-filter-schema";
 import CreateContract from "./CreateContract";
+import PropertyChip from "../PropertyChip";
+import PersonChip from "../PersonChip";
 
 interface ListContractsProps {
   onSelect?: (contractIds: Array<Contract["id"]>) => void;
@@ -98,6 +101,7 @@ export default function ListContracts({
     [filtersVisible]
   );
 
+  // searchContracts effect
   useEffect(() => {
     setSearchContractsResponse(undefined);
     setSearchingContracts(true);
@@ -164,9 +168,16 @@ export default function ListContracts({
                           />
                         </ListItemIcon>
                       )}
+                      <Stack direction="row" spacing={1}>
+                        <PropertyChip propertyId={contract.property} />
+                        <Typography>::</Typography>
+                        <PersonChip personId={contract.client} />
+                      </Stack>
                       <ListItemText
-                        primary={`${contract.property} :: ${contract.client}`}
-                        secondary={`${contract.start} -> ${contract.end}`}
+                        primary={`${timestampToDDMMYYString(
+                          contract.start
+                        )} -> ${timestampToDDMMYYString(contract.end)}`}
+                        sx={{ textAlign: "end", paddingInline: 1 }}
                       />
                     </ListItemButton>
                   </ListItem>
