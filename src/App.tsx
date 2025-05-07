@@ -8,12 +8,14 @@ import ListProperties from "./components/properties/ListProperties";
 import Test from "./layouts/Test";
 import { Button } from "@mui/material";
 import { useAuthContext } from "./utils/helperFunctions";
+import { CalendarContracts } from "./components/contracts/CalendarContracts";
 
 export function App() {
   const { endSession } = useAuthContext();
 
   const slides: NavigationSlide[] = [
     //{ label: "Map", component: <MapProperties /> },
+    { label: "Calendar", component: <CalendarContracts /> },
     { label: "Properties", component: <ListProperties /> },
     { label: "Persons", component: <ListPersons /> },
     { label: "Realtors", component: <ListRealtors /> },
