@@ -4,7 +4,6 @@ import {
   RealtimeChannel,
   Session,
   Subscription,
-  SupabaseClient,
 } from "@supabase/supabase-js";
 
 import { OperationResponse } from "../utils/helperFunctions";
@@ -24,6 +23,7 @@ import {
 } from "../utils/data-schema";
 import { BackendApi } from "../utils/services-interface";
 import {
+  BaseDataFilter,
   ContractFilter,
   PersonFilter,
   PropertyFilter,
@@ -90,40 +90,42 @@ export const logout = async (): Promise<OperationResponse> => {
 };
 
 // SQL
-const queryConstructor = {
-  searchPropertyIdsQuery: (
-    supabaseClient: SupabaseClient,
-    filter: PropertyFilter
-  ) => {
-    const query = supabaseClient.from("property").select("id");
+const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
+  const query = client.from(tableName).select("id");
 
-    if (filter.idEq) {
-      query.eq("id", filter.idEq);
-    }
-    if (filter.idNot) {
-      query.not("id", "in", `${filter.idNot.join(",")}`);
-    }
-    if (filter.createdBy) {
-      query.eq("createdBy", filter.createdBy);
-    }
-    if (filter.createdAtAfter) {
-      query.gte("createdAt", filter.createdAtAfter);
-    }
-    if (filter.createdAtBefore) {
-      query.lte("createdAt", filter.createdAtBefore);
-    }
-    if (filter.updatedBy) {
-      query.eq("updatedBy", filter.updatedBy);
-    }
-    if (filter.updatedAtAfter) {
-      query.gte("updatedAt", filter.updatedAtAfter);
-    }
-    if (filter.updatedAtBefore) {
-      query.lte("updatedAt", filter.updatedAtBefore);
-    }
-    if (filter.deleted != undefined) {
-      query.eq("deleted", filter.deleted);
-    }
+  if (filter.idEq) {
+    query.in("id", filter.idEq);
+  }
+  if (filter.idNot) {
+    query.not("id", "in", `${filter.idNot.join(",")}`);
+  }
+  if (filter.createdBy) {
+    query.eq("createdBy", filter.createdBy);
+  }
+  if (filter.createdAtAfter) {
+    query.gte("createdAt", filter.createdAtAfter);
+  }
+  if (filter.createdAtBefore) {
+    query.lte("createdAt", filter.createdAtBefore);
+  }
+  if (filter.updatedBy) {
+    query.eq("updatedBy", filter.updatedBy);
+  }
+  if (filter.updatedAtAfter) {
+    query.gte("updatedAt", filter.updatedAtAfter);
+  }
+  if (filter.updatedAtBefore) {
+    query.lte("updatedAt", filter.updatedAtBefore);
+  }
+  if (filter.deleted != undefined) {
+    query.eq("deleted", filter.deleted);
+  }
+
+  return query;
+};
+const queryConstructor = {
+  searchPropertyIdsQuery: (filter: PropertyFilter) => {
+    const query = searchBaseDataIdsQuery(filter, "property");
 
     if (filter.address) {
       const filterWords = filter.address.split(" ");
@@ -147,39 +149,8 @@ const queryConstructor = {
 
     return query;
   },
-  searchRealtorIdsQuery: (
-    supabaseClient: SupabaseClient,
-    filter: RealtorFilter
-  ) => {
-    const query = supabaseClient.from("realtor").select("id");
-
-    if (filter.idEq) {
-      query.eq("id", filter.idEq);
-    }
-    if (filter.idNot) {
-      query.not("id", "in", `${filter.idNot.join(",")}`);
-    }
-    if (filter.createdBy) {
-      query.eq("createdBy", filter.createdBy);
-    }
-    if (filter.createdAtAfter) {
-      query.gte("createdAt", filter.createdAtAfter);
-    }
-    if (filter.createdAtBefore) {
-      query.lte("createdAt", filter.createdAtBefore);
-    }
-    if (filter.updatedBy) {
-      query.eq("updatedBy", filter.updatedBy);
-    }
-    if (filter.updatedAtAfter) {
-      query.gte("updatedAt", filter.updatedAtAfter);
-    }
-    if (filter.updatedAtBefore) {
-      query.lte("updatedAt", filter.updatedAtBefore);
-    }
-    if (filter.deleted != undefined) {
-      query.eq("deleted", filter.deleted);
-    }
+  searchRealtorIdsQuery: (filter: RealtorFilter) => {
+    const query = searchBaseDataIdsQuery(filter, "realtor");
 
     if (filter.name) {
       const filterWords = filter.name.split(" ");
@@ -188,39 +159,8 @@ const queryConstructor = {
 
     return query;
   },
-  searchPersonIdsQuery: (
-    supabseClient: SupabaseClient,
-    filter: PersonFilter
-  ) => {
-    const query = supabseClient.from("person").select("id");
-
-    if (filter.idEq) {
-      query.eq("id", filter.idEq);
-    }
-    if (filter.idNot) {
-      query.not("id", "in", `${filter.idNot.join(",")}`);
-    }
-    if (filter.createdBy) {
-      query.eq("createdBy", filter.createdBy);
-    }
-    if (filter.createdAtAfter) {
-      query.gte("createdAt", filter.createdAtAfter);
-    }
-    if (filter.createdAtBefore) {
-      query.lte("createdAt", filter.createdAtBefore);
-    }
-    if (filter.updatedBy) {
-      query.eq("updatedBy", filter.updatedBy);
-    }
-    if (filter.updatedAtAfter) {
-      query.gte("updatedAt", filter.updatedAtAfter);
-    }
-    if (filter.updatedAtBefore) {
-      query.lte("updatedAt", filter.updatedAtBefore);
-    }
-    if (filter.deleted != undefined) {
-      query.eq("deleted", filter.deleted);
-    }
+  searchPersonIdsQuery: (filter: PersonFilter) => {
+    const query = searchBaseDataIdsQuery(filter, "person");
 
     if (filter.name) {
       const filterWords = filter.name.split(" ");
@@ -235,39 +175,8 @@ const queryConstructor = {
 
     return query;
   },
-  searchContractIdsQuery: (
-    supabaseClient: SupabaseClient,
-    filter: ContractFilter
-  ) => {
-    const query = supabaseClient.from("contract").select("id");
-
-    if (filter.idEq) {
-      query.eq("id", filter.idEq);
-    }
-    if (filter.idNot) {
-      query.not("id", "in", `${filter.idNot.join(",")}`);
-    }
-    if (filter.createdBy) {
-      query.eq("createdBy", filter.createdBy);
-    }
-    if (filter.createdAtAfter) {
-      query.gte("createdAt", filter.createdAtAfter);
-    }
-    if (filter.createdAtBefore) {
-      query.lte("createdAt", filter.createdAtBefore);
-    }
-    if (filter.updatedBy) {
-      query.eq("updatedBy", filter.updatedBy);
-    }
-    if (filter.updatedAtAfter) {
-      query.gte("updatedAt", filter.updatedAtAfter);
-    }
-    if (filter.updatedAtBefore) {
-      query.lte("updatedAt", filter.updatedAtBefore);
-    }
-    if (filter.deleted != undefined) {
-      query.eq("deleted", filter.deleted);
-    }
+  searchContractIdsQuery: (filter: ContractFilter) => {
+    const query = searchBaseDataIdsQuery(filter, "contract");
 
     if (filter.property) {
       query.eq("property", filter.property);
@@ -298,7 +207,7 @@ const searchPropertyIds = async (
   filter: PropertyFilter
 ): Promise<OperationResponse<Array<Property["id"]>>> => {
   console.log(`supabase -> searchPropertyIds`);
-  const query = queryConstructor.searchPropertyIdsQuery(client, filter);
+  const query = queryConstructor.searchPropertyIdsQuery(filter);
   const { data, error } = await query;
 
   if (error) {
@@ -475,7 +384,7 @@ const searchRealtorIds = async (
   filter: RealtorFilter
 ): Promise<OperationResponse<Array<Realtor["id"]>>> => {
   console.log(`supabase -> searchRealtorIds`);
-  const query = queryConstructor.searchRealtorIdsQuery(client, filter);
+  const query = queryConstructor.searchRealtorIdsQuery(filter);
   const { data, error } = await query;
 
   if (error) {
@@ -650,7 +559,7 @@ const searchPersonIds = async (
   filter: PersonFilter
 ): Promise<OperationResponse<Array<Person["id"]>>> => {
   console.log(`supabase -> searchPersonIds`);
-  const query = queryConstructor.searchPersonIdsQuery(client, filter);
+  const query = queryConstructor.searchPersonIdsQuery(filter);
   const { data, error } = await query;
 
   if (error) {
@@ -826,7 +735,7 @@ const searchContractIds = async (
   filter: ContractFilter
 ): Promise<OperationResponse<Array<Contract["id"]>>> => {
   console.log(`supabase -> searchContractIds`);
-  const query = queryConstructor.searchContractIdsQuery(client, filter);
+  const query = queryConstructor.searchContractIdsQuery(filter);
   const { data, error } = await query;
 
   if (error) {

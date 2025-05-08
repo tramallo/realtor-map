@@ -11,7 +11,7 @@ import {
  * Otherwise will cause that not all received data is shown, and incorrect data is shown from local storage 
  */
 export const dataCompliesFilter = (data: BaseData, filter: BaseDataFilter): boolean => {
-    if(filter.idEq && data.id != filter.idEq) { return false }
+    if(filter.idEq && !filter.idEq.some((filterId) => filterId == data.id)) { return false }
     if(filter.idNot && (data.id ? filter.idNot.includes(data.id) : true)) { return false }
     if(filter.createdBy && data.createdBy != filter.createdBy) { return false }
     if(filter.createdAtBefore && (data.createdAt ?? Number.MAX_SAFE_INTEGER) > filter.createdAtBefore) { return false }

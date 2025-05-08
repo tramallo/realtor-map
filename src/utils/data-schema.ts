@@ -5,14 +5,15 @@ import { z } from "zod";
 // helpers
 export const propertyTypes = ['house', 'apartment'] as const;
 export const propertyStates = ['rented', 'available', 'reserved'] as const
-export const entryId = z.number().int().positive().finite();
+export const dataIdSchema = z.number().int().positive().finite();
+export const userIdSchema = z.string().uuid();
 export const timestampSchema = z.number().int().positive().finite();
 export const coordinatesSchema = z.object({
     lat: z.coerce.number().finite().safe(),
     lng: z.coerce.number().finite().safe()
 })
 export const baseDataSchema = z.object({
-    id: entryId,
+    id: dataIdSchema,
     createdBy: z.string().uuid(),
     createdAt: timestampSchema,
     updatedBy: z.string().uuid().optional(),
@@ -36,14 +37,14 @@ export const propertySchema = baseDataSchema.extend({
     coordinates: coordinatesSchema,
     type: z.enum(propertyTypes),
     state: z.enum(propertyStates).optional(),
-    ownerId: entryId.optional(),
-    relatedRealtorIds: entryId.array().optional(),
-    exclusiveRealtorId: entryId.optional(),
+    ownerId: dataIdSchema.optional(),
+    relatedRealtorIds: dataIdSchema.array().optional(),
+    exclusiveRealtorId: dataIdSchema.optional(),
     description: z.string().optional(),
 })
 export const contractSchema = baseDataSchema.extend({
-    property: entryId,
-    client: entryId,
+    property: dataIdSchema,
+    client: dataIdSchema,
     start: timestampSchema,
     end: timestampSchema,
     description: z.string().optional(),

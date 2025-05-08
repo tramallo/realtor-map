@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-import { entryId, propertyStates, propertyTypes, timestampSchema } from "./data-schema";
+import { dataIdSchema, propertyStates, propertyTypes, timestampSchema, userIdSchema } from "./data-schema";
 
 export const baseDataFilterSchema = z.object({
-    idEq: entryId.optional(),
-    idNot: entryId.array().optional(),
-    createdBy: entryId.optional(),
+    idEq: dataIdSchema.array().optional(),
+    idNot: dataIdSchema.array().optional(),
+    createdBy: userIdSchema.optional(),
     createdAtBefore: timestampSchema.optional(),
     createdAtAfter: timestampSchema.optional(),
-    updatedBy: entryId.optional(),
+    updatedBy: userIdSchema.optional(),
     updatedAtBefore: timestampSchema.optional(),
     updatedAtAfter: timestampSchema.optional(),
     deleted: z.boolean().optional(),
@@ -28,14 +28,14 @@ export const propertyFilterSchema = baseDataFilterSchema.extend({
     address: z.string().optional(),
     type: z.enum(propertyTypes).optional(),
     state: z.enum(propertyStates).optional(),
-    ownerId: entryId.optional(),
-    relatedRealtorIds: entryId.array().optional(),
-    exclusiveRealtorId: entryId.optional(),
+    ownerId: dataIdSchema.optional(),
+    relatedRealtorIds: dataIdSchema.array().optional(),
+    exclusiveRealtorId: dataIdSchema.optional(),
 })
 
 export const contractFilterSchema = baseDataFilterSchema.extend({
-    client: entryId.optional(),
-    property: entryId.optional(),
+    client: dataIdSchema.optional(),
+    property: dataIdSchema.optional(),
     startBefore: timestampSchema.optional(),
     startAfter: timestampSchema.optional(),
     endBefore: timestampSchema.optional(),

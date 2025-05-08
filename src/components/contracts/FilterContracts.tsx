@@ -25,21 +25,14 @@ export function FilterContracts({ filter, onChange }: FilterConractsProps) {
 
   return (
     <Grid2 container spacing={1}>
-      <Grid2 size={2}>
+      <Grid2 size={4}>
         <PersonField
           label="Client"
           selected={filter.client ? [filter.client] : []}
           onSelect={(newValue) => setFilterValue({ client: newValue[0] })}
         />
       </Grid2>
-      <Grid2 size={2}>
-        <PropertyField
-          label="Property"
-          selected={filter.property ? [filter.property] : []}
-          onSelect={(newValue) => setFilterValue({ property: newValue[0] })}
-        />
-      </Grid2>
-      <Grid2 size={2}>
+      <Grid2 size={4}>
         <DateField
           label="Start before"
           value={filter.startBefore}
@@ -48,7 +41,7 @@ export function FilterContracts({ filter, onChange }: FilterConractsProps) {
           }
         />
       </Grid2>
-      <Grid2 size={2}>
+      <Grid2 size={4}>
         <DateField
           label="Start after"
           value={filter.startAfter}
@@ -57,7 +50,14 @@ export function FilterContracts({ filter, onChange }: FilterConractsProps) {
           }
         />
       </Grid2>
-      <Grid2 size={2}>
+      <Grid2 size={4}>
+        <PropertyField
+          label="Property"
+          selected={filter.property ? [filter.property] : []}
+          onSelect={(newValue) => setFilterValue({ property: newValue[0] })}
+        />
+      </Grid2>
+      <Grid2 size={4}>
         <DateField
           label="End before"
           value={filter.endBefore}
@@ -66,7 +66,7 @@ export function FilterContracts({ filter, onChange }: FilterConractsProps) {
           }
         />
       </Grid2>
-      <Grid2 size={2}>
+      <Grid2 size={4}>
         <DateField
           label="End after"
           value={filter.endAfter}

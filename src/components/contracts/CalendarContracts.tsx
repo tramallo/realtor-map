@@ -124,6 +124,8 @@ export function CalendarContracts() {
         sx={(theme) => ({
           backgroundColor: theme.palette.grey[200],
           borderRadius: 3,
+          margin: 0,
+          width: "100%",
         })}
         views={["year", "month", "day"]}
         disableHighlightToday
