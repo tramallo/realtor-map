@@ -29,7 +29,7 @@ export default function Test() {
         <TextField key={index} value={person.name} />
       ))}
     </Stack> */}
-      <SearchPersons onSelect={alert} multiselect />
+      <SearchContracts onSelect={alert} multiselect />
     </>
   );
 }

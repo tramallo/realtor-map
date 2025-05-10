@@ -1,13 +1,5 @@
 import { useCallback } from "react";
-import {
-  Box,
-  Checkbox,
-  List,
-  ListItem,
-  ListItemIcon,
-  Stack,
-  StackProps,
-} from "@mui/material";
+import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
 
 import { Contract } from "../../utils/data-schema";
 import { CardContract } from "./CardContract";
@@ -61,20 +53,17 @@ export function ListContracts({
       <Box overflow="auto">
         <List>
           {contractIds.map((contractId, index) => (
-            <ListItem key={`list-contract-${index}`} disablePadding>
-              {onSelect && (
-                <ListItemIcon sx={{ minWidth: "1px" }}>
-                  <Checkbox
-                    edge="start"
-                    checked={selected.includes(contractId)}
-                    sx={{ minWidth: 1 }}
-                    onClick={() => toggleContractSelection(contractId)}
-                  />
-                </ListItemIcon>
-              )}
+            <ListItem
+              key={`list-contract-${index}`}
+              sx={{
+                "&:not(:last-child)": { marginBottom: 1 },
+              }}
+              disablePadding
+            >
               <CardContract
                 contractId={contractId}
                 onClick={onSelect ? toggleContractSelection : undefined}
+                selected={onSelect ? selected.includes(contractId) : undefined}
               />
             </ListItem>
           ))}

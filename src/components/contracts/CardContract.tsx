@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Box,
+  Checkbox,
   CircularProgress,
   IconButton,
   Stack,
@@ -25,9 +26,14 @@ import PersonChip from "../PersonChip";
 export interface CardContractProps {
   contractId: Contract["id"];
   onClick?: (contractId: Contract["id"]) => void;
+  selected?: boolean;
 }
 
-export function CardContract({ contractId, onClick }: CardContractProps) {
+export function CardContract({
+  contractId,
+  onClick,
+  selected,
+}: CardContractProps) {
   const fetchContract = useContractStore((store) => store.fetchContract);
 
   const [fetchingContract, setFetchingContract] = useState(false);
@@ -50,8 +56,9 @@ export function CardContract({ contractId, onClick }: CardContractProps) {
   return (
     <Box
       width="100%"
-      borderRadius={2}
+      borderRadius={1}
       paddingInline={1}
+      border="2px solid black"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
       onClick={onClick ? () => onClick(contractId) : undefined}
     >
@@ -70,8 +77,13 @@ export function CardContract({ contractId, onClick }: CardContractProps) {
           justifyContent="space-between"
         >
           <Stack direction="row" spacing={1}>
+            {selected != undefined && (
+              <Checkbox
+                checked={selected}
+                sx={{ minWidth: "1px", padding: 0 }}
+              />
+            )}
             <PropertyChip propertyId={contract.property} />
-            <Typography>::</Typography>
             <PersonChip personId={contract.client} />
           </Stack>
           <Stack direction="row" spacing={1} alignItems="center">

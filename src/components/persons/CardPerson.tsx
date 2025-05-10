@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Box,
+  Checkbox,
   CircularProgress,
   IconButton,
   Stack,
@@ -17,9 +18,10 @@ import ViewPerson from "./ViewPerson";
 export interface CardPersonProps {
   personId: Person["id"];
   onClick?: (personId: Person["id"]) => void;
+  selected?: boolean;
 }
 
-export function CardPerson({ personId, onClick }: CardPersonProps) {
+export function CardPerson({ personId, onClick, selected }: CardPersonProps) {
   const fetchPerson = usePersonStore((store) => store.fetchPerson);
 
   const [fetchingPerson, setFetchingPerson] = useState(false);
@@ -42,8 +44,9 @@ export function CardPerson({ personId, onClick }: CardPersonProps) {
   return (
     <Box
       width="100%"
-      borderRadius={2}
+      borderRadius={1}
       paddingInline={1}
+      border="2px solid black"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
       onClick={onClick ? () => onClick(personId) : undefined}
     >
@@ -61,12 +64,25 @@ export function CardPerson({ personId, onClick }: CardPersonProps) {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Typography>{person.name}</Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {selected != undefined && (
+              <Checkbox
+                checked={selected}
+                sx={{ minWidth: "1px", padding: 0 }}
+              />
+            )}
+            <Typography>{person.name}</Typography>
+          </Stack>
           <Stack direction="row" spacing={1} alignItems="center">
             {person.mobile && (
               <Typography variant="body2">{person.mobile}</Typography>
             )}
-            <IconButton onClick={() => setViewPersonModalOpen(true)}>
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation();
+                setViewPersonModalOpen(true);
+              }}
+            >
               <VisibilityIcon />
             </IconButton>
           </Stack>

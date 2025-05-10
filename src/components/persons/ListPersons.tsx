@@ -1,13 +1,5 @@
 import { useCallback } from "react";
-import {
-  Box,
-  Checkbox,
-  List,
-  ListItem,
-  ListItemIcon,
-  Stack,
-  StackProps,
-} from "@mui/material";
+import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
 
 import { Person } from "../../utils/data-schema";
 import { CardPerson } from "./CardPerson";
@@ -61,20 +53,17 @@ export function ListPersons({
       <Box overflow="auto">
         <List>
           {personIds.map((personId, index) => (
-            <ListItem key={`list-person-${index}`} disablePadding>
-              {onSelect && (
-                <ListItemIcon sx={{ minWidth: "1px" }}>
-                  <Checkbox
-                    edge="start"
-                    checked={selected.includes(personId)}
-                    sx={{ minWidth: 1 }}
-                    onClick={() => togglePersonSelection(personId)}
-                  />
-                </ListItemIcon>
-              )}
+            <ListItem
+              key={`list-person-${index}`}
+              sx={{
+                "&:not(:last-child)": { marginBottom: 1 },
+              }}
+              disablePadding
+            >
               <CardPerson
                 personId={personId}
                 onClick={onSelect ? togglePersonSelection : undefined}
+                selected={onSelect ? selected.includes(personId) : undefined}
               />
             </ListItem>
           ))}
