@@ -46,7 +46,7 @@ export function CardProperty({ propertyId, onClick }: CardPropertyProps) {
   return (
     <Box
       width="100%"
-      borderRadius={2}
+      borderRadius={1}
       paddingInline={1}
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
       onClick={onClick ? () => onClick(propertyId) : undefined}

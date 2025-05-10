@@ -58,7 +58,7 @@ export function CardContract({
       width="100%"
       borderRadius={1}
       paddingInline={1}
-      border="2px solid black"
+      border="1px solid black"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
       onClick={onClick ? () => onClick(contractId) : undefined}
     >
