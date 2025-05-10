@@ -6,7 +6,7 @@ import PersonField from "./PersonField";
 import ComponentsField from "./ComponentsField";
 import PersonChip from "./PersonChip";
 import CustomModal from "./CustomModal";
-import ListPersons from "./persons/ListPersons";
+import SearchPersons from "./persons/SearchPersons";
 
 // mock dependencies
 vi.mock("./ComponentsField", () => ({
@@ -41,7 +41,7 @@ vi.mock("./CustomModal", () => ({
 }));
 
 vi.mock("./persons/ListPersons", () => ({
-  default: vi.fn((props: ComponentProps<typeof ListPersons>) => (
+  default: vi.fn((props: ComponentProps<typeof SearchPersons>) => (
     <div data-testid="list-persons">
       {props.onSelect && (
         <button
@@ -110,7 +110,7 @@ describe("PersonField", () => {
       );
       fireEvent.click(openListButton);
 
-      expect(ListPersons).toHaveBeenCalledWith(
+      expect(SearchPersons).toHaveBeenCalledWith(
         expect.objectContaining({ multiple: multipleTest }),
         expect.anything()
       );
@@ -196,7 +196,7 @@ describe("PersonField", () => {
     const openButton = screen.getByTestId("open-list-persons-modal-button");
     fireEvent.click(openButton);
 
-    expect(ListPersons).toHaveBeenCalledWith(
+    expect(SearchPersons).toHaveBeenCalledWith(
       expect.objectContaining({ defaultSelected: selectedIds }),
       expect.anything()
     );

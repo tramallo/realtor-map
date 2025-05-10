@@ -32,17 +32,17 @@ import ViewRealtor from "./ViewRealtor";
 import RealtorChip from "../RealtorChip";
 import { RealtorFilter } from "../../utils/data-filter-schema";
 
-interface ListRealtorsProps {
+interface SearchRealtorsProps {
   onSelect?: (realtorIds: Array<Realtor["id"]>) => void;
   defaultSelected?: Array<Realtor["id"]>;
   multiple?: boolean;
 }
 
-export default function ListRealtors({
+export default function SearchRealtors({
   onSelect,
   defaultSelected,
   multiple,
-}: ListRealtorsProps) {
+}: SearchRealtorsProps) {
   const searchRealtors = useRealtorStore((store) => store.searchRealtors);
 
   const [selectedRealtors, setSelectedRealtors] = useState(

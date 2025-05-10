@@ -4,9 +4,11 @@ import { CreatePersonDTO, Person, UpdatePersonDTO } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { PersonFilter } from "../utils/data-filter-schema";
+import { personCompliesFilter } from "../utils/filter-evaluators";
 
 export interface PersonStore {
-    persons: Record<Person["id"], Person>;
+    persons: Record<Person["id"], Person | undefined>;
+    searchResults: Record<string, Array<Person["id"]> | undefined>;
     fetchPerson: (personId: Person["id"]) => Promise<OperationResponse>;
     searchPersons: (filter: PersonFilter) => Promise<OperationResponse>;
     createPerson: (newPersonData: CreatePersonDTO) => Promise<OperationResponse>;
@@ -56,17 +58,70 @@ export const usePersonStore = create<PersonStore>((set, get) => {
         set({ persons: storedPersonsCopy });
     }
 
+    const storeSearchResult = (filter: string, result: Array<Person["id"]>) => {
+        const { searchResults } = get();
+        const searchResultsCopy = { ...searchResults };
+
+        const storedFilterResults = searchResults[filter];
+        if (storedFilterResults) {
+            searchResultsCopy[filter] = [...storedFilterResults, ...result];
+        } else {
+            searchResultsCopy[filter] = result;
+        }
+
+        set({ searchResults: searchResultsCopy });
+    }
+    const removeSearchResult = (filter: string, result: Array<Person["id"]>) => {
+        const { searchResults } = get();
+        if (!searchResults[filter]) return;
+
+        const searchResultsCopy = { ...searchResults };
+        searchResultsCopy[filter] = searchResultsCopy[filter]!.filter(
+            personId => !result.includes(personId)
+        );
+        set({ searchResults: searchResultsCopy });
+    }
+
     const newPersonHandler = (newPerson: Person) => {
         console.log(`event -> [new-person] ${newPerson.name} `);
         storePersons([newPerson]);
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            const filter = JSON.parse(filterAsString) as PersonFilter;
+            if (personCompliesFilter(newPerson, filter)) {
+                storeSearchResult(filterAsString, [newPerson.id]);
+            }
+        })
     }
     const updatedPersonHandler = (updatedPerson: Person) => {
         console.log(`event -> [updated-person] ${updatedPerson.name} `);
         storePersons([updatedPerson]);
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            const filter = JSON.parse(filterAsString) as PersonFilter;
+            if (searchResults[filterAsString]!.includes(updatedPerson.id)) {
+                if (!personCompliesFilter(updatedPerson, filter)) {
+                    removeSearchResult(filterAsString, [updatedPerson.id]);
+                }
+            } else {
+                if (personCompliesFilter(updatedPerson, filter)) {
+                    storeSearchResult(filterAsString, [updatedPerson.id]);
+                }
+            }
+        })
     }
     const deletedPersonHandler = (deletedPerson: Person) => {
         console.log(`event -> [deleted-person] ${deletedPerson.name}`);
         removePersons([deletedPerson.id]);
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            if (searchResults[filterAsString]!.includes(deletedPerson.id)) {
+                removeSearchResult(filterAsString, [deletedPerson.id]);
+            }
+        })
     }
     backendApi.personsSubscribe(newPersonHandler, updatedPersonHandler, deletedPersonHandler);
 
@@ -109,6 +164,7 @@ export const usePersonStore = create<PersonStore>((set, get) => {
 
     return {
         persons: {},
+        searchResults: {},
         fetchPerson: async (personId: Person["id"]) => {
             console.log(`personStore -> fetchPerson - personId: ${personId}`)
 
@@ -132,27 +188,29 @@ export const usePersonStore = create<PersonStore>((set, get) => {
             return { data: undefined };
         },
         searchPersons: async (filter) => {
-            console.log(`personStore -> searchPersons - filter: ${JSON.stringify(filter)}`)
+            const filterAsString = JSON.stringify(filter);
+            console.log(`personStore -> searchPersons - filter: ${filterAsString}`)
 
-            const { error, data } = await backendApi.searchPersonIds(filter);
+            const { persons, searchResults: storedSearchResults } = get();
 
-            if (error) {
-                return { error };
+            let searchResult = storedSearchResults[filterAsString];
+            if (!searchResult) {
+                const { error, data } = await backendApi.searchPersonIds(filter);
+                if (error) return { error };
+                storeSearchResult(filterAsString, data);
+                searchResult = data;
             }
 
-            const { persons } = get();
             const storedPersonIds = new Set(Object.keys(persons).map(Number));
-            const nonStoredPersonIds = data.filter((personId) => !storedPersonIds.has(personId));
+            const nonStoredPersonIds = searchResult.filter(
+                personId => !storedPersonIds.has(personId)
+            );
 
-            if (nonStoredPersonIds.length == 0) {
-                return { data: undefined };
-            }
+            if (nonStoredPersonIds.length === 0) return { data: undefined };
 
-            const { error: getPersonsError, data: nonStoredPersons } = await backendApi.getPersons(nonStoredPersonIds);
-
-            if (getPersonsError) {
-                return { error: getPersonsError };
-            }
+            const { error: getPersonsError, data: nonStoredPersons } = 
+                await backendApi.getPersons(nonStoredPersonIds);
+            if (getPersonsError) return { error: getPersonsError };
 
             storePersons(nonStoredPersons);
             return { data: undefined };
@@ -199,4 +257,7 @@ usePersonStore.subscribe((state) => {
 
 export const fetchByIdSelector = (personId: Person["id"]) => {
     return (store: PersonStore) => store.persons[personId];
+}
+export const searchResultByStringFilter = (filter: string) => {
+    return (store: PersonStore) => store.searchResults[filter];
 }

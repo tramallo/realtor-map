@@ -4,6 +4,7 @@ import { CreateRealtorDTO, Realtor, UpdateRealtorDTO } from "../utils/data-schem
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { RealtorFilter } from "../utils/data-filter-schema";
+import { realtorCompliesFilter } from "../utils/filter-evaluators";
 
 const REALTORS_LOCAL_STORAGE_KEY = "realtors-store";
 const fetchLocalStorageRealtors = (): OperationResponse<Record<Realtor["id"], Realtor> | undefined> => {
@@ -24,7 +25,8 @@ const fetchLocalStorageRealtors = (): OperationResponse<Record<Realtor["id"], Re
 }
 
 export interface RealtorStore {
-    realtors: Record<Realtor["id"], Realtor>;
+    realtors: Record<Realtor["id"], Realtor | undefined>;
+    searchResults: Record<string, Array<Realtor["id"]> | undefined>;
     fetchRealtor: (realtorId: Realtor["id"]) => Promise<OperationResponse>;
     searchRealtors: (filter: RealtorFilter) => Promise<OperationResponse>;
     createRealtor: (newRealtorData: CreateRealtorDTO) => Promise<OperationResponse>;
@@ -46,28 +48,81 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
         set({ realtors: cacheCopy });
     };
     const removeRealtors = (realtorIds: Array<Realtor['id']>) => {
-            const { realtors: storedRealtors } = get();
-            const storedRealtorsCopy = { ...storedRealtors };
+        const { realtors: storedRealtors } = get();
+        const storedRealtorsCopy = { ...storedRealtors };
             
-            realtorIds.forEach((realtorId) => {
-                delete storedRealtorsCopy[realtorId];
-            })
+        realtorIds.forEach((realtorId) => {
+            delete storedRealtorsCopy[realtorId];
+        })
     
-            set({ realtors: storedRealtorsCopy });
+        set({ realtors: storedRealtorsCopy });
+    };
+
+    const storeSearchResult = (filter: string, result: Array<Realtor["id"]>) => {
+        const { searchResults } = get();
+        const searchResultsCopy = { ...searchResults };
+
+        const storedFilterResults = searchResults[filter];
+        if (storedFilterResults) {
+            searchResultsCopy[filter] = [...storedFilterResults, ...result];
+        } else {
+            searchResultsCopy[filter] = result;
+        }
+
+        set({ searchResults: searchResultsCopy });
+    };
+    const removeSearchResult = (filter: string, result: Array<Realtor["id"]>) => {
+        const { searchResults } = get();
+        if (!searchResults[filter]) return;
+
+        const searchResultsCopy = { ...searchResults };
+        searchResultsCopy[filter] = searchResultsCopy[filter]!.filter(
+            realtorId => !result.includes(realtorId)
+        );
+        set({ searchResults: searchResultsCopy });
     };
 
     const newRealtorHandler = (newRealtor: Realtor) => {
         console.log(`event -> [new-realtor] ${newRealtor.name} `);
         storeRealtors([newRealtor]);
-    }
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            const filter = JSON.parse(filterAsString) as RealtorFilter;
+            if (realtorCompliesFilter(newRealtor, filter)) {
+                storeSearchResult(filterAsString, [newRealtor.id]);
+            }
+        });
+    };
     const updatedRealtorHandler = (updatedRealtor: Realtor) => {
         console.log(`event -> [updated-realtor] ${updatedRealtor.name} `);
         storeRealtors([updatedRealtor]);
-    }
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            const filter = JSON.parse(filterAsString) as RealtorFilter;
+            if (searchResults[filterAsString]!.includes(updatedRealtor.id)) {
+                if (!realtorCompliesFilter(updatedRealtor, filter)) {
+                    removeSearchResult(filterAsString, [updatedRealtor.id]);
+                }
+            } else {
+                if (realtorCompliesFilter(updatedRealtor, filter)) {
+                    storeSearchResult(filterAsString, [updatedRealtor.id]);
+                }
+            }
+        });
+    };
     const deletedRealtorHandler = (deletedRealtor: Realtor) => {
         console.log(`event -> [deleted-realtor] ${deletedRealtor.name}`);
         removeRealtors([deletedRealtor.id]);
-    }
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            if (searchResults[filterAsString]!.includes(deletedRealtor.id)) {
+                removeSearchResult(filterAsString, [deletedRealtor.id]);
+            }
+        });
+    };
     backendApi.realtorsSubscribe(newRealtorHandler, updatedRealtorHandler, deletedRealtorHandler);
 
     const syncLocalStorageState = async () => {
@@ -109,6 +164,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
 
     return {
         realtors: {},
+        searchResults: {},
         fetchRealtor: async (realtorId: Realtor["id"]) => {
             console.log(`realtorStore -> fetchRealtor - realtorId: ${realtorId}`)
 
@@ -132,29 +188,31 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             return { data: undefined };
         },
         searchRealtors: async (filter) => {
-            console.log(`realtorStore -> searchRealtors - filter: ${JSON.stringify(filter)}`)
-    
-            const { error, data } = await backendApi.searchRealtorIds(filter);
-        
-            if (error) {
-                return { error };
+            const filterAsString = JSON.stringify(filter);
+            console.log(`realtorStore -> searchRealtors - filter: ${filterAsString}`);
+
+            const { realtors, searchResults: storedSearchResults } = get();
+
+            let searchResult = storedSearchResults[filterAsString];
+            if (!searchResult) {
+                const { error, data } = await backendApi.searchRealtorIds(filter);
+                if (error) return { error };
+                storeSearchResult(filterAsString, data);
+                searchResult = data;
             }
-        
-            const { realtors } = get();
+
             const storedRealtorIds = new Set(Object.keys(realtors).map(Number));
-            const nonStoredRealtorIds = data.filter((realtorId) => !storedRealtorIds.has(realtorId));
+            const nonStoredRealtorIds = searchResult.filter(
+                id => !storedRealtorIds.has(id)
+            );
 
-            if (nonStoredRealtorIds.length == 0) {
-                return { data: undefined };
+            if (nonStoredRealtorIds.length > 0) {
+                const { error: getError, data: newRealtors } = 
+                    await backendApi.getRealtors(nonStoredRealtorIds);
+                if (getError) return { error: getError };
+                storeRealtors(newRealtors);
             }
 
-            const { error: getRealtorsError, data: nonStoredRealtors } = await backendApi.getRealtors(nonStoredRealtorIds);
-            
-            if (getRealtorsError) {
-                return { error: getRealtorsError };
-            }
-        
-            storeRealtors(nonStoredRealtors);
             return { data: undefined };
         },
         createRealtor: async (newRealtorData) => {
@@ -200,3 +258,6 @@ useRealtorStore.subscribe((state) => {
 export const fetchByIdSelector = (realtorId: Realtor["id"]) => {
     return (store: RealtorStore) => store.realtors[realtorId];
 }
+export const searchResultByStringFilter = (filter: string) => {
+    return (store: RealtorStore) => store.searchResults[filter];
+};

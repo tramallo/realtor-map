@@ -5,7 +5,7 @@ import { Property } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
 import PropertyChip from "./PropertyChip";
 import CustomModal from "./CustomModal";
-import ListProperties from "./properties/ListProperties";
+import SearchProperties from "./properties/SearchProperties";
 
 export interface PropertyFieldProps {
   label?: string;
@@ -69,7 +69,7 @@ export default function PropertyField({
         open={selectPropertyModalOpen}
         onClose={() => setSelectPropertyModalOpen(false)}
       >
-        <ListProperties
+        <SearchProperties
           defaultSelected={selected}
           onSelect={onPropertySelect}
           multiple={multiple}

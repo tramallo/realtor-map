@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Button,
   Chip,
@@ -8,90 +8,51 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { DateCalendar } from "@mui/x-date-pickers";
-import { isSameDay } from "date-fns";
 
-import {
-  CustomCalendarDay,
-  CustomCalendarDayProps,
-} from "../CustomCalendarDay";
 import {
   searchResultByStringFilter,
   useContractStore,
 } from "../../stores/contractsStore";
-import { ContractFilter } from "../../utils/data-filter-schema";
 import {
   countDefinedAttributes,
   OperationResponse,
-  timestampToDate,
 } from "../../utils/helperFunctions";
 import { FilterContracts } from "./FilterContracts";
+import { ContractFilter } from "../../utils/data-filter-schema";
+import { ListContracts } from "./ListContracts";
 import CustomModal from "../CustomModal";
 import CreateContract from "./CreateContract";
+import { Contract } from "../../utils/data-schema";
 
-export function CalendarContracts() {
+export interface SearchContractsProps {
+  onSelect?: (selected: Array<Contract["id"]>) => void;
+  defaultSelected?: Array<Contract["id"]>;
+  multiselect?: boolean;
+}
+
+export default function SearchContracts({
+  onSelect,
+  defaultSelected = [],
+  multiselect,
+}: SearchContractsProps) {
   const searchContracts = useContractStore((store) => store.searchContracts);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [contractsFilter, setContractsFilter] = useState({
     deleted: false,
   } as ContractFilter);
-  const [createContractModalOpen, setCreateContractModalOpen] = useState(false);
 
   const [searchingContracts, setSearchingContracts] = useState(false);
   const [searchContractsResponse, setSearchContractsResponse] = useState(
     undefined as OperationResponse | undefined
   );
 
-  const contracts = useContractStore((store) => store.contracts);
+  const [selectedContracts, setSelectedContracts] = useState(defaultSelected);
+  const [createContractModalOpen, setCreateContractModalOpen] = useState(false);
+
   const filteredContractIds = useContractStore(
     searchResultByStringFilter(JSON.stringify(contractsFilter))
   );
-
-  const highlightedDates = useMemo((): Array<{
-    date: Date;
-    colors: string[];
-  }> => {
-    const highlightsObject: Record<number, string[]> = {};
-
-    if (!filteredContractIds) {
-      return [];
-    }
-
-    filteredContractIds.forEach((contractId) => {
-      const contract = contracts[contractId];
-      if (!contract) {
-        return;
-      }
-
-      if (!highlightsObject[contract.start]) {
-        highlightsObject[contract.start] = ["green"];
-      } else {
-        if (highlightsObject[contract.start].includes("green")) {
-          return;
-        }
-        highlightsObject[contract.start].push("green");
-      }
-
-      if (!highlightsObject[contract.end]) {
-        highlightsObject[contract.end] = ["orange"];
-      } else {
-        if (highlightsObject[contract.end].includes("orange")) {
-          return;
-        }
-        highlightsObject[contract.end].push("orange");
-      }
-    });
-
-    const objectEntries = Object.entries(highlightsObject) as unknown as Array<
-      [number, string[]]
-    >;
-
-    return objectEntries.map(([timestamp, colors]) => ({
-      date: timestampToDate(timestamp)!,
-      colors: colors,
-    }));
-  }, [filteredContractIds, contracts]);
 
   const toggleFiltersVisibility = useCallback(
     () => setFiltersVisible(!filtersVisible),
@@ -109,43 +70,28 @@ export function CalendarContracts() {
 
   return (
     <Stack
-      boxSizing="border-box"
+      spacing={1}
       padding={1}
       height="100%"
+      boxSizing="border-box"
+      overflow="hidden"
       justifyContent="space-between"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <DateCalendar
-        value={null}
-        loading={searchingContracts || !!searchContractsResponse?.error}
-        renderLoading={() =>
-          searchContractsResponse?.error ? (
-            <Typography variant="h6" color="error" textAlign="center">
-              {searchContractsResponse?.error.message}
-            </Typography>
-          ) : (
-            <CircularProgress />
-          )
-        }
-        sx={(theme) => ({
-          backgroundColor: theme.palette.grey[200],
-          borderRadius: 3,
-          margin: 0,
-          width: "100%",
-        })}
-        views={["year", "month", "day"]}
-        disableHighlightToday
-        showDaysOutsideCurrentMonth
-        slots={{ day: CustomCalendarDay }}
-        slotProps={{
-          day: (ownerState) =>
-            ({
-              highlightColors: highlightedDates.find((highlight) =>
-                isSameDay(highlight.date, ownerState.day)
-              )?.colors,
-            } as CustomCalendarDayProps),
-        }}
-      />
+      {searchContractsResponse?.error && (
+        <Typography variant="h6" align="center" color="error">
+          {searchContractsResponse.error.message}
+        </Typography>
+      )}
+      {!searchContractsResponse?.error && (
+        <ListContracts
+          contractIds={filteredContractIds ?? []}
+          selected={selectedContracts}
+          onSelect={onSelect ? setSelectedContracts : undefined}
+          multiselect={multiselect}
+          flexGrow={1}
+        />
+      )}
 
       <Stack spacing={1}>
         <Stack spacing={filtersVisible ? 1 : 0}>
@@ -185,10 +131,28 @@ export function CalendarContracts() {
           >
             New Contract
           </Button>
+          {onSelect && (
+            <>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => setSelectedContracts([])}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => onSelect(selectedContracts)}
+              >
+                Confirm
+              </Button>
+            </>
+          )}
         </Stack>
       </Stack>
+
       <CustomModal
-        title="Create Contract"
+        title="Create contract"
         open={createContractModalOpen}
         onClose={() => setCreateContractModalOpen(false)}
       >

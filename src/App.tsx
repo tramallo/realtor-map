@@ -2,9 +2,9 @@ import { memo } from "react";
 
 //import MapProperties from "./components/properties/MapProperties";
 import Navigation, { NavigationSlide } from "./components/Navigation";
-import ListPersons from "./components/persons/ListPersons";
-import ListRealtors from "./components/realtors/ListRealtors";
-import ListProperties from "./components/properties/ListProperties";
+import SearchPersons from "./components/persons/SearchPersons";
+import SearchRealtors from "./components/realtors/SearchRealtors";
+import SearchProperties from "./components/properties/SearchProperties";
 import Test from "./layouts/Test";
 import { Button } from "@mui/material";
 import { useAuthContext } from "./utils/helperFunctions";
@@ -16,9 +16,9 @@ export function App() {
   const slides: NavigationSlide[] = [
     //{ label: "Map", component: <MapProperties /> },
     { label: "Calendar", component: <CalendarContracts /> },
-    { label: "Properties", component: <ListProperties /> },
-    { label: "Persons", component: <ListPersons /> },
-    { label: "Realtors", component: <ListRealtors /> },
+    { label: "Properties", component: <SearchProperties /> },
+    { label: "Persons", component: <SearchPersons /> },
+    { label: "Realtors", component: <SearchRealtors /> },
     { label: "test", component: <Test /> },
   ];
 

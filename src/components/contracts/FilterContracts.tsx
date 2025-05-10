@@ -1,17 +1,18 @@
 import { memo, useCallback } from "react";
-import { ContractFilter } from "../../utils/data-filter-schema";
 import { Grid2 } from "@mui/material";
+
+import { ContractFilter } from "../../utils/data-filter-schema";
 import FilterBaseData from "../FilterBaseData";
 import PersonField from "../PersonField";
 import PropertyField from "../PropretyField";
 import DateField from "../DateField";
 
-export interface FilterConractsProps {
+export interface FilterContractsProps {
   filter: ContractFilter;
   onChange: (newValue: ContractFilter) => void;
 }
 
-export function FilterContracts({ filter, onChange }: FilterConractsProps) {
+export function FilterContracts({ filter, onChange }: FilterContractsProps) {
   console.log(
     `FilterContracts -> render - defaultFilter: ${JSON.stringify(filter)}`
   );

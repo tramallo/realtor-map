@@ -32,17 +32,17 @@ import CreateProperty from "./CreateProperty";
 import ViewProperty from "./ViewProperty";
 import { PropertyFilter } from "../../utils/data-filter-schema";
 
-interface ListPropertiesProps {
+interface SearchPropertiesProps {
   onSelect?: (propertyIds: Array<Property["id"]>) => void;
   defaultSelected?: Array<Property["id"]>;
   multiple?: boolean;
 }
 
-export default function ListProperties({
+export default function SearchProperties({
   onSelect,
   defaultSelected,
   multiple,
-}: ListPropertiesProps) {
+}: SearchPropertiesProps) {
   const searchProperties = usePropertyStore((store) => store.searchProperties);
 
   const [selectedProperties, setSelectedProperties] = useState(

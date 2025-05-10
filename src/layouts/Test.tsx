@@ -7,8 +7,11 @@ import { SelectPerson } from "../components/persons/SelectPerson";
 import RealtorField from "../components/RealtorField";
 import { useState } from "react"; */
 import CreateContract from "../components/contracts/CreateContract";
-import ListContracts from "../components/contracts/ListContracts";
+import SearchContracts from "../components/contracts/SearchContracts";
+import { ListContracts } from "../components/contracts/ListContracts";
 import ViewContract from "../components/contracts/ViewContract";
+import { ListPersons } from "../components/persons/ListPersons";
+import SearchPersons from "../components/persons/SearchPersons";
 //import ListProperties from "../components/properties/ListProperties";
 
 export default function Test() {
@@ -26,7 +29,7 @@ export default function Test() {
         <TextField key={index} value={person.name} />
       ))}
     </Stack> */}
-      <ListContracts />
+      <SearchPersons onSelect={alert} multiselect />
     </>
   );
 }

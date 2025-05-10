@@ -4,9 +4,11 @@ import { CreateContractDTO, Contract, UpdateContractDTO } from "../utils/data-sc
 import { OperationResponse } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { ContractFilter } from "../utils/data-filter-schema";
+import { contractCompliesFilter } from "../utils/filter-evaluators";
 
 export interface ContractStore {
-    contracts: Record<Contract["id"], Contract>;
+    contracts: Record<Contract["id"], Contract | undefined>;
+    searchResults: Record<string, Array<Contract["id"]> | undefined>;
     fetchContract: (contractId: Contract["id"]) => Promise<OperationResponse>;
     searchContracts: (filter: ContractFilter) => Promise<OperationResponse>;
     createContract: (newContractData: CreateContractDTO) => Promise<OperationResponse>;
@@ -56,17 +58,72 @@ export const useContractStore = create<ContractStore>((set, get) => {
         set({ contracts: storedContractsCopy });
     }
 
+    const storeSearchResult = (filter: string, result: Array<Contract["id"]>) => {
+        const { searchResults } = get();
+        const searchResultsCopy = { ...searchResults };
+
+        const storedFilterResults = searchResults[filter];
+        if (storedFilterResults) {
+            //TODO: result may contain already present ids, filter those
+            searchResultsCopy[filter] = [...storedFilterResults, ...result];
+        } else {
+            searchResultsCopy[filter] = result;
+        }
+
+        set({ searchResults: searchResultsCopy });
+    }
+    const removeSearchResult = (filter: string, result: Array<Contract["id"]>) => {
+        const { searchResults } = get();
+        if (!searchResults[filter]) {
+            return;
+        }
+
+        const searchResultsCopy = { ...searchResults };
+
+        searchResultsCopy[filter] = searchResultsCopy[filter]!.filter((contractId) => !result.includes(contractId));
+        set({ searchResults: searchResultsCopy });
+    }
+
     const newContractHandler = (newContract: Contract) => {
         console.log(`event -> [new-contract] ${newContract.id} `);
         storeContracts([newContract]);
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            const filter = JSON.parse(filterAsString) as ContractFilter;
+            if (contractCompliesFilter(newContract, filter)) {
+                storeSearchResult(filterAsString, [newContract.id]);
+            }
+        })
     }
     const updatedContractHandler = (updatedContract: Contract) => {
         console.log(`event -> [updated-contract] ${updatedContract.id} `);
         storeContracts([updatedContract]);
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            const filter = JSON.parse(filterAsString) as ContractFilter;
+            if(searchResults[filterAsString]!.includes(updatedContract.id)) {
+                if (!contractCompliesFilter(updatedContract, filter)) {
+                    removeSearchResult(filterAsString, [updatedContract.id]);
+                }
+            } else {
+                if (contractCompliesFilter(updatedContract, filter)) {
+                    storeSearchResult(filterAsString, [updatedContract.id]);
+                }
+            }
+        })
     }
     const deletedContractHandler = (deletedContract: Contract) => {
         console.log(`event -> [deleted-contract] ${deletedContract.id}`);
         removeContracts([deletedContract.id]);
+
+        const { searchResults } = get();
+        Object.keys(searchResults).forEach((filterAsString) => {
+            if (searchResults[filterAsString]!.includes(deletedContract.id)) {
+                removeSearchResult(filterAsString, [deletedContract.id]);
+            }
+        })
     }
     backendApi.contractsSubscribe(newContractHandler, updatedContractHandler, deletedContractHandler);
 
@@ -109,6 +166,7 @@ export const useContractStore = create<ContractStore>((set, get) => {
 
     return {
         contracts: {},
+        searchResults: {},
         fetchContract: async (contractId) => {
             console.log(`contractStore -> fetchContract - contractId: ${contractId}`)
 
@@ -132,29 +190,34 @@ export const useContractStore = create<ContractStore>((set, get) => {
             return { data: undefined };
         },
         searchContracts: async (filter) => {
-            console.log(`contractStore -> searchContracts - filter: ${JSON.stringify(filter)}`)
+            const filterAsString = JSON.stringify(filter)
+            console.log(`contractStore -> searchContracts - filter: ${filterAsString}`)
 
-            const { error, data } = await backendApi.searchContractIds(filter);
+            const { contracts, searchResults: storedSearchResults } = get();
 
-            if (error) {
-                return { error };
+            let searchResult = storedSearchResults[filterAsString];
+            if (!searchResult) {
+                const { error, data } = await backendApi.searchContractIds(filter);
+                if (error) {
+                    return { error };
+                }   
+                storeSearchResult(filterAsString, data);
+                searchResult = data;
             }
 
-            const { contracts } = get();
             const storedContractIds = new Set(Object.keys(contracts).map(Number));
-            const nonStoredContractIds = data.filter((contractId) => !storedContractIds.has(contractId));
+            const nonStoredContractIds = searchResult.filter((contractId) => !storedContractIds.has(contractId));
 
             if (nonStoredContractIds.length === 0) {
                 return { data: undefined };
             }
 
             const { error: getContractsError, data: nonStoredContracts } = await backendApi.getContracts(nonStoredContractIds);
-
             if (getContractsError) {
                 return { error: getContractsError };
             }
-
             storeContracts(nonStoredContracts);
+
             return { data: undefined };
         },
         createContract: async (newContractData) => {
@@ -199,4 +262,7 @@ useContractStore.subscribe((state) => {
 
 export const fetchByIdSelector = (contractId: Contract["id"]) => {
     return (store: ContractStore) => store.contracts[contractId];
+}
+export const searchResultByStringFilter = (filter: string) => {
+    return (store: ContractStore) => store.searchResults[filter];
 }

@@ -56,7 +56,14 @@ export default function CustomModal({
         <Button
           variant="outlined"
           color="error"
-          onClick={onClose}
+          onClick={
+            onClose
+              ? (event) => {
+                  event.stopPropagation();
+                  onClose();
+                }
+              : undefined
+          }
           sx={{ visibility: onClose ? "visible" : "hidden" }}
         >
           <CloseIcon />
