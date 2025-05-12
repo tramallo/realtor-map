@@ -137,11 +137,11 @@ const queryConstructor = {
     if (filter.state) {
       query.eq("state", filter.state);
     }
-    if (filter.ownerId) {
-      query.eq("ownerId", filter.ownerId);
+    if (filter.ownerEq) {
+      query.eq("owner", filter.ownerEq);
     }
-    if (filter.exclusiveRealtorId) {
-      query.eq("exclusiveRealtorId", filter.exclusiveRealtorId);
+    if (filter.exclusiveRealtorEq) {
+      query.eq("exclusiveRealtor", filter.exclusiveRealtorEq);
     }
     if (filter.relatedRealtorIds) {
       query.contains("relatedRealtorIds", filter.relatedRealtorIds);

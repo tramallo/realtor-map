@@ -114,7 +114,7 @@ export default function MapProperties() {
             </Collapse>
           </Stack>
         </MemoMapComponent>
-        {filteredProperties.map((property, index) => (
+        {(filteredProperties ?? []).map((property, index) => (
           <Marker
             key={`Properties-Map-Marker-${index}`}
             position={property.coordinates}

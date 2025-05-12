@@ -104,7 +104,7 @@ export default function CreateProperty({
           emptyOptionLabel="select a state"
         />
         <FormPersonField
-          fieldName="ownerId"
+          fieldName="owner"
           label="Owner"
           readOnly={creatingProperty}
         />
@@ -115,7 +115,7 @@ export default function CreateProperty({
           multiline
         />
         <FormRealtorField
-          fieldName="exclusiveRealtorId"
+          fieldName="exclusiveRealtor"
           label="Exclusive realtor"
           readOnly={creatingProperty}
         />

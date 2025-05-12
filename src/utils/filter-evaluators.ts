@@ -38,7 +38,7 @@ export const propertyCompliesFilter = (property: Property, filter: PropertyFilte
     }
     if(filter.type && property.type != filter.type) { return false }
     if(filter.state && property.state != filter.state) { return false }
-    if(filter.ownerId && property.ownerId != filter.ownerId) { return false }
+    if(filter.ownerEq && property.owner != filter.ownerEq) { return false }
     if (
         filter.relatedRealtorIds && 
         !filter.relatedRealtorIds.every((filterRealtorId) => (property.relatedRealtorIds ?? []).includes(filterRealtorId))
@@ -46,8 +46,8 @@ export const propertyCompliesFilter = (property: Property, filter: PropertyFilte
         return false;
     }
     if(
-        filter.exclusiveRealtorId && 
-        property.exclusiveRealtorId != filter.exclusiveRealtorId
+        filter.exclusiveRealtorEq && 
+        property.exclusiveRealtor != filter.exclusiveRealtorEq
     ) { return false }
 
     return true;

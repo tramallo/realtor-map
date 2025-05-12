@@ -87,12 +87,12 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
           {cachedProperty.state && (
             <CustomTextField value={cachedProperty.state ?? ""} label="State" />
           )}
-          {cachedProperty.ownerId && (
+          {cachedProperty.owner && (
             <ComponentsField
               label="Owner"
               components={
-                cachedProperty.ownerId
-                  ? [<PersonChip personId={cachedProperty.ownerId} />]
+                cachedProperty.owner
+                  ? [<PersonChip personId={cachedProperty.owner} />]
                   : []
               }
             />
@@ -110,14 +110,14 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               )}
             />
           )}
-          {cachedProperty.exclusiveRealtorId && (
+          {cachedProperty.exclusiveRealtor && (
             <ComponentsField
               label="Exclusive realtor"
               components={
-                cachedProperty.exclusiveRealtorId
+                cachedProperty.exclusiveRealtor
                   ? [
                       <RealtorChip
-                        realtorId={cachedProperty.exclusiveRealtorId}
+                        realtorId={cachedProperty.exclusiveRealtor}
                       />,
                     ]
                   : []

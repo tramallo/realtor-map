@@ -134,17 +134,17 @@ export default function DeleteProperty({
             value={cachedProperty.address ?? ""}
           />
           <CustomTextField label="type" value={cachedProperty.type} />
-          {cachedProperty.ownerId && (
+          {cachedProperty.owner && (
             <ComponentsField
               label="owner"
-              components={[<PersonChip personId={cachedProperty.ownerId} />]}
+              components={[<PersonChip personId={cachedProperty.owner} />]}
             />
           )}
-          {cachedProperty.exclusiveRealtorId && (
+          {cachedProperty.exclusiveRealtor && (
             <ComponentsField
               label="realtor"
               components={[
-                <RealtorChip realtorId={cachedProperty.exclusiveRealtorId} />,
+                <RealtorChip realtorId={cachedProperty.exclusiveRealtor} />,
               ]}
             />
           )}

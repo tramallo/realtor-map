@@ -139,14 +139,14 @@ export default function UpdateProperty({
                 value: propertyState,
               }))}
             />
-            <FormPersonField fieldName="ownerId" label="Owner" />
+            <FormPersonField fieldName="owner" label="Owner" />
             <FormTextField
               fieldName="description"
               label="Description"
               multiline
             />
             <FormRealtorField
-              fieldName="exclusiveRealtorId"
+              fieldName="exclusiveRealtor"
               label="Exclusive realtor"
             />
             <FormRealtorField

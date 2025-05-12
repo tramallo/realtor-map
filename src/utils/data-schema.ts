@@ -37,9 +37,9 @@ export const propertySchema = baseDataSchema.extend({
     coordinates: coordinatesSchema,
     type: z.enum(propertyTypes),
     state: z.enum(propertyStates).optional(),
-    ownerId: dataIdSchema.optional(),
+    owner: dataIdSchema.optional(),
+    exclusiveRealtor: dataIdSchema.optional(),
     relatedRealtorIds: dataIdSchema.array().optional(),
-    exclusiveRealtorId: dataIdSchema.optional(),
     description: z.string().optional(),
 })
 export const contractSchema = baseDataSchema.extend({

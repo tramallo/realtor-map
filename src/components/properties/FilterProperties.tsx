@@ -103,10 +103,10 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
       <Grid2 size={3}>
         <PersonField
           label="Owner"
-          selected={filter.ownerId ? [filter.ownerId] : []}
+          selected={filter.ownerEq ? [filter.ownerEq] : []}
           onSelect={(newValue) =>
             setFilterValue({
-              ownerId: newValue.length ? newValue[0] : undefined,
+              ownerEq: newValue.length ? newValue[0] : undefined,
             })
           }
         />
@@ -115,11 +115,11 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
         <RealtorField
           label="Exclusive realtor"
           selected={
-            filter.exclusiveRealtorId ? [filter.exclusiveRealtorId] : []
+            filter.exclusiveRealtorEq ? [filter.exclusiveRealtorEq] : []
           }
           onSelect={(newValue) => {
             setFilterValue({
-              exclusiveRealtorId: newValue.length ? newValue[0] : undefined,
+              exclusiveRealtorEq: newValue.length ? newValue[0] : undefined,
             });
           }}
         />

@@ -28,9 +28,9 @@ export const propertyFilterSchema = baseDataFilterSchema.extend({
     address: z.string().optional(),
     type: z.enum(propertyTypes).optional(),
     state: z.enum(propertyStates).optional(),
-    ownerId: dataIdSchema.optional(),
+    ownerEq: dataIdSchema.optional(),
     relatedRealtorIds: dataIdSchema.array().optional(),
-    exclusiveRealtorId: dataIdSchema.optional(),
+    exclusiveRealtorEq: dataIdSchema.optional(),
 })
 
 export const contractFilterSchema = baseDataFilterSchema.extend({
