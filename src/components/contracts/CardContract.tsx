@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Box,
   Checkbox,
   CircularProgress,
   IconButton,
@@ -54,28 +53,29 @@ export function CardContract({
   }, [contractId, fetchContract]);
 
   return (
-    <Box
-      width="100%"
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
       borderRadius={1}
       paddingInline={1}
+      width="100%"
       border="1px solid black"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
-      onClick={onClick ? () => onClick(contractId) : undefined}
+      onClick={onClick && contract ? () => onClick(contractId) : undefined}
     >
-      {fetchingContract && <CircularProgress size="1.4em" />}
+      {fetchingContract && (
+        <CircularProgress size="1.4em" sx={{ padding: 1 }} />
+      )}
       {!fetchingContract && !contract && (
-        <Typography color="error" sx={{ paddingInline: 2 }}>
+        <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchContractResponse?.error
             ? fetchContractResponse?.error.message
             : "Contract not found"}
         </Typography>
       )}
       {!fetchingContract && contract && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
+        <>
           <Stack direction="row" spacing={1}>
             {selected != undefined && (
               <Checkbox
@@ -87,7 +87,10 @@ export function CardContract({
             <PersonChip personId={contract.client} />
           </Stack>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="body2">{`${timestampToDDMMYYString(
+            <Typography
+              variant="body2"
+              color="textSecondary"
+            >{`${timestampToDDMMYYString(
               contract.start
             )} -> ${timestampToDDMMYYString(contract.end)}`}</Typography>
             <IconButton
@@ -99,16 +102,15 @@ export function CardContract({
               <VisibilityIcon />
             </IconButton>
           </Stack>
-        </Stack>
+          <CustomModal
+            title={`View Contract: ${contractId}`}
+            open={viewContractModalOpen}
+            onClose={() => setViewContractModalOpen(false)}
+          >
+            <ViewContract contractId={contractId} />
+          </CustomModal>
+        </>
       )}
-
-      <CustomModal
-        title={`View Contract: ${contractId}`}
-        open={viewContractModalOpen}
-        onClose={() => setViewContractModalOpen(false)}
-      >
-        <ViewContract contractId={contractId} />
-      </CustomModal>
-    </Box>
+    </Stack>
   );
 }

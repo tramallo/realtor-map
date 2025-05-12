@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Box,
+  Checkbox,
   CircularProgress,
   IconButton,
   Stack,
@@ -16,9 +16,15 @@ import ViewRealtor from "./ViewRealtor";
 
 export interface CardRealtorProps {
   realtorId: Realtor["id"];
+  onClick?: (realtorId: Realtor["id"]) => void;
+  selected?: boolean;
 }
 
-export function CardRealtor({ realtorId }: CardRealtorProps) {
+export function CardRealtor({
+  realtorId,
+  onClick,
+  selected,
+}: CardRealtorProps) {
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
 
   const [fetchingRealtor, setFetchingRealtor] = useState(false);
@@ -39,35 +45,56 @@ export function CardRealtor({ realtorId }: CardRealtorProps) {
   }, [realtorId, fetchRealtor]);
 
   return (
-    <Box width="100%">
-      {fetchingRealtor && <CircularProgress size="1.4em" />}
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      borderRadius={1}
+      paddingInline={1}
+      width="100%"
+      border="1px solid black"
+      sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
+      onClick={onClick && realtor ? () => onClick(realtorId) : undefined}
+    >
+      {fetchingRealtor && <CircularProgress size="1.4em" sx={{ padding: 1 }} />}
       {!fetchingRealtor && !realtor && (
-        <Typography color="error" sx={{ paddingInline: 2 }}>
+        <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchRealtorResponse?.error
             ? fetchRealtorResponse?.error.message
             : "Realtor not found"}
         </Typography>
       )}
       {!fetchingRealtor && realtor && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Typography>{realtor.name}</Typography>
-          <IconButton onClick={() => setViewRealtorModalOpen(true)}>
-            <VisibilityIcon />
-          </IconButton>
-        </Stack>
-      )}
+        <>
+          <Stack direction="row" spacing={1}>
+            {selected !== undefined && (
+              <Checkbox
+                checked={selected}
+                sx={{ minWidth: "1px", padding: 0 }}
+              />
+            )}
+            <Typography variant="body1">{realtor.name}</Typography>
+          </Stack>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation();
+                setViewRealtorModalOpen(true);
+              }}
+            >
+              <VisibilityIcon />
+            </IconButton>
+          </Stack>
 
-      <CustomModal
-        title={`View Realtor: ${realtor?.name || realtorId}`}
-        open={viewRealtorModalOpen}
-        onClose={() => setViewRealtorModalOpen(false)}
-      >
-        <ViewRealtor realtorId={realtorId} />
-      </CustomModal>
-    </Box>
+          <CustomModal
+            title={`View Realtor: ${realtor.name}`}
+            open={viewRealtorModalOpen}
+            onClose={() => setViewRealtorModalOpen(false)}
+          >
+            <ViewRealtor realtorId={realtorId} />
+          </CustomModal>
+        </>
+      )}
+    </Stack>
   );
 }

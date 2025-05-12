@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Box,
+  Checkbox,
   CircularProgress,
   IconButton,
   Stack,
@@ -16,14 +16,18 @@ import {
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import ViewProperty from "./ViewProperty";
-import PersonChip from "../PersonChip";
 
 export interface CardPropertyProps {
   propertyId: Property["id"];
   onClick?: (propertyId: Property["id"]) => void;
+  selected?: boolean;
 }
 
-export function CardProperty({ propertyId, onClick }: CardPropertyProps) {
+export function CardProperty({
+  propertyId,
+  onClick,
+  selected,
+}: CardPropertyProps) {
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
 
   const [fetchingProperty, setFetchingProperty] = useState(false);
@@ -44,44 +48,58 @@ export function CardProperty({ propertyId, onClick }: CardPropertyProps) {
   }, [propertyId, fetchProperty]);
 
   return (
-    <Box
-      width="100%"
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
       borderRadius={1}
       paddingInline={1}
+      width="100%"
+      border="1px solid black"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
-      onClick={onClick ? () => onClick(propertyId) : undefined}
+      onClick={onClick && property ? () => onClick(propertyId) : undefined}
     >
-      {fetchingProperty && <CircularProgress size="1.4em" />}
+      {fetchingProperty && (
+        <CircularProgress size="1.4em" sx={{ padding: 1 }} />
+      )}
       {!fetchingProperty && !property && (
-        <Typography color="error" sx={{ paddingInline: 2 }}>
+        <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchPropertyResponse?.error
             ? fetchPropertyResponse?.error.message
             : "Property not found"}
         </Typography>
       )}
       {!fetchingProperty && property && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Typography>{property.address}</Typography>
+        <>
           <Stack direction="row" spacing={1}>
-            {property.ownerId && <PersonChip personId={property.ownerId} />}
-            <IconButton onClick={() => setViewPropertyModalOpen(true)}>
+            {selected !== undefined && (
+              <Checkbox
+                checked={selected}
+                sx={{ minWidth: "1px", padding: 0 }}
+              />
+            )}
+            <Typography variant="body1">{property.address}</Typography>
+          </Stack>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation();
+                setViewPropertyModalOpen(true);
+              }}
+            >
               <VisibilityIcon />
             </IconButton>
           </Stack>
-        </Stack>
-      )}
 
-      <CustomModal
-        title={`View Property: ${propertyId}`}
-        open={viewPropertyModalOpen}
-        onClose={() => setViewPropertyModalOpen(false)}
-      >
-        <ViewProperty propertyId={propertyId} />
-      </CustomModal>
-    </Box>
+          <CustomModal
+            title={`View Property: ${property.address}`}
+            open={viewPropertyModalOpen}
+            onClose={() => setViewPropertyModalOpen(false)}
+          >
+            <ViewProperty propertyId={propertyId} />
+          </CustomModal>
+        </>
+      )}
+    </Stack>
   );
 }

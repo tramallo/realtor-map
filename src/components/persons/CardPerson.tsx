@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Box,
   Checkbox,
   CircularProgress,
   IconButton,
@@ -42,41 +41,40 @@ export function CardPerson({ personId, onClick, selected }: CardPersonProps) {
   }, [personId, fetchPerson]);
 
   return (
-    <Box
-      width="100%"
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
       borderRadius={1}
       paddingInline={1}
+      width="100%"
       border="1px solid black"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
-      onClick={onClick ? () => onClick(personId) : undefined}
+      onClick={onClick && person ? () => onClick(personId) : undefined}
     >
-      {fetchingPerson && <CircularProgress size="1.4em" />}
+      {fetchingPerson && <CircularProgress size="1.4em" sx={{ padding: 1 }} />}
       {!fetchingPerson && !person && (
-        <Typography color="error" sx={{ paddingInline: 2 }}>
+        <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchPersonResponse?.error
             ? fetchPersonResponse?.error.message
             : "Person not found"}
         </Typography>
       )}
       {!fetchingPerson && person && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
+        <>
+          <Stack direction="row" spacing={1}>
             {selected != undefined && (
               <Checkbox
                 checked={selected}
                 sx={{ minWidth: "1px", padding: 0 }}
               />
             )}
-            <Typography>{person.name}</Typography>
+            <Typography variant="body1">{person.name}</Typography>
           </Stack>
           <Stack direction="row" spacing={1} alignItems="center">
-            {person.mobile && (
-              <Typography variant="body2">{person.mobile}</Typography>
-            )}
+            <Typography variant="body2" color="textSecondary">
+              {person.mobile}
+            </Typography>
             <IconButton
               onClick={(event) => {
                 event.stopPropagation();
@@ -86,16 +84,16 @@ export function CardPerson({ personId, onClick, selected }: CardPersonProps) {
               <VisibilityIcon />
             </IconButton>
           </Stack>
-        </Stack>
-      )}
 
-      <CustomModal
-        title={`View Person: ${personId}`}
-        open={viewPersonModalOpen}
-        onClose={() => setViewPersonModalOpen(false)}
-      >
-        <ViewPerson personId={personId} />
-      </CustomModal>
-    </Box>
+          <CustomModal
+            title={`View Person: ${person.name}`}
+            open={viewPersonModalOpen}
+            onClose={() => setViewPersonModalOpen(false)}
+          >
+            <ViewPerson personId={personId} />
+          </CustomModal>
+        </>
+      )}
+    </Stack>
   );
 }

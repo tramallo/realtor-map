@@ -1,53 +1,41 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
-  Box,
   Button,
-  Checkbox,
   Chip,
   CircularProgress,
   Collapse,
   Divider,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Stack,
   Typography,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
-import { usePropertyStore } from "../../stores/propertiesStore";
-import { Property } from "../../utils/data-schema";
+import {
+  searchResultByStringFilter,
+  usePropertyStore,
+} from "../../stores/propertiesStore";
 import {
   countDefinedAttributes,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import { propertyCompliesFilter } from "../../utils/filter-evaluators";
-import ComponentsField from "../ComponentsField";
 import { FilterProperties } from "./FilterProperties";
-import CustomModal from "../CustomModal";
-import CreateProperty from "./CreateProperty";
-import ViewProperty from "./ViewProperty";
 import { PropertyFilter } from "../../utils/data-filter-schema";
+import { ListProperties } from "./ListProperties";
+import CustomModal from "../CustomModal";
+import { Property } from "../../utils/data-schema";
+import CreateProperty from "./CreateProperty";
 
-interface SearchPropertiesProps {
-  onSelect?: (propertyIds: Array<Property["id"]>) => void;
+export interface SearchPropertiesProps {
+  onSelect?: (selected: Array<Property["id"]>) => void;
   defaultSelected?: Array<Property["id"]>;
-  multiple?: boolean;
+  multiselect?: boolean;
 }
 
 export default function SearchProperties({
   onSelect,
-  defaultSelected,
-  multiple,
+  defaultSelected = [],
+  multiselect,
 }: SearchPropertiesProps) {
   const searchProperties = usePropertyStore((store) => store.searchProperties);
-
-  const [selectedProperties, setSelectedProperties] = useState(
-    defaultSelected ?? []
-  );
 
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [propertiesFilter, setPropertiesFilter] = useState({
@@ -59,42 +47,11 @@ export default function SearchProperties({
     undefined as OperationResponse | undefined
   );
 
-  const [viewPropertyId, setViewPropertyId] = useState(
-    undefined as Property["id"] | undefined
-  );
+  const [selectedProperties, setSelectedProperties] = useState(defaultSelected);
   const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
 
-  const cachedProperties = usePropertyStore((store) => store.properties);
-  const filteredProperties = useMemo(
-    () =>
-      Object.values(cachedProperties).filter((property) =>
-        propertyCompliesFilter(property, propertiesFilter)
-      ),
-    [cachedProperties, propertiesFilter]
-  );
-
-  const togglePropertySelection = useCallback(
-    (propertyId: Property["id"]) => {
-      const alreadySelected = selectedProperties.some(
-        (selectedId) => selectedId === propertyId
-      );
-
-      //deselect
-      if (alreadySelected) {
-        setSelectedProperties((prevSelected) =>
-          prevSelected.filter((id) => id !== propertyId)
-        );
-        return;
-      }
-
-      //select
-      if (multiple) {
-        setSelectedProperties((prevSelected) => [...prevSelected, propertyId]);
-      } else {
-        setSelectedProperties([propertyId]);
-      }
-    },
-    [selectedProperties, multiple]
+  const filteredPropertyIds = usePropertyStore(
+    searchResultByStringFilter(JSON.stringify(propertiesFilter))
   );
 
   const toggleFiltersVisibility = useCallback(
@@ -102,10 +59,8 @@ export default function SearchProperties({
     [filtersVisible]
   );
 
-  //searchProperties effect
+  // searchProperties effect
   useEffect(() => {
-    console.log(`ListProperties -> effect [searchProperties]`);
-
     setSearchPropertiesResponse(undefined);
     setSearchingProperties(true);
     searchProperties(propertiesFilter)
@@ -123,63 +78,20 @@ export default function SearchProperties({
       justifyContent="space-between"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Box
-        overflow="auto"
-        border="2px solid black"
-        borderRadius={1}
-        sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
-      >
-        {searchPropertiesResponse?.error && (
-          <Typography variant="h6" align="center" color="error">
-            {searchPropertiesResponse.error.message}
-          </Typography>
-        )}
-        {!searchPropertiesResponse?.error && (
-          <>
-            {!searchingProperties && filteredProperties.length === 0 ? (
-              <Typography variant="h6" align="center" color="warning">
-                No property(es) found
-              </Typography>
-            ) : (
-              <List dense>
-                {filteredProperties.map((property, index) => (
-                  <ListItem
-                    key={`list-property-${index}`}
-                    disablePadding
-                    secondaryAction={
-                      <IconButton
-                        onClick={() => setViewPropertyId(property.id)}
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemButton
-                      onClick={
-                        onSelect
-                          ? () => togglePropertySelection(property.id)
-                          : undefined
-                      }
-                    >
-                      {onSelect && (
-                        <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            checked={selectedProperties.includes(property.id)}
-                            tabIndex={-1}
-                            disableRipple
-                          />
-                        </ListItemIcon>
-                      )}
-                      <ListItemText primary={property.address} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </>
-        )}
-      </Box>
+      {searchPropertiesResponse?.error && (
+        <Typography variant="h6" align="center" color="error">
+          {searchPropertiesResponse.error.message}
+        </Typography>
+      )}
+      {!searchPropertiesResponse?.error && (
+        <ListProperties
+          propertyIds={filteredPropertyIds ?? []}
+          selected={selectedProperties}
+          onSelect={onSelect ? setSelectedProperties : undefined}
+          multiselect={multiselect}
+          flexGrow={1}
+        />
+      )}
 
       <Stack spacing={1}>
         <Stack spacing={filtersVisible ? 1 : 0}>
@@ -195,6 +107,7 @@ export default function SearchProperties({
                   ? undefined
                   : `Filters (${countDefinedAttributes(propertiesFilter)})`
               }
+              disabled={searchingProperties}
               color="primary"
               onClick={toggleFiltersVisibility}
               size="small"
@@ -207,30 +120,18 @@ export default function SearchProperties({
             />
           </Collapse>
         </Stack>
-
-        {onSelect && (
-          <ComponentsField
-            label="Selected"
-            components={selectedProperties.map((selectedId) => (
-              <Chip
-                label={selectedId}
-                onDelete={() => togglePropertySelection(selectedId)}
-              />
-            ))}
-          />
-        )}
         <Stack
           direction="row"
           alignItems="center"
           justifyContent="end"
-          spacing={2}
+          spacing={1}
         >
           <Button
             variant="contained"
             color="success"
             onClick={() => setCreatePropertyModalOpen(true)}
           >
-            New property
+            New Property
           </Button>
           {onSelect && (
             <>
@@ -253,18 +154,11 @@ export default function SearchProperties({
       </Stack>
 
       <CustomModal
-        title="Create property"
+        title="Create Property"
         open={createPropertyModalOpen}
         onClose={() => setCreatePropertyModalOpen(false)}
       >
         <CreateProperty onCreate={() => setCreatePropertyModalOpen(false)} />
-      </CustomModal>
-      <CustomModal
-        title={`View property: ${viewPropertyId}`}
-        open={viewPropertyId != undefined}
-        onClose={() => setViewPropertyId(undefined)}
-      >
-        <ViewProperty propertyId={viewPropertyId ?? 0} />
       </CustomModal>
     </Stack>
   );
