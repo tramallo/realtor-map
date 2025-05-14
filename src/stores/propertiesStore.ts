@@ -10,6 +10,7 @@ export interface PropertyStore {
     properties: Record<Property["id"], Property | undefined>;
     searchResults: Record<string, Array<Property["id"]> | undefined>;
     fetchProperty: (propertyId: Property["id"]) => Promise<OperationResponse>;
+    fetchProperties: (propertyIds: Array<Property["id"]>) => Promise<OperationResponse>;
     searchProperties: (filter: PropertyFilter) => Promise<OperationResponse>;
     createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
     updateProperty: (propertyId: Property['id'], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
@@ -186,6 +187,29 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             }
 
             return { data: undefined };
+        },
+        fetchProperties: async (propertyIds) => {
+            console.log(`propertyStore -> fetchProperties - propertyIds: ${propertyIds}`);
+
+            const { properties: storedProperties } = get();
+            
+            const nonStoredProperties = propertyIds.filter((propertyId) => storedProperties[propertyId] == undefined);
+
+            if (nonStoredProperties.length == 0) {
+                return { data: undefined };
+            }
+
+            const { data: properties, error } = await backendApi.getProperties(propertyIds);
+
+            if (error) {
+                return { error };
+            }
+
+            if (properties) {
+                storeProperties(properties);
+            }
+
+            return { data: undefined }
         },
         searchProperties: async (filter) => {
             const filterAsString = JSON.stringify(filter);
