@@ -60,6 +60,7 @@ export default function Navigation({ slides, children }: NavigationProps) {
               key={`nav-button-${slide.label}-${index}`}
               onClick={() => setActiveSlideIndex(index)}
               variant="contained"
+              color={activeSlideIndex == index ? "secondary" : "primary"}
               sx={{ flex: 1, borderRadius: 0 }}
             >
               {slide.label}
