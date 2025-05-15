@@ -15,7 +15,6 @@ export function CustomCalendarDay({
     }
 
     const colorDegrees = 360 / highlightColors.length;
-
     const gradient = `conic-gradient(${highlightColors
       .map(
         (color, index) =>
@@ -31,7 +30,7 @@ export function CustomCalendarDay({
       {...props}
       sx={{
         ...props.sx,
-        background: highlightColors ? highlightGradient : undefined,
+        background: highlightGradient,
       }}
     />
   );

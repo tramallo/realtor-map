@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, BoxProps, CircularProgress, Typography } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers";
-import { isSameDay } from "date-fns";
 
 import {
   CustomCalendarDay,
@@ -9,10 +8,13 @@ import {
 } from "../CustomCalendarDay";
 import { useContractStore } from "../../stores/contractsStore";
 import {
+  dateToTimestamp,
   OperationResponse,
-  timestampToDate,
+  timestampToDDMMYYString,
 } from "../../utils/helperFunctions";
 import { Contract } from "../../utils/data-schema";
+import CustomModal from "../CustomModal";
+import { ListContracts } from "./ListContracts";
 
 export type CalendarContractsProps = BoxProps & {
   contractIds: Array<Contract["id"]>;
@@ -30,11 +32,19 @@ export function CalendarContracts({
     undefined as OperationResponse | undefined
   );
 
-  const highlightedDates = useMemo((): Array<{
-    date: Date;
-    colors: string[];
-  }> => {
-    const highlightsObject: Record<number, string[]> = {};
+  //controls modal open state
+  const [viewContractsDate, setViewContractsDate] = useState(
+    undefined as string | undefined
+  );
+
+  const highlightedDates: Record<
+    string,
+    { colors: string[]; contractIds: Array<Contract["id"]> }
+  > = useMemo(() => {
+    const highlightsObject = {} as Record<
+      string,
+      { colors: string[]; contractIds: Array<Contract["id"]> }
+    >;
 
     contractIds.forEach((contractId) => {
       const contract = contracts[contractId];
@@ -42,33 +52,34 @@ export function CalendarContracts({
         return;
       }
 
-      if (!highlightsObject[contract.start]) {
-        highlightsObject[contract.start] = ["green"];
+      const contractStartAsString = timestampToDDMMYYString(contract.start)!;
+      if (!highlightsObject[contractStartAsString]) {
+        highlightsObject[contractStartAsString] = {
+          colors: ["green"],
+          contractIds: [contractId],
+        };
       } else {
-        if (highlightsObject[contract.start].includes("green")) {
-          return;
+        highlightsObject[contractStartAsString].contractIds.push(contractId);
+        if (!highlightsObject[contractStartAsString].colors.includes("green")) {
+          highlightsObject[contractStartAsString].colors.push("green");
         }
-        highlightsObject[contract.start].push("green");
       }
 
-      if (!highlightsObject[contract.end]) {
-        highlightsObject[contract.end] = ["orange"];
+      const contractEndAsString = timestampToDDMMYYString(contract.end)!;
+      if (!highlightsObject[contractEndAsString]) {
+        highlightsObject[contractEndAsString] = {
+          colors: ["orange"],
+          contractIds: [contractId],
+        };
       } else {
-        if (highlightsObject[contract.end].includes("orange")) {
-          return;
+        highlightsObject[contractEndAsString].contractIds.push(contractId);
+        if (!highlightsObject[contractEndAsString].colors.includes("orange")) {
+          highlightsObject[contractEndAsString].colors.push("orange");
         }
-        highlightsObject[contract.end].push("orange");
       }
     });
 
-    const objectEntries = Object.entries(highlightsObject) as unknown as Array<
-      [number, string[]]
-    >;
-
-    return objectEntries.map(([timestamp, colors]) => ({
-      date: timestampToDate(timestamp)!,
-      colors: colors,
-    }));
+    return highlightsObject;
   }, [contractIds, contracts]);
 
   // fetchContracts effect
@@ -105,14 +116,37 @@ export function CalendarContracts({
         showDaysOutsideCurrentMonth
         slots={{ day: CustomCalendarDay }}
         slotProps={{
-          day: (ownerState) =>
-            ({
-              highlightColors: highlightedDates.find((highlight) =>
-                isSameDay(highlight.date, ownerState.day)
-              )?.colors,
-            } as CustomCalendarDayProps),
+          day: (ownerState): Partial<CustomCalendarDayProps> => {
+            const ownerDayAsString = timestampToDDMMYYString(
+              dateToTimestamp(ownerState.day)!
+            )!;
+
+            const highlightDay = highlightedDates[ownerDayAsString];
+
+            if (!highlightDay) {
+              return {};
+            }
+
+            return {
+              highlightColors: highlightDay.colors,
+              onClick: () => setViewContractsDate(ownerDayAsString),
+            };
+          },
         }}
       />
+      <CustomModal
+        title={`Contracts at ${viewContractsDate}`}
+        open={viewContractsDate != undefined}
+        onClose={() => setViewContractsDate(undefined)}
+      >
+        <Box padding={1}>
+          <ListContracts
+            contractIds={
+              highlightedDates[viewContractsDate!]?.contractIds ?? []
+            }
+          />
+        </Box>
+      </CustomModal>
     </Box>
   );
 }
