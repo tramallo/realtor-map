@@ -5,7 +5,7 @@ import { Person } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
 import PersonChip from "./PersonChip";
 import CustomModal from "./CustomModal";
-import SearchPersons from "./persons/SearchPersons";
+import { SelectPerson } from "./persons/SelectPerson";
 
 export interface PersonFieldProps {
   label?: string;
@@ -65,7 +65,7 @@ export default function PersonField({
         open={selectPersonModalOpen}
         onClose={() => setSelectPersonModalOpen(false)}
       >
-        <SearchPersons
+        <SelectPerson
           defaultSelected={selected}
           onSelect={onPersonSelect}
           multiselect={multiple}

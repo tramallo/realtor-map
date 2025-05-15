@@ -5,7 +5,7 @@ import { Realtor } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
 import RealtorChip from "./RealtorChip";
 import CustomModal from "./CustomModal";
-import SearchRealtors from "./realtors/SearchRealtors";
+import { SelectRealtor } from "./realtors/SelectRealtor";
 
 export interface RealtorFieldProps {
   label?: string;
@@ -65,10 +65,10 @@ export default function RealtorField({
         open={selectRealtorModalOpen}
         onClose={() => setSelectRealtorModalOpen(false)}
       >
-        <SearchRealtors
+        <SelectRealtor
           defaultSelected={selected}
           onSelect={onRealtorSelect}
-          multiple={multiple}
+          multiselect={multiple}
         />
       </CustomModal>
     </Box>

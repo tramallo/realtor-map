@@ -47,13 +47,7 @@ export default function MapProperties({
   }, [propertyIds, fetchProperties]);
 
   return (
-    <Box
-      {...boxProps}
-      sx={(theme) => ({
-        backgroundColor: theme.palette.grey[500],
-        position: "relative",
-      })}
-    >
+    <Box {...boxProps} position="relative">
       <MemoMap mapTilesService={osmMapTilesService}>
         {propertyIds.map((propertyId, index) => {
           if (cachedProperties[propertyId]) {

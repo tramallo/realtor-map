@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 
@@ -27,7 +27,7 @@ export function PropertiesLayout() {
       boxSizing="border-box"
       sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
-      <Stack spacing={1} height="100%">
+      <Stack spacing={1} minHeight={0} flexGrow={1}>
         <Stack
           direction="row"
           alignItems="center"
@@ -40,13 +40,15 @@ export function PropertiesLayout() {
             <LocationOnIcon />
           </Button>
         </Stack>
-        {view == "map" ? (
-          <MapProperties propertyIds={searchResults} flexGrow={1} />
-        ) : (
-          <ListProperties propertyIds={searchResults} />
-        )}
+        <Box overflow="auto" height="100%">
+          {view == "map" ? (
+            <MapProperties propertyIds={searchResults} height="100%" />
+          ) : (
+            <ListProperties propertyIds={searchResults} />
+          )}
+        </Box>
       </Stack>
-      <Stack spacing={1}>
+      <Stack spacing={1} minHeight="auto">
         <SearchProperties onSearch={setSearchResults} />
         <Stack
           direction="row"

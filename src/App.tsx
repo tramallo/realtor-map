@@ -1,24 +1,22 @@
 import { memo } from "react";
 
 import Navigation, { NavigationSlide } from "./components/Navigation";
-import SearchPersons from "./components/persons/SearchPersons";
-import SearchRealtors from "./components/realtors/SearchRealtors";
 import { Button } from "@mui/material";
 import { useAuthContext } from "./utils/helperFunctions";
-import { CalendarContracts } from "./components/contracts/CalendarContracts";
-import SearchContracts from "./components/contracts/SearchContracts";
 //import Test from "./layouts/Test";
 import { PropertiesLayout } from "./layouts/PropertiesLayout";
+import { ContractsLayout } from "./layouts/ContractsLayout";
+import { RealtorsLayout } from "./layouts/RealtorsLayout";
+import { PersonsLayout } from "./layouts/PersonsLayout";
 
 export function App() {
   const { endSession } = useAuthContext();
 
   const slides: NavigationSlide[] = [
     { label: "Properties", component: <PropertiesLayout /> },
-    { label: "Calendar", component: <CalendarContracts /> },
-    { label: "Persons", component: <SearchPersons /> },
-    { label: "Realtors", component: <SearchRealtors /> },
-    { label: "Contracts", component: <SearchContracts /> },
+    { label: "Persons", component: <PersonsLayout /> },
+    { label: "Realtors", component: <RealtorsLayout /> },
+    { label: "Contracts", component: <ContractsLayout /> },
     //{ label: "test", component: <Test /> },
   ];
 
