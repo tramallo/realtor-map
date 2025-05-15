@@ -56,6 +56,7 @@ export function PropertiesLayout() {
         >
           <Button
             variant="contained"
+            color="success"
             onClick={() => setCreatePropertyModalOpen(true)}
           >
             New property
