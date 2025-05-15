@@ -6,6 +6,7 @@ import {
   DialogProps,
   DialogTitle,
   Slide,
+  SlideProps,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -13,21 +14,23 @@ export type CustomModalProps = Omit<DialogProps, "children" | "onClose"> & {
   title: string;
   children: ReactNode;
   onClose?: () => void;
+  slideDirection?: SlideProps["direction"];
 };
 
 export default function CustomModal({
   title,
   children,
   onClose,
-  ...props
+  slideDirection = "up",
+  ...dialogProps
 }: CustomModalProps) {
   return (
     <Dialog
-      {...props}
+      {...dialogProps}
       slots={{ transition: Slide }}
       slotProps={{
         transition: {
-          direction: "up",
+          direction: slideDirection,
           timeout: 400,
         },
         paper: {

@@ -26,7 +26,11 @@ export function AppContextProvider({ children }: AppContenxtProviderProps) {
         onClose={() => setCurrentMessage("")}
         message={currentMessage}
       />
-      <CustomModal title="Login" open={userSession == undefined}>
+      <CustomModal
+        title="Login"
+        open={userSession == undefined}
+        slideDirection="down"
+      >
         <LoginPane />
       </CustomModal>
     </appContext.Provider>

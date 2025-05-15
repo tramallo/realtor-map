@@ -37,6 +37,7 @@ export function App() {
         title="User menu"
         open={userMenuOpen}
         onClose={() => setUserMenuOpen(false)}
+        slideDirection="left"
       >
         <UserMenu />
       </CustomModal>
