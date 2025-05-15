@@ -20,7 +20,7 @@ export function AppContextProvider({ children }: AppContenxtProviderProps) {
 
   return (
     <appContext.Provider value={{ notifyUser }}>
-      {children}
+      {userSession && children}
       <CustomSnackbar
         open={currentMessage != ""}
         onClose={() => setCurrentMessage("")}
