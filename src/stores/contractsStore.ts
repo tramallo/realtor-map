@@ -10,6 +10,7 @@ export interface ContractStore {
     contracts: Record<Contract["id"], Contract | undefined>;
     searchResults: Record<string, Array<Contract["id"]> | undefined>;
     fetchContract: (contractId: Contract["id"]) => Promise<OperationResponse>;
+    fetchContracts: (contractIds: Array<Contract["id"]>) => Promise<OperationResponse>;
     searchContracts: (filter: ContractFilter) => Promise<OperationResponse>;
     createContract: (newContractData: CreateContractDTO) => Promise<OperationResponse>;
     updateContract: (contractId: Contract["id"], updateData: UpdateContractDTO) => Promise<OperationResponse>;
@@ -188,6 +189,29 @@ export const useContractStore = create<ContractStore>((set, get) => {
             }
 
             return { data: undefined };
+        },
+        fetchContracts: async (contractIds) => {
+          console.log(`contractStore -> fetchContracts - contractIds: ${contractIds}`);
+
+          const { contracts: storedContracts } = get();
+
+          const nonStoredContracts = contractIds.filter((contractId) => storedContracts[contractId] == undefined);
+
+          if (nonStoredContracts.length == 0) {
+            return { data: undefined };
+          }
+
+          const { data: contracts, error } = await backendApi.getContracts(contractIds);
+
+          if (error) {
+            return { error };
+          }
+
+          if (contracts) {
+            storeContracts(contracts);
+          }
+
+          return { data: undefined };
         },
         searchContracts: async (filter) => {
             const filterAsString = JSON.stringify(filter)
