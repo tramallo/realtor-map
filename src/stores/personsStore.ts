@@ -10,6 +10,7 @@ export interface PersonStore {
     persons: Record<Person["id"], Person | undefined>;
     searchResults: Record<string, Array<Person["id"]> | undefined>;
     fetchPerson: (personId: Person["id"]) => Promise<OperationResponse>;
+    fetchPersons: (personIds: Array<Person["id"]>) => Promise<OperationResponse>;
     searchPersons: (filter: PersonFilter) => Promise<OperationResponse>;
     createPerson: (newPersonData: CreatePersonDTO) => Promise<OperationResponse>;
     updatePerson: (personId: Person["id"], updateData: UpdatePersonDTO) => Promise<OperationResponse>;
@@ -186,6 +187,29 @@ export const usePersonStore = create<PersonStore>((set, get) => {
             }
 
             return { data: undefined };
+        },
+        fetchPersons: async (personIds) => {
+          console.log(`personStore -> fetchPersons - personIds: ${personIds}`);
+
+          const { persons: storedPersons } = get();
+
+          const nonStoredPersonIds = personIds.filter((personId) => storedPersons[personId] == undefined);
+
+          if (nonStoredPersonIds.length == 0) {
+            return { data: undefined };
+          }
+
+          const { data: persons, error } = await backendApi.getPersons(personIds);
+
+          if (error) {
+            return { error };
+          }
+
+          if (persons) {
+            storePersons(persons);
+          }
+
+          return { data: undefined };
         },
         searchPersons: async (filter) => {
             const filterAsString = JSON.stringify(filter);

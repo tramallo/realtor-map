@@ -28,6 +28,7 @@ export interface RealtorStore {
     realtors: Record<Realtor["id"], Realtor | undefined>;
     searchResults: Record<string, Array<Realtor["id"]> | undefined>;
     fetchRealtor: (realtorId: Realtor["id"]) => Promise<OperationResponse>;
+    fetchRealtors: (realtorIds: Array<Realtor["id"]>) => Promise<OperationResponse>;
     searchRealtors: (filter: RealtorFilter) => Promise<OperationResponse>;
     createRealtor: (newRealtorData: CreateRealtorDTO) => Promise<OperationResponse>;
     updateRealtor: (realtorId: Realtor['id'], updateData: UpdateRealtorDTO) => Promise<OperationResponse>;
@@ -186,6 +187,29 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             }
 
             return { data: undefined };
+        },
+        fetchRealtors: async (realtorIds) => {
+          console.log(`realtorStore -> fetchRealtors - realtorIds: ${realtorIds}`);
+
+          const { realtors: storedRealtors } = get();
+
+          const nonStoredRealtorIds = realtorIds.filter((realtorId) => storedRealtors[realtorId] == undefined);
+
+          if (nonStoredRealtorIds.length == 0) {
+            return { data: undefined };
+          }
+
+          const { data: realtors, error } = await backendApi.getRealtors(realtorIds);
+
+          if (error) {
+            return { error };
+          }
+
+          if (realtors) {
+            storeRealtors(realtors);
+          }
+
+          return { data: undefined };
         },
         searchRealtors: async (filter) => {
             const filterAsString = JSON.stringify(filter);
