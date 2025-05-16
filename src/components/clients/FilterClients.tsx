@@ -3,20 +3,20 @@ import { Grid2 } from "@mui/material";
 
 import FilterBaseData from "../FilterBaseData";
 import { CustomTextField } from "../CustomTextField";
-import { PersonFilter } from "../../utils/data-filter-schema";
+import { ClientFilter } from "../../utils/data-filter-schema";
 
-export interface FilterPersonsProps {
-  filter: PersonFilter;
-  onChange: (newValue: PersonFilter) => void;
+export interface FilterClientsProps {
+  filter: ClientFilter;
+  onChange: (newValue: ClientFilter) => void;
 }
 
-export function FilterPersons({ filter, onChange }: FilterPersonsProps) {
+export function FilterClients({ filter, onChange }: FilterClientsProps) {
   console.log(
-    `FilterPersons -> render - defaultFilter: ${JSON.stringify(filter)}`
+    `FilterClients -> render - defaultFilter: ${JSON.stringify(filter)}`
   );
 
   const setFilterValue = useCallback(
-    (value: Partial<PersonFilter>) => {
+    (value: Partial<ClientFilter>) => {
       onChange({ ...filter, ...value });
     },
     [filter, onChange]
@@ -62,4 +62,4 @@ export function FilterPersons({ filter, onChange }: FilterPersonsProps) {
   );
 }
 
-export const MemoFilterPersons = memo(FilterPersons);
+export const MemoFilterPersons = memo(FilterClients);

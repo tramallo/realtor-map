@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
 
-import { CreatePersonDTO, createPersonDTO } from "../../utils/data-schema";
+import { CreateClientDTO, createClientDTO } from "../../utils/data-schema";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
@@ -9,56 +9,56 @@ import {
   useAppContext,
   useAuthContext,
 } from "../../utils/helperFunctions";
-import { usePersonStore } from "../../stores/personsStore";
+import { useClientStore } from "../../stores/clientsStore";
 import { FormTextField } from "../form/FormTextField";
 
-export interface CreatePersonProps {
-  prefillPerson?: Partial<CreatePersonDTO>;
+export interface CreateClientProps {
+  prefillClient?: Partial<CreateClientDTO>;
   onCreate?: () => void;
 }
 
-export default function CreatePerson({
-  prefillPerson,
+export default function CreateClient({
+  prefillClient,
   onCreate,
-}: CreatePersonProps) {
+}: CreateClientProps) {
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
-  const createPerson = usePersonStore((store) => store.createPerson);
+  const createClient = useClientStore((store) => store.createClient);
 
-  const [creatingPerson, setCreatingPerson] = useState(false);
+  const [creatingClient, setCreatingClient] = useState(false);
 
   const prefillData = useMemo(
     () =>
       ({
-        ...prefillPerson,
+        ...prefillClient,
         createdBy: userSession?.user.id,
         createdAt: dateToTimestamp(new Date()),
-      } as CreatePersonDTO),
-    [prefillPerson, userSession]
+      } as CreateClientDTO),
+    [prefillClient, userSession]
   );
 
   const onSubmit = useCallback(
-    async (newPersonData: CreatePersonDTO) => {
-      setCreatingPerson(true);
-      const createResponse = await createPerson(newPersonData);
-      setCreatingPerson(false);
+    async (newClientData: CreateClientDTO) => {
+      setCreatingClient(true);
+      const createResponse = await createClient(newClientData);
+      setCreatingClient(false);
 
       if (createResponse.error) {
-        notifyUser("Error. Person not created.");
+        notifyUser("Error. Client not created.");
         return;
       }
 
-      notifyUser("Person created.");
+      notifyUser("Client created.");
       if (onCreate) {
         onCreate();
       }
     },
-    [createPerson, notifyUser, onCreate]
+    [createClient, notifyUser, onCreate]
   );
 
   return (
-    <MemoForm<typeof createPersonDTO>
-      schema={createPersonDTO}
+    <MemoForm<typeof createClientDTO>
+      schema={createClientDTO}
       prefillData={prefillData}
     >
       <Stack spacing={2} padding={1}>
@@ -76,8 +76,8 @@ export default function CreatePerson({
             onSubmit={onSubmit}
             label="Create"
             color="success"
-            loading={creatingPerson}
-            disabled={creatingPerson}
+            loading={creatingClient}
+            disabled={creatingClient}
           />
         </Stack>
       </Stack>

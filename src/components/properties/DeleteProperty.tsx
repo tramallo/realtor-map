@@ -13,7 +13,7 @@ import {
 } from "../../stores/propertiesStore";
 import { Property, UpdatePropertyDTO } from "../../utils/data-schema";
 import ComponentsField from "../ComponentsField";
-import PersonChip from "../PersonChip";
+import ClientChip from "../ClientChip";
 import RealtorChip from "../RealtorChip";
 import {
   dateToTimestamp,
@@ -137,7 +137,7 @@ export default function DeleteProperty({
           {cachedProperty.owner && (
             <ComponentsField
               label="owner"
-              components={[<PersonChip personId={cachedProperty.owner} />]}
+              components={[<ClientChip clientId={cachedProperty.owner} />]}
             />
           )}
           {cachedProperty.exclusiveRealtor && (

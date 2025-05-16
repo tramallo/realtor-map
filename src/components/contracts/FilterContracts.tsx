@@ -3,7 +3,7 @@ import { Grid2 } from "@mui/material";
 
 import { ContractFilter } from "../../utils/data-filter-schema";
 import FilterBaseData from "../FilterBaseData";
-import PersonField from "../PersonField";
+import ClientField from "../ClientField";
 import PropertyField from "../PropretyField";
 import DateField from "../DateField";
 
@@ -27,7 +27,7 @@ export function FilterContracts({ filter, onChange }: FilterContractsProps) {
   return (
     <Grid2 container spacing={1}>
       <Grid2 size={4}>
-        <PersonField
+        <ClientField
           label="Client"
           selected={filter.client ? [filter.client] : []}
           onSelect={(newValue) => setFilterValue({ client: newValue[0] })}

@@ -2,11 +2,11 @@ import { ComponentProps } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import PersonField from "./PersonField";
+import ClientField from "./ClientField";
 import ComponentsField from "./ComponentsField";
-import PersonChip from "./PersonChip";
+import ClientChip from "./ClientChip";
 import CustomModal from "./CustomModal";
-import SearchPersons from "./persons/SearchPersons";
+import SearchClients from "./clients/SearchClients";
 
 // mock dependencies
 vi.mock("./ComponentsField", () => ({
@@ -24,10 +24,10 @@ vi.mock("./ComponentsField", () => ({
 }));
 
 vi.mock("./PersonChip", () => ({
-  default: vi.fn((props: ComponentProps<typeof PersonChip>) => (
-    <div data-testid={`person-chip-${props.personId}`}>
+  default: vi.fn((props: ComponentProps<typeof ClientChip>) => (
+    <div data-testid={`person-chip-${props.clientId}`}>
       <button
-        data-testid={`person-chip-close-${props.personId}`}
+        data-testid={`person-chip-close-${props.clientId}`}
         onClick={props.onClose}
       />
     </div>
@@ -41,7 +41,7 @@ vi.mock("./CustomModal", () => ({
 }));
 
 vi.mock("./persons/ListPersons", () => ({
-  default: vi.fn((props: ComponentProps<typeof SearchPersons>) => (
+  default: vi.fn((props: ComponentProps<typeof SearchClients>) => (
     <div data-testid="list-persons">
       {props.onSelect && (
         <button
@@ -67,7 +67,7 @@ describe("PersonField", () => {
         onSelect: vi.fn(),
       };
 
-      render(<PersonField {...testProps} />);
+      render(<ClientField {...testProps} />);
 
       expect(ComponentsField).toHaveBeenCalledWith(
         expect.objectContaining({ label: labelTest }),
@@ -85,7 +85,7 @@ describe("PersonField", () => {
         onSelect: vi.fn(),
       };
 
-      render(<PersonField {...testProps} />);
+      render(<ClientField {...testProps} />);
 
       expect(ComponentsField).toHaveBeenCalledWith(
         expect.objectContaining({ errorMessage: errorMessageTest }),
@@ -103,14 +103,14 @@ describe("PersonField", () => {
         onSelect: vi.fn(),
       };
 
-      render(<PersonField {...testProps} />);
+      render(<ClientField {...testProps} />);
 
       const openListButton = screen.getByTestId(
         "open-list-persons-modal-button"
       );
       fireEvent.click(openListButton);
 
-      expect(SearchPersons).toHaveBeenCalledWith(
+      expect(SearchClients).toHaveBeenCalledWith(
         expect.objectContaining({ multiple: multipleTest }),
         expect.anything()
       );
@@ -127,7 +127,7 @@ describe("PersonField", () => {
           readOnly: readOnlyTest,
         };
 
-        render(<PersonField {...testProps} />);
+        render(<ClientField {...testProps} />);
 
         expect(ComponentsField).toHaveBeenCalledWith(
           expect.objectContaining({ readOnly: readOnlyTest }),
@@ -143,13 +143,13 @@ describe("PersonField", () => {
         readOnly: true,
       };
 
-      render(<PersonField {...testProps} />);
+      render(<ClientField {...testProps} />);
 
       expect(ComponentsField).toHaveBeenCalledWith(
         expect.objectContaining({ onActionButtonClick: undefined }),
         expect.anything()
       );
-      expect(PersonChip).toHaveBeenCalledWith(
+      expect(ClientChip).toHaveBeenCalledWith(
         expect.objectContaining({ onClose: undefined }),
         expect.anything()
       );
@@ -163,7 +163,7 @@ describe("PersonField", () => {
       readOnly: true,
     };
 
-    render(<PersonField {...testProps} />);
+    render(<ClientField {...testProps} />);
 
     expect(screen.queryByTestId("open-list-persons-modal-button")).toBeNull();
   });
@@ -174,7 +174,7 @@ describe("PersonField", () => {
       onSelect: vi.fn(),
     };
 
-    render(<PersonField {...testProps} />);
+    render(<ClientField {...testProps} />);
 
     expect(screen.queryByTestId("list-persons")).toBeNull();
 
@@ -191,12 +191,12 @@ describe("PersonField", () => {
       onSelect: vi.fn(),
     };
 
-    render(<PersonField {...testProps} />);
+    render(<ClientField {...testProps} />);
 
     const openButton = screen.getByTestId("open-list-persons-modal-button");
     fireEvent.click(openButton);
 
-    expect(SearchPersons).toHaveBeenCalledWith(
+    expect(SearchClients).toHaveBeenCalledWith(
       expect.objectContaining({ defaultSelected: selectedIds }),
       expect.anything()
     );
@@ -210,7 +210,7 @@ describe("PersonField", () => {
       onSelect: onSelectMock,
     };
 
-    render(<PersonField {...testProps} />);
+    render(<ClientField {...testProps} />);
 
     const openButton = screen.getByTestId("open-list-persons-modal-button");
     fireEvent.click(openButton);
@@ -228,7 +228,7 @@ describe("PersonField", () => {
       onSelect: onSelectMock,
     };
 
-    render(<PersonField {...testProps} />);
+    render(<ClientField {...testProps} />);
 
     const closeButton = screen.getByTestId("person-chip-close-4");
     fireEvent.click(closeButton);
@@ -243,14 +243,14 @@ describe("PersonField", () => {
       onSelect: vi.fn(),
     };
 
-    render(<PersonField {...testProps} />);
+    render(<ClientField {...testProps} />);
 
     expect(ComponentsField).toHaveBeenCalledWith(
       expect.objectContaining({
         components: expect.arrayContaining([
-          expect.objectContaining({ type: PersonChip }),
-          expect.objectContaining({ type: PersonChip }),
-          expect.objectContaining({ type: PersonChip }),
+          expect.objectContaining({ type: ClientChip }),
+          expect.objectContaining({ type: ClientChip }),
+          expect.objectContaining({ type: ClientChip }),
         ]),
       }),
       expect.anything()

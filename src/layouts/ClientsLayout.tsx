@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
 
-import { Person } from "../utils/data-schema";
-import { ListPersons } from "../components/persons/ListPersons";
-import SearchPersons from "../components/persons/SearchPersons";
+import { Client } from "../utils/data-schema";
+import { ListPersons } from "../components/clients/ListClients";
+import SearchClients from "../components/clients/SearchClients";
 import CustomModal from "../components/CustomModal";
-import CreatePerson from "../components/persons/CreatePerson";
+import CreateClient from "../components/clients/CreateClient";
 
-export function PersonsLayout() {
-  const [searchResults, setSearchResults] = useState([] as Array<Person["id"]>);
-  const [createPersonModalOpen, setCreatePersonModalOpen] = useState(false);
+export function ClientsLayout() {
+  const [searchResults, setSearchResults] = useState([] as Array<Client["id"]>);
+  const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
 
   return (
     <Stack
@@ -22,11 +22,11 @@ export function PersonsLayout() {
     >
       <Stack spacing={1} minHeight={0}>
         <Box overflow="auto">
-          <ListPersons personIds={searchResults} />
+          <ListPersons clientIds={searchResults} />
         </Box>
       </Stack>
       <Stack spacing={1} minHeight={"auto"}>
-        <SearchPersons onSearch={setSearchResults} />
+        <SearchClients onSearch={setSearchResults} />
         <Stack
           direction="row"
           alignItems="center"
@@ -36,17 +36,17 @@ export function PersonsLayout() {
           <Button
             variant="contained"
             color="success"
-            onClick={() => setCreatePersonModalOpen(true)}
+            onClick={() => setCreateClientModalOpen(true)}
           >
-            New person
+            New client
           </Button>
         </Stack>
         <CustomModal
-          title="New person"
-          open={createPersonModalOpen}
-          onClose={() => setCreatePersonModalOpen(false)}
+          title="New client"
+          open={createClientModalOpen}
+          onClose={() => setCreateClientModalOpen(false)}
         >
-          <CreatePerson />
+          <CreateClient />
         </CustomModal>
       </Stack>
     </Stack>

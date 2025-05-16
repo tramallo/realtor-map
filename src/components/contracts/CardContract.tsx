@@ -20,7 +20,7 @@ import {
 import CustomModal from "../CustomModal";
 import ViewContract from "./ViewContract";
 import PropertyChip from "../PropertyChip";
-import PersonChip from "../PersonChip";
+import ClientChip from "../ClientChip";
 
 export interface CardContractProps {
   contractId: Contract["id"];
@@ -84,7 +84,7 @@ export function CardContract({
               />
             )}
             <PropertyChip propertyId={contract.property} />
-            <PersonChip personId={contract.client} />
+            <ClientChip clientId={contract.client} />
           </Stack>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography

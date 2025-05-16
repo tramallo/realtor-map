@@ -6,7 +6,7 @@ import Navigation, { NavigationSlide } from "./components/Navigation";
 import { PropertiesLayout } from "./layouts/PropertiesLayout";
 import { ContractsLayout } from "./layouts/ContractsLayout";
 import { RealtorsLayout } from "./layouts/RealtorsLayout";
-import { PersonsLayout } from "./layouts/PersonsLayout";
+import { ClientsLayout } from "./layouts/ClientsLayout";
 import CustomModal from "./components/CustomModal";
 import { UserMenu } from "./layouts/UserMenu";
 
@@ -16,7 +16,7 @@ export function App() {
   const slides: NavigationSlide[] = useMemo(
     () => [
       { label: "Properties", component: <PropertiesLayout /> },
-      { label: "Persons", component: <PersonsLayout /> },
+      { label: "Clients", component: <ClientsLayout /> },
       { label: "Realtors", component: <RealtorsLayout /> },
       { label: "Contracts", component: <ContractsLayout /> },
     ],

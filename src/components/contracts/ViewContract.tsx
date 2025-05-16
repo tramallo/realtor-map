@@ -18,7 +18,7 @@ import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import { CustomTextField } from "../CustomTextField";
 import PropertyField from "../PropretyField";
-import PersonField from "../PersonField";
+import ClientField from "../ClientField";
 import DateField from "../DateField";
 
 export interface ViewContractProps {
@@ -78,7 +78,7 @@ export default function ViewContract({ contractId }: ViewContractProps) {
             selected={[cachedContract.property]}
             onSelect={() => undefined}
           />
-          <PersonField
+          <ClientField
             label="Client"
             selected={[cachedContract.client]}
             onSelect={() => undefined}

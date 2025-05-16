@@ -1,6 +1,6 @@
 import {
   AuthChangeEvent,
-  createClient,
+  createClient as createSupabaseClient,
   RealtimeChannel,
   Session,
   Subscription,
@@ -10,14 +10,14 @@ import { OperationResponse } from "../utils/helperFunctions";
 import {
   Contract,
   CreateContractDTO,
-  CreatePersonDTO,
+  CreateClientDTO,
   CreatePropertyDTO,
   CreateRealtorDTO,
-  Person,
+  Client,
   Property,
   Realtor,
   UpdateContractDTO,
-  UpdatePersonDTO,
+  UpdateClientDTO,
   UpdatePropertyDTO,
   UpdateRealtorDTO,
 } from "../utils/data-schema";
@@ -25,7 +25,7 @@ import { BackendApi } from "../utils/services-interface";
 import {
   BaseDataFilter,
   ContractFilter,
-  PersonFilter,
+  ClientFilter,
   PropertyFilter,
   RealtorFilter,
 } from "../utils/data-filter-schema";
@@ -33,13 +33,13 @@ import {
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const client = createClient(supabaseUrl, key);
+const supabase = createSupabaseClient(supabaseUrl, key);
 
 // AUTH
 export const getSession = async (): Promise<OperationResponse<Session>> => {
   console.log(`supabase -> getSession`);
 
-  const { data, error } = await client.auth.getSession();
+  const { data, error } = await supabase.auth.getSession();
 
   if (!data.session) {
     const e = new Error(`getSession -> Session not found. Error: ${error}`);
@@ -55,7 +55,7 @@ export const onAuthStateChange = (
 ): OperationResponse<Subscription> => {
   console.log(`supabase -> onAuthStateChange: register callback`);
 
-  const { data } = client.auth.onAuthStateChange(callback);
+  const { data } = supabase.auth.onAuthStateChange(callback);
   return { data: data.subscription };
 };
 
@@ -65,7 +65,7 @@ export const signInWithPassword = async (
 ): Promise<OperationResponse<Session>> => {
   console.log(`supabase -> signInWithPassword: sign in user: ${email}`);
 
-  const { data, error } = await client.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -80,7 +80,7 @@ export const signInWithPassword = async (
 export const logout = async (): Promise<OperationResponse> => {
   console.log(`supabase -> logout`);
 
-  const { error } = await client.auth.signOut();
+  const { error } = await supabase.auth.signOut();
 
   if (error) {
     return { error };
@@ -91,7 +91,7 @@ export const logout = async (): Promise<OperationResponse> => {
 
 // SQL
 const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
-  const query = client.from(tableName).select("id");
+  const query = supabase.from(tableName).select("id");
 
   if (filter.idEq) {
     query.in("id", filter.idEq);
@@ -159,8 +159,8 @@ const queryConstructor = {
 
     return query;
   },
-  searchPersonIdsQuery: (filter: PersonFilter) => {
-    const query = searchBaseDataIdsQuery(filter, "person");
+  searchClientIdsQuery: (filter: ClientFilter) => {
+    const query = searchBaseDataIdsQuery(filter, "client");
 
     if (filter.name) {
       const filterWords = filter.name.split(" ");
@@ -223,7 +223,7 @@ const getProperties = async (
   propertyIds: Array<Property["id"]>
 ): Promise<OperationResponse<Array<Property>>> => {
   console.log(`supabase -> getProperties propertyIds: ${propertyIds}`);
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("property")
     .select()
     .in("id", propertyIds);
@@ -240,7 +240,7 @@ const createProperty = async (
   newPropertyData: CreatePropertyDTO
 ): Promise<OperationResponse> => {
   console.log(`supabase -> createProperty ${newPropertyData.address}`);
-  const { error } = await client.from("property").insert(newPropertyData);
+  const { error } = await supabase.from("property").insert(newPropertyData);
 
   if (error) {
     const e = new Error(`createProperty -> error: ${error.message}`);
@@ -255,7 +255,7 @@ const updateProperty = async (
   updateData: UpdatePropertyDTO
 ): Promise<OperationResponse> => {
   console.log(`supabase -> updateProperty ${propertyId}`);
-  const { error } = await client
+  const { error } = await supabase
     .from("property")
     .update(updateData)
     .eq("id", propertyId);
@@ -272,7 +272,10 @@ const deleteProperty = async (
   propertyId: Property["id"]
 ): Promise<OperationResponse> => {
   console.log(`supabase -> deleteProperty ${propertyId}`);
-  const { error } = await client.from("property").delete().eq("id", propertyId);
+  const { error } = await supabase
+    .from("property")
+    .delete()
+    .eq("id", propertyId);
 
   if (error) {
     const e = new Error(`deleteProperty -> error: ${error.message}`);
@@ -292,7 +295,7 @@ const invalidateProperties = async (
     return { data: [] };
   }
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("property")
     .select("id")
     .in("id", propertyIds)
@@ -326,7 +329,7 @@ const propertiesSubscribe = async (
     }
   }
 
-  propertyChannel = client
+  propertyChannel = supabase
     .channel("realtime-properties")
     .on(
       "postgres_changes",
@@ -363,7 +366,7 @@ const propertiesUnsubscribe = async (): Promise<OperationResponse> => {
     return { data: undefined };
   }
 
-  client
+  supabase
     .removeChannel(propertyChannel)
     .then(() => {
       propertyChannel = undefined;
@@ -400,7 +403,7 @@ const getRealtors = async (
   realtorIds: Array<Realtor["id"]>
 ): Promise<OperationResponse<Array<Realtor>>> => {
   console.log(`supabase -> getRealtors realtorIds: ${realtorIds}`);
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("realtor")
     .select()
     .in("id", realtorIds);
@@ -417,7 +420,7 @@ const createRealtor = async (
   newRealtorData: CreateRealtorDTO
 ): Promise<OperationResponse> => {
   console.log(`supabase -> createRealtor ${newRealtorData.name}`);
-  const { error } = await client.from("realtor").insert(newRealtorData);
+  const { error } = await supabase.from("realtor").insert(newRealtorData);
 
   if (error) {
     const e = new Error(`createRealtor -> error: ${error.message}`);
@@ -432,7 +435,7 @@ const updateRealtor = async (
   updateData: UpdateRealtorDTO
 ): Promise<OperationResponse> => {
   console.log(`supabase -> updateRealtor ${realtorId}`);
-  const { error } = await client
+  const { error } = await supabase
     .from("realtor")
     .update(updateData)
     .eq("id", realtorId);
@@ -449,7 +452,7 @@ const deleteRealtor = async (
   realtorId: Realtor["id"]
 ): Promise<OperationResponse> => {
   console.log(`supabase -> deleteRealtor ${realtorId}`);
-  const { error } = await client.from("realtor").delete().eq("id", realtorId);
+  const { error } = await supabase.from("realtor").delete().eq("id", realtorId);
 
   if (error) {
     const e = new Error(`deleteRealtor -> error: ${error.message}`);
@@ -469,7 +472,7 @@ const invalidateRealtors = async (
     return { data: [] };
   }
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("realtor")
     .select("id")
     .in("id", realtorIds)
@@ -501,7 +504,7 @@ const realtorsSubscribe = async (
     }
   }
 
-  realtorChannel = client
+  realtorChannel = supabase
     .channel("realtime-realtors")
     .on(
       "postgres_changes",
@@ -538,7 +541,7 @@ const realtorsUnsubscribe = async (): Promise<OperationResponse> => {
     return { data: undefined };
   }
 
-  client
+  supabase
     .removeChannel(realtorChannel)
     .then(() => {
       realtorChannel = undefined;
@@ -553,152 +556,152 @@ const realtorsUnsubscribe = async (): Promise<OperationResponse> => {
   return { data: undefined };
 };
 
-// person
-let personChannel = undefined as RealtimeChannel | undefined;
-const searchPersonIds = async (
-  filter: PersonFilter
-): Promise<OperationResponse<Array<Person["id"]>>> => {
-  console.log(`supabase -> searchPersonIds`);
-  const query = queryConstructor.searchPersonIdsQuery(filter);
+// client
+let clientChannel = undefined as RealtimeChannel | undefined;
+const searchClientIds = async (
+  filter: ClientFilter
+): Promise<OperationResponse<Array<Client["id"]>>> => {
+  console.log(`supabase -> searchClientIds`);
+  const query = queryConstructor.searchClientIdsQuery(filter);
   const { data, error } = await query;
 
   if (error) {
-    const e = new Error(`searchPersonIds -> error: ${error.message}`);
+    const e = new Error(`searchClientIds -> error: ${error.message}`);
     console.log(e);
     return { error: e };
   }
 
-  const personIds = data.map((idObj) => idObj.id);
-  return { data: personIds };
+  const clientIds = data.map((idObj) => idObj.id);
+  return { data: clientIds };
 };
-const getPersons = async (
-  personIds: Array<Person["id"]>
-): Promise<OperationResponse<Array<Person>>> => {
-  console.log(`supabase -> getPersons personIds: ${personIds}`);
-  const { data, error } = await client
-    .from("person")
+const getClients = async (
+  clientIds: Array<Client["id"]>
+): Promise<OperationResponse<Array<Client>>> => {
+  console.log(`supabase -> getClients clientIds: ${clientIds}`);
+  const { data, error } = await supabase
+    .from("client")
     .select()
-    .in("id", personIds);
+    .in("id", clientIds);
 
   if (error) {
-    const e = new Error(`getPersons -> error: ${error.message}`);
+    const e = new Error(`getClients -> error: ${error.message}`);
     console.log(e);
     return { error: e };
   }
 
   return { data };
 };
-const createPerson = async (
-  newPersonData: CreatePersonDTO
+const createClient = async (
+  newClientData: CreateClientDTO
 ): Promise<OperationResponse> => {
-  console.log(`supabase -> createPerson ${newPersonData.name}`);
-  const { error } = await client.from("person").insert(newPersonData);
+  console.log(`supabase -> createClient ${newClientData.name}`);
+  const { error } = await supabase.from("client").insert(newClientData);
 
   if (error) {
-    const e = new Error(`createPerson -> error: ${error.message}`);
+    const e = new Error(`createClient -> error: ${error.message}`);
     console.log(e);
     return { error: e };
   }
 
   return { data: undefined };
 };
-const updatePerson = async (
-  personId: Person["id"],
-  updateData: UpdatePersonDTO
+const updateClient = async (
+  clientId: Client["id"],
+  updateData: UpdateClientDTO
 ): Promise<OperationResponse> => {
-  console.log(`supabase -> updatePerson ${personId}`);
-  const { error } = await client
-    .from("person")
+  console.log(`supabase -> updateClient - clientId: ${clientId}`);
+  const { error } = await supabase
+    .from("client")
     .update(updateData)
-    .eq("id", personId);
+    .eq("id", clientId);
 
   if (error) {
-    const e = new Error(`updatePerson -> error: ${error.message}`);
+    const e = new Error(`updateClient -> error: ${error.message}`);
     console.log(e);
     return { error: e };
   }
 
   return { data: undefined };
 };
-const deletePerson = async (
-  personId: Person["id"]
+const deleteClient = async (
+  clientId: Client["id"]
 ): Promise<OperationResponse> => {
-  console.log(`supabase -> deletePerson ${personId}`);
-  const { error } = await client.from("person").delete().eq("id", personId);
+  console.log(`supabase -> deleteClient - clientId: ${clientId}`);
+  const { error } = await supabase.from("client").delete().eq("id", clientId);
 
   if (error) {
-    const e = new Error(`deletePerson -> error: ${error.message}`);
+    const e = new Error(`deleteClient -> error: ${error.message}`);
     console.log(e);
     return { error: e };
   }
 
   return { data: undefined };
 };
-const invalidatePersons = async (
-  personIds: Array<Person["id"]>,
+const invalidateClients = async (
+  clientIds: Array<Client["id"]>,
   timestamp: number
-): Promise<OperationResponse<Array<Person["id"]>>> => {
-  console.log(`supabase -> invalidatePersons ${personIds}`);
+): Promise<OperationResponse<Array<Client["id"]>>> => {
+  console.log(`supabase -> invalidateClients - clientIds: ${clientIds}`);
 
-  if (personIds.length === 0) {
+  if (clientIds.length === 0) {
     return { data: [] };
   }
 
-  const { data, error } = await client
-    .from("person")
+  const { data, error } = await supabase
+    .from("client")
     .select("id")
-    .in("id", personIds)
+    .in("id", clientIds)
     .or(`updatedAt.is.NULL,updatedAt.lt.${timestamp}`);
 
   if (error) {
-    const e = new Error(`invalidatePersons -> error: ${error.message}`);
+    const e = new Error(`invalidateClients -> error: ${error.message}`);
     console.log(e);
     return { error: e };
   }
 
-  const validIds = data.map((person) => person.id);
+  const validIds = data.map((client) => client.id);
   return { data: validIds };
 };
-const personsSubscribe = async (
-  newPersonHandler: (newPerson: Person) => void,
-  updatedPersonHandler: (updatedPerson: Person) => void,
-  deletedPersonHandler: (deletedPerson: Person) => void
+const clientsSubscribe = async (
+  newClientHandler: (newClient: Client) => void,
+  updatedClientHandler: (updatedClient: Client) => void,
+  deletedClientHandler: (deletedClient: Client) => void
 ): Promise<OperationResponse> => {
-  console.log(`supabase -> personsSubscribe`);
+  console.log(`supabase -> clientsSubscribe`);
 
-  if (personChannel) {
-    console.log(`personsSubscribe -> Already subscribed: unsubscribing first`);
-    const { error } = await personsUnsubscribe();
+  if (clientChannel) {
+    console.log(`clientsSubscribe -> Already subscribed: unsubscribing first`);
+    const { error } = await clientsUnsubscribe();
 
     if (error) {
-      const e = new Error(`personsSubscribe -> error: ${error.message}`);
+      const e = new Error(`clientsSubscribe -> error: ${error.message}`);
       console.log(e);
       return { error: e };
     }
   }
 
-  personChannel = client
-    .channel("realtime-persons")
+  clientChannel = supabase
+    .channel("realtime-clients")
     .on(
       "postgres_changes",
-      { event: "INSERT", table: "person", schema: "public" },
-      (payload) => newPersonHandler(payload.new as Person)
+      { event: "INSERT", table: "client", schema: "public" },
+      (payload) => newClientHandler(payload.new as Client)
     )
     .on(
       "postgres_changes",
-      { event: "UPDATE", table: "person", schema: "public" },
-      (payload) => updatedPersonHandler(payload.new as Person)
+      { event: "UPDATE", table: "client", schema: "public" },
+      (payload) => updatedClientHandler(payload.new as Client)
     )
     .on(
       "postgres_changes",
-      { event: "DELETE", table: "person", schema: "public" },
-      (payload) => deletedPersonHandler(payload.old as Person)
+      { event: "DELETE", table: "client", schema: "public" },
+      (payload) => deletedClientHandler(payload.old as Client)
     );
 
-  personChannel.subscribe((_status, err) => {
+  clientChannel.subscribe((_status, err) => {
     if (err) {
-      personChannel = undefined;
-      const e = new Error(`personsSubscribe -> error: ${err.message}`);
+      clientChannel = undefined;
+      const e = new Error(`clientsSubscribe -> error: ${err.message}`);
       console.log(e);
       return { error: e };
     }
@@ -706,22 +709,22 @@ const personsSubscribe = async (
 
   return { data: undefined };
 };
-const personsUnsubscribe = async (): Promise<OperationResponse> => {
-  console.log(`supabase -> personsUnsubscribe`);
+const clientsUnsubscribe = async (): Promise<OperationResponse> => {
+  console.log(`supabase -> clientsUnsubscribe`);
 
-  if (!personChannel) {
-    console.log(`personsUnsubscribe -> Already unsubscribed`);
+  if (!clientChannel) {
+    console.log(`clientsUnsubscribe -> Already unsubscribed`);
     return { data: undefined };
   }
 
-  client
-    .removeChannel(personChannel)
+  supabase
+    .removeChannel(clientChannel)
     .then(() => {
-      personChannel = undefined;
+      clientChannel = undefined;
       return { data: undefined };
     })
     .catch((err) => {
-      const e = new Error(`personsUnsubscribe -> error: ${err.message}`);
+      const e = new Error(`clientsUnsubscribe -> error: ${err.message}`);
       console.log(e);
       return { error: e };
     });
@@ -751,7 +754,7 @@ const getContracts = async (
   contractIds: Array<Contract["id"]>
 ): Promise<OperationResponse<Array<Contract>>> => {
   console.log(`supabase -> getContracts contractIds: ${contractIds}`);
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("contract")
     .select()
     .in("id", contractIds);
@@ -770,7 +773,7 @@ const createContract = async (
   console.log(
     `supabase -> createContract property: ${newContractData.property} client: ${newContractData.client}`
   );
-  const { error } = await client.from("contract").insert(newContractData);
+  const { error } = await supabase.from("contract").insert(newContractData);
 
   if (error) {
     const e = new Error(`createContract -> error: ${error.message}`);
@@ -785,7 +788,7 @@ const updateContract = async (
   updateData: UpdateContractDTO
 ): Promise<OperationResponse> => {
   console.log(`supabase -> updateContract ${contractId}`);
-  const { error } = await client
+  const { error } = await supabase
     .from("contract")
     .update(updateData)
     .eq("id", contractId);
@@ -802,7 +805,10 @@ const deleteContract = async (
   contractId: Contract["id"]
 ): Promise<OperationResponse> => {
   console.log(`supabase -> deleteContract ${contractId}`);
-  const { error } = await client.from("contract").delete().eq("id", contractId);
+  const { error } = await supabase
+    .from("contract")
+    .delete()
+    .eq("id", contractId);
 
   if (error) {
     const e = new Error(`deleteContract -> error: ${error.message}`);
@@ -822,7 +828,7 @@ const invalidateContracts = async (
     return { data: [] };
   }
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from("contract")
     .select("id")
     .in("id", contractIds)
@@ -856,7 +862,7 @@ const contractsSubscribe = async (
     }
   }
 
-  contractChannel = client
+  contractChannel = supabase
     .channel("realtime-contracts")
     .on(
       "postgres_changes",
@@ -893,7 +899,7 @@ const contractsUnsubscribe = async (): Promise<OperationResponse> => {
     return { data: undefined };
   }
 
-  client
+  supabase
     .removeChannel(contractChannel)
     .then(() => {
       contractChannel = undefined;
@@ -909,15 +915,15 @@ const contractsUnsubscribe = async (): Promise<OperationResponse> => {
 };
 
 export const supabaseApi: BackendApi = {
-  //person
-  searchPersonIds,
-  getPersons,
-  createPerson,
-  updatePerson,
-  deletePerson,
-  invalidatePersons,
-  personsSubscribe,
-  personsUnsubscribe,
+  //client
+  searchClientIds,
+  getClients,
+  createClient,
+  updateClient,
+  deleteClient,
+  invalidateClients,
+  clientsSubscribe,
+  clientsUnsubscribe,
   //realtor
   searchRealtorIds,
   getRealtors,

@@ -1,10 +1,10 @@
 import { expect, it, describe } from "vitest";
 
-import { dataCompliesFilter, personCompliesFilter, propertyCompliesFilter, realtorCompliesFilter } from "./filter-evaluators";
+import { dataCompliesFilter, clientCompliesFilter, propertyCompliesFilter, realtorCompliesFilter } from "./filter-evaluators";
 import { 
     BaseData, 
     BaseFilterData, 
-    Person, 
+    Client, 
     PersonFilterData, 
     Property, 
     PropertyFilterData, 
@@ -469,7 +469,7 @@ describe("filter-evaluators", () => {
     })
 
     describe("personCompliesFilter", () => {
-        const person1: Person = {
+        const person1: Client = {
             id: 1,
             createdBy: 1,
             createdAt: dateToTimestamp(new Date("1999-05-15"))!,
@@ -482,21 +482,21 @@ describe("filter-evaluators", () => {
         describe("filter by name", () => {
             it("returns false when 'name' doesnt match filter", () => {
                 const filter: PersonFilterData = { name: "non.existent.name" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(false);
             })
 
             it("returns true when 'name' match filter", () => {
                 const filter: PersonFilterData = { name: "Timothy" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(true);
             })
 
             it("returns false when 'name' is undefined", () => {
                 const filter: PersonFilterData = { name: "Timothy" };
-                const result = personCompliesFilter({} as Person, filter);
+                const result = clientCompliesFilter({} as Client, filter);
 
                 expect(result).toBe(false);
             })
@@ -505,21 +505,21 @@ describe("filter-evaluators", () => {
         describe("filter by email", () => {
             it("returns false when 'email' value doesnt match filter", () => {
                 const filter: PersonFilterData = { email: "non.existent.email" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(false);
             })
 
             it("returns true when 'email' value match filter", () => {
                 const filter: PersonFilterData = { email: "timo@mail.com" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(true);
             })
 
             it("returns false when 'email' is undefined", () => {
                 const filter: PersonFilterData = { email: "timo@mail.com" };
-                const result = personCompliesFilter({} as Person, filter);
+                const result = clientCompliesFilter({} as Client, filter);
 
                 expect(result).toBe(false);
             })
@@ -528,21 +528,21 @@ describe("filter-evaluators", () => {
         describe("filter by mobile", () => {
             it("returns false when 'mobile' doesnt match filter", () => {
                 const filter: PersonFilterData = { mobile: "non.existent.mobile" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(false);
             })
 
             it("returns true when 'mobile' value match filter", () => {
                 const filter: PersonFilterData = { mobile: "091234567" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(true);
             })
 
             it("returns false when 'mobile' is undefined", () => {
                 const filter: PersonFilterData = { mobile: "091234567" };
-                const result = personCompliesFilter({} as Person, filter);
+                const result = clientCompliesFilter({} as Client, filter);
 
                 expect(result).toBe(false);
             })

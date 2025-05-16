@@ -24,7 +24,7 @@ export const PropertyTypesSchema = z.enum(propertyTypes);
 export const PropertyStatesSchema = z.enum(propertyStates);
 
 // entities
-export const personSchema = baseDataSchema.extend({
+export const clientSchema = baseDataSchema.extend({
     name: z.string(),
     mobile: z.string().optional(),
     email: z.string().email().optional()
@@ -61,12 +61,12 @@ export const updatePropertyDTO = propertySchema.omit({
     createdBy: true,
     createdAt: true
 }).partial()
-export const createPersonDTO = personSchema.omit({
+export const createClientDTO = clientSchema.omit({
     id: true,
     updatedBy: true,
     updatedAt: true,
 })
-export const updatePersonDTO = personSchema.omit({
+export const updateClientDTO = clientSchema.omit({
     id: true,
     createdBy: true,
     createdAt: true
@@ -97,15 +97,15 @@ export type PropertyState = z.infer<typeof PropertyStatesSchema>;
 export type Coordinates = z.infer<typeof coordinatesSchema>;
 
 export type BaseData = z.infer<typeof baseDataSchema>;
-export type Person = z.infer<typeof personSchema>;
+export type Client = z.infer<typeof clientSchema>;
 export type Realtor = z.infer<typeof realtorSchema>;
 export type Property = z.infer<typeof propertySchema>;
 export type Contract = z.infer<typeof contractSchema>;
 
 export type CreatePropertyDTO = z.infer<typeof createPropertyDTO>;
 export type UpdatePropertyDTO = z.infer<typeof updatePropertyDTO>;
-export type CreatePersonDTO = z.infer<typeof createPersonDTO>;
-export type UpdatePersonDTO = z.infer<typeof updatePersonDTO>
+export type CreateClientDTO = z.infer<typeof createClientDTO>;
+export type UpdateClientDTO = z.infer<typeof updateClientDTO>
 export type CreateRealtorDTO = z.infer<typeof createRealtorDTO>;
 export type UpdateRealtorDTO = z.infer<typeof updateRealtorDTO>;
 export type CreateContractDTO = z.infer<typeof createContractDTO>;

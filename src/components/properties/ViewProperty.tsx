@@ -14,7 +14,7 @@ import {
 import { Property } from "../../utils/data-schema";
 import UpdateProperty from "./UpdateProperty";
 import RealtorChip from "../RealtorChip";
-import PersonChip from "../PersonChip";
+import ClientChip from "../ClientChip";
 import ComponentsField from "../ComponentsField";
 import DeleteProperty from "./DeleteProperty";
 import DateField from "../DateField";
@@ -92,7 +92,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               label="Owner"
               components={
                 cachedProperty.owner
-                  ? [<PersonChip personId={cachedProperty.owner} />]
+                  ? [<ClientChip clientId={cachedProperty.owner} />]
                   : []
               }
             />

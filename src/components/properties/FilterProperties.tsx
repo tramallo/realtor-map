@@ -13,7 +13,7 @@ import {
   PropertyType,
   propertyTypes,
 } from "../../utils/data-schema";
-import PersonField from "../PersonField";
+import ClientField from "../ClientField";
 import RealtorField from "../RealtorField";
 import FilterBaseData from "../FilterBaseData";
 import { CustomTextField } from "../CustomTextField";
@@ -101,7 +101,7 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
         </FormControl>
       </Grid2>
       <Grid2 size={3}>
-        <PersonField
+        <ClientField
           label="Owner"
           selected={filter.ownerEq ? [filter.ownerEq] : []}
           onSelect={(newValue) =>

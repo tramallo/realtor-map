@@ -18,7 +18,7 @@ import {
   useAuthContext,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
-import PersonChip from "../PersonChip";
+import ClientChip from "../ClientChip";
 import PropertyChip from "../PropertyChip";
 import ComponentsField from "../ComponentsField";
 import { format } from "date-fns";
@@ -134,7 +134,7 @@ export default function DeleteContract({
           />
           <ComponentsField
             label="Client"
-            components={[<PersonChip personId={cachedContract.client} />]}
+            components={[<ClientChip clientId={cachedContract.client} />]}
           />
           <CustomTextField
             label="Start Date"

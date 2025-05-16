@@ -3,10 +3,10 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, CircularProgress } from "@mui/material";
 
-import PersonChip from "./PersonChip";
-import { Person } from "../utils/data-schema";
+import ClientChip from "./ClientChip";
+import { Client } from "../utils/data-schema";
 import CustomModal from "./CustomModal";
-import ViewPerson from "./persons/ViewPerson";
+import ViewClient from "./clients/ViewClient";
 
 // mock dependencies
 vi.mock("@mui/material", () => ({
@@ -20,10 +20,10 @@ vi.mock("@mui/material", () => ({
   CircularProgress: vi.fn(() => <div data-testid="circular-progress" />),
 }));
 
-let personsMock = {} as Record<Person["id"], Person>;
+let personsMock = {} as Record<Client["id"], Client>;
 const fetchPersonMock = vi.fn();
 vi.mock("../stores/personsStore", async (requireActual) => {
-  const actual = await requireActual<typeof import("../stores/personsStore")>();
+  const actual = await requireActual<typeof import("../stores/clientsStore")>();
 
   return {
     ...actual,
@@ -53,8 +53,8 @@ vi.mock("./CustomModal", () => ({
 }));
 
 vi.mock("./persons/ViewPerson", () => ({
-  default: vi.fn((props: ComponentProps<typeof ViewPerson>) => (
-    <div data-testid={`view-person-${props.personId}`} />
+  default: vi.fn((props: ComponentProps<typeof ViewClient>) => (
+    <div data-testid={`view-person-${props.clientId}`} />
   )),
 }));
 
@@ -66,14 +66,14 @@ describe("PersonChip", () => {
 
   it("renders without crashing", () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
     expect(screen.getByTestId("mui-chip")).toBeInTheDocument();
   });
 
   it("displays loading spinner when fetching person data", () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     expect(Chip).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -92,10 +92,10 @@ describe("PersonChip", () => {
   it("shows person name when fetch succeeds", async () => {
     const personId = 1;
     const personName = "John Doe";
-    personsMock[personId] = { id: personId, name: personName } as Person;
+    personsMock[personId] = { id: personId, name: personName } as Client;
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={personId} />);
+    render(<ClientChip clientId={personId} />);
 
     await waitFor(() => {
       expect(Chip).toHaveBeenCalledWith(
@@ -110,7 +110,7 @@ describe("PersonChip", () => {
       error: new Error("error message"),
     });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     await waitFor(() => {
       expect(Chip).toHaveBeenCalledWith(
@@ -125,7 +125,7 @@ describe("PersonChip", () => {
   it("shows 'Not found' when person is not in cache", async () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     await waitFor(() => {
       expect(Chip).toHaveBeenCalledWith(
@@ -140,7 +140,7 @@ describe("PersonChip", () => {
   it("opens view person modal when chip is clicked", async () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     fireEvent.click(screen.getByTestId("mui-chip"));
     await waitFor(() => {
@@ -152,7 +152,7 @@ describe("PersonChip", () => {
   it("closes modal when CustomModal onClose is triggered", async () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     fireEvent.click(screen.getByTestId("mui-chip"));
     await waitFor(() => {
@@ -171,12 +171,12 @@ describe("PersonChip", () => {
   it("displays ViewPerson component in modal with correct personId", async () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     fireEvent.click(screen.getByTestId("mui-chip"));
     await waitFor(() => {
       expect(screen.queryByTestId("view-person-1")).toBeInTheDocument();
-      expect(ViewPerson).toHaveBeenCalledWith(
+      expect(ViewClient).toHaveBeenCalledWith(
         expect.objectContaining({
           personId: 1,
         }),
@@ -189,7 +189,7 @@ describe("PersonChip", () => {
     const onCloseMock = vi.fn();
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} onClose={onCloseMock} />);
+    render(<ClientChip clientId={1} onClose={onCloseMock} />);
 
     expect(onCloseMock).not.toHaveBeenCalled();
     await waitFor(() => {
@@ -206,7 +206,7 @@ describe("PersonChip", () => {
   it("hides delete button when onClose prop is not provided", () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    render(<PersonChip personId={1} />);
+    render(<ClientChip clientId={1} />);
 
     expect(Chip).toHaveBeenCalledWith(
       expect.objectContaining({ onDelete: undefined }),
@@ -225,7 +225,7 @@ describe("PersonChip", () => {
         })
     );
 
-    render(<PersonChip personId={1} onClose={vi.fn()} />);
+    render(<ClientChip clientId={1} onClose={vi.fn()} />);
 
     expect(Chip).toHaveBeenCalledWith(
       expect.objectContaining({ onDelete: undefined }),
@@ -243,10 +243,10 @@ describe("PersonChip", () => {
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
     fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
-    const { rerender } = render(<PersonChip personId={1} />);
+    const { rerender } = render(<ClientChip clientId={1} />);
 
     await waitFor(() => expect(fetchPersonMock).toHaveBeenCalledWith(1));
-    rerender(<PersonChip personId={2} />);
+    rerender(<ClientChip clientId={2} />);
     await waitFor(() => expect(fetchPersonMock).toHaveBeenCalledWith(2));
   });
 });

@@ -1,8 +1,8 @@
-import { BaseDataFilter, ContractFilter, PersonFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
+import { BaseDataFilter, ContractFilter, ClientFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
 import { 
     BaseData, 
     Contract, 
-    Person, 
+    Client, 
     Property, 
     Realtor,
 } from "./data-schema";
@@ -69,10 +69,10 @@ export const realtorCompliesFilter = (realtor: Realtor, filter: RealtorFilter): 
     return true;
 }
 
-export const personCompliesFilter = (person: Person, filter: PersonFilter): boolean => {
-    if(!dataCompliesFilter(person, filter)) { return false }
+export const clientCompliesFilter = (client: Client, filter: ClientFilter): boolean => {
+    if(!dataCompliesFilter(client, filter)) { return false }
     if (filter.name) {
-        const lowercasePersonName = (person.name ?? "").toLowerCase();
+        const lowercasePersonName = (client.name ?? "").toLowerCase();
 
         const lowercaseNameFilter = filter.name.toLowerCase();
         const filterWords = lowercaseNameFilter.split(" ");
@@ -81,8 +81,8 @@ export const personCompliesFilter = (person: Person, filter: PersonFilter): bool
             return false;
         }
     }
-    if(filter.mobile && person.mobile != filter.mobile) { return false }
-    if(filter.email && person.email != filter.email) { return false }
+    if(filter.mobile && client.mobile != filter.mobile) { return false }
+    if(filter.email && client.email != filter.email) { return false }
 
     return true;
 }

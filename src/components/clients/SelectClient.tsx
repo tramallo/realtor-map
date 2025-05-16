@@ -1,21 +1,21 @@
 import { Button, Stack } from "@mui/material";
-import { Person } from "../../utils/data-schema";
-import { ListPersons } from "./ListPersons";
-import SearchPersons from "./SearchPersons";
+import { Client } from "../../utils/data-schema";
+import { ListPersons } from "./ListClients";
+import SearchClients from "./SearchClients";
 import { useState } from "react";
 
-export interface SelectPersonProps {
-  onSelect: (selected: Array<Person["id"]>) => void;
-  defaultSelected?: Array<Person["id"]>;
+export interface SelectClientProps {
+  onSelect: (selected: Array<Client["id"]>) => void;
+  defaultSelected?: Array<Client["id"]>;
   multiselect?: boolean;
 }
 
-export function SelectPerson({
+export function SelectClient({
   onSelect,
   defaultSelected,
   multiselect,
-}: SelectPersonProps) {
-  const [searchResult, setSearchResult] = useState([] as Array<Person["id"]>);
+}: SelectClientProps) {
+  const [searchResult, setSearchResult] = useState([] as Array<Client["id"]>);
   const [selected, setSelected] = useState(defaultSelected ?? []);
 
   return (
@@ -27,14 +27,14 @@ export function SelectPerson({
       height="100%"
     >
       <ListPersons
-        personIds={searchResult}
+        clientIds={searchResult}
         selected={selected}
         onSelect={setSelected}
         multiselect={multiselect}
         height="100%"
       />
       <Stack spacing={1}>
-        <SearchPersons onSearch={setSearchResult} />
+        <SearchClients onSearch={setSearchResult} />
         <Stack
           direction="row"
           alignItems="center"

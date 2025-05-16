@@ -14,7 +14,7 @@ export const baseDataFilterSchema = z.object({
     deleted: z.boolean().optional(),
 })
 
-export const personFilterSchema = baseDataFilterSchema.extend({
+export const clientFilterSchema = baseDataFilterSchema.extend({
     name: z.string().optional(),
     mobile: z.string().optional(),
     email: z.string().optional(),
@@ -44,6 +44,6 @@ export const contractFilterSchema = baseDataFilterSchema.extend({
 
 export type BaseDataFilter = z.infer<typeof baseDataFilterSchema>;
 export type PropertyFilter = z.infer<typeof propertyFilterSchema>;
-export type PersonFilter = z.infer<typeof personFilterSchema>;
+export type ClientFilter = z.infer<typeof clientFilterSchema>;
 export type RealtorFilter = z.infer<typeof realtorFilterSchema>;
 export type ContractFilter = z.infer<typeof contractFilterSchema>;

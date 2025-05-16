@@ -1,5 +1,17 @@
-import { ContractFilter, PersonFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
-import { Contract, CreateContractDTO, CreatePersonDTO, CreatePropertyDTO, CreateRealtorDTO, Person, Property, Realtor, UpdateContractDTO, UpdatePersonDTO, UpdatePropertyDTO, UpdateRealtorDTO } from "./data-schema";
+import { ContractFilter, ClientFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
+import { Contract, 
+    CreateContractDTO, 
+    CreateClientDTO, 
+    CreatePropertyDTO, 
+    CreateRealtorDTO, 
+    Client, 
+    Property, 
+    Realtor, 
+    UpdateContractDTO, 
+    UpdateClientDTO, 
+    UpdatePropertyDTO, 
+    UpdateRealtorDTO 
+} from "./data-schema";
 import { OperationResponse } from "./helperFunctions";
 
 export interface BackendApi {
@@ -29,19 +41,19 @@ export interface BackendApi {
         deletedRealtorHandler: (deletedRealtor: Realtor) => void,
     ) => Promise<OperationResponse>;
     realtorsUnsubscribe: () => void;
-    //persons
-    getPersons: (personIds: Array<Person['id']>) => Promise<OperationResponse<Array<Person>>>;
-    searchPersonIds: (filter: PersonFilter) => Promise<OperationResponse<Array<Person['id']>>>;
-    createPerson: (newPersonData: CreatePersonDTO) => Promise<OperationResponse>;
-    updatePerson: (personId: Person["id"], updateData: UpdatePersonDTO) => Promise<OperationResponse>;
-    deletePerson: (personId: Person['id']) => Promise<OperationResponse>;
-    invalidatePersons: (personIds: Array<Person["id"]>, timestamp: number) => Promise<OperationResponse<Array<Person["id"]>>>;
-    personsSubscribe: (
-        newPersonHandler: (newPerson: Person) => void,
-        updatedPersonHandler: (updatedPerson: Person) => void,
-        deletedPersonHandler: (deletedPerson: Person) => void,
+    //clients
+    getClients: (clientIds: Array<Client['id']>) => Promise<OperationResponse<Array<Client>>>;
+    searchClientIds: (filter: ClientFilter) => Promise<OperationResponse<Array<Client['id']>>>;
+    createClient: (newClientData: CreateClientDTO) => Promise<OperationResponse>;
+    updateClient: (clientId: Client["id"], updateData: UpdateClientDTO) => Promise<OperationResponse>;
+    deleteClient: (clientId: Client['id']) => Promise<OperationResponse>;
+    invalidateClients: (clientIds: Array<Client["id"]>, timestamp: number) => Promise<OperationResponse<Array<Client["id"]>>>;
+    clientsSubscribe: (
+        newClientHandler: (newClient: Client) => void,
+        updatedClientHandler: (updatedClient: Client) => void,
+        deletedClientHandler: (deletedClient: Client) => void,
     ) => Promise<OperationResponse>;
-    personsUnsubscribe: () => void;
+    clientsUnsubscribe: () => void;
     // contracts
     getContracts: (contractIds: Array<Contract['id']>) => Promise<OperationResponse<Array<Contract>>>;
     searchContractIds: (filter: ContractFilter) => Promise<OperationResponse<Array<Contract['id']>>>;
