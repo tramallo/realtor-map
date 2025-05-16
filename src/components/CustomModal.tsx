@@ -7,6 +7,7 @@ import {
   DialogTitle,
   Slide,
   SlideProps,
+  Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -38,6 +39,8 @@ export default function CustomModal({
             boxSizing: "border-box",
             maxWidth: "100%",
             maxHeight: "100%",
+            width: "90svw",
+            height: "85svh",
             margin: 0,
             border: "2px solid black",
             borderRadius: 2,
@@ -49,13 +52,14 @@ export default function CustomModal({
         display="flex"
         alignItems="end"
         justifyContent="space-between"
+        boxSizing="border-box"
         sx={(theme) => ({
           padding: 1,
           color: theme.palette.primary.main,
           backgroundColor: theme.palette.grey[400],
         })}
       >
-        {title}
+        <Typography variant="h6" noWrap>{title}</Typography>
         <Button
           variant="outlined"
           color="error"
@@ -76,8 +80,6 @@ export default function CustomModal({
         sx={(theme) => ({
           padding: 0,
           boxSizing: "border-box",
-          width: "90svw",
-          height: "85svh",
           backgroundColor: theme.palette.grey[500],
         })}
       >
