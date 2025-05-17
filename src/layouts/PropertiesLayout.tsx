@@ -33,10 +33,18 @@ export function PropertiesLayout() {
           alignItems="center"
           justifyContent="space-around"
         >
-          <Button variant="contained" onClick={() => setView("list")}>
+          <Button
+            variant="contained"
+            color={view == "list" ? "secondary" : undefined}
+            onClick={() => setView("list")}
+          >
             <FormatListNumberedIcon />
           </Button>
-          <Button variant="contained" onClick={() => setView("map")}>
+          <Button
+            variant="contained"
+            color={view == "map" ? "secondary" : undefined}
+            onClick={() => setView("map")}
+          >
             <LocationOnIcon />
           </Button>
         </Stack>

@@ -32,10 +32,18 @@ export function ContractsLayout() {
           alignItems="center"
           justifyContent="space-around"
         >
-          <Button variant="contained" onClick={() => setView("list")}>
+          <Button
+            variant="contained"
+            color={view == "list" ? "secondary" : undefined}
+            onClick={() => setView("list")}
+          >
             <FormatListNumberedIcon />
           </Button>
-          <Button variant="contained" onClick={() => setView("calendar")}>
+          <Button
+            variant="contained"
+            color={view == "calendar" ? "secondary" : undefined}
+            onClick={() => setView("calendar")}
+          >
             <CalendarMonthIcon />
           </Button>
         </Stack>
