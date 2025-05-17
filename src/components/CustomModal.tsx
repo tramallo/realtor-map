@@ -4,9 +4,9 @@ import {
   Dialog,
   DialogContent,
   DialogProps,
-  DialogTitle,
   Slide,
   SlideProps,
+  Stack,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -48,18 +48,19 @@ export default function CustomModal({
         },
       }}
     >
-      <DialogTitle
-        display="flex"
+      <Stack
+        direction="row"
         alignItems="end"
         justifyContent="space-between"
         boxSizing="border-box"
+        padding={1}
         sx={(theme) => ({
-          padding: 1,
-          color: theme.palette.primary.main,
           backgroundColor: theme.palette.grey[400],
         })}
       >
-        <Typography variant="h6" noWrap>{title}</Typography>
+        <Typography variant="h6" textOverflow="ellipsis" color="primary" noWrap>
+          {title}
+        </Typography>
         <Button
           variant="outlined"
           color="error"
@@ -75,7 +76,7 @@ export default function CustomModal({
         >
           <CloseIcon />
         </Button>
-      </DialogTitle>
+      </Stack>
       <DialogContent
         sx={(theme) => ({
           padding: 0,

@@ -12,9 +12,9 @@ import { Realtor, UpdateRealtorDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
-  useAppContext,
-  useAuthContext,
 } from "../../utils/helperFunctions";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 import { CustomTextField } from "../CustomTextField";
 
 export interface DeleteRealtorProps {

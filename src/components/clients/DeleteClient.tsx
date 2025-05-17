@@ -12,10 +12,10 @@ import { Client, UpdateClientDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
-  useAppContext,
-  useAuthContext,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 
 export interface DeleteClientProps {
   clientId: Client["id"];

@@ -1,5 +1,5 @@
-import { CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 
 import {
   Contract,
@@ -15,9 +15,9 @@ import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
-  useAppContext,
-  useAuthContext,
 } from "../../utils/helperFunctions";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 import { FormTextField } from "../form/FormTextField";
 import FormPropertyField from "../form/FormPropertyField";
 import FormPersonField from "../form/FormPersonField";

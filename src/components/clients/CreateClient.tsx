@@ -4,13 +4,11 @@ import { Stack } from "@mui/material";
 import { CreateClientDTO, createClientDTO } from "../../utils/data-schema";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
-import {
-  dateToTimestamp,
-  useAppContext,
-  useAuthContext,
-} from "../../utils/helperFunctions";
+import { dateToTimestamp } from "../../utils/helperFunctions";
 import { useClientStore } from "../../stores/clientsStore";
 import { FormTextField } from "../form/FormTextField";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 
 export interface CreateClientProps {
   prefillClient?: Partial<CreateClientDTO>;

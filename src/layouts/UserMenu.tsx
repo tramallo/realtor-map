@@ -1,6 +1,6 @@
 import { Button, Stack, Typography } from "@mui/material";
 
-import { useAuthContext } from "../utils/helperFunctions";
+import { useAuthContext } from "../components/AuthContext";
 
 export function UserMenu() {
   const { endSession } = useAuthContext();

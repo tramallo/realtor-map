@@ -6,6 +6,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { format } from "date-fns";
+
 import {
   useContractStore,
   fetchByIdSelector,
@@ -14,14 +16,13 @@ import { Contract, UpdateContractDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
   OperationResponse,
-  useAppContext,
-  useAuthContext,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
 import ClientChip from "../ClientChip";
 import PropertyChip from "../PropertyChip";
 import ComponentsField from "../ComponentsField";
-import { format } from "date-fns";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 
 export interface DeleteContractProps {
   contractId: Contract["id"];

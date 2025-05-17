@@ -18,9 +18,9 @@ import RealtorChip from "../RealtorChip";
 import {
   dateToTimestamp,
   OperationResponse,
-  useAppContext,
-  useAuthContext,
 } from "../../utils/helperFunctions";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 import { CustomTextField } from "../CustomTextField";
 
 export interface DeletePropertyProps {

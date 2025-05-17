@@ -1,6 +1,4 @@
-import { Session } from "@supabase/supabase-js";
 import { format, isValid } from "date-fns";
-import { createContext, useContext } from "react";
 
 interface SuccessResponse<T> {
   data: T;
@@ -44,38 +42,4 @@ export const timestampToDDMMYYString = (timestamp: number): string | undefined =
 
 export const countDefinedAttributes = <T extends Record<string, unknown>>(object: T) => {
   return Object.keys(object).filter(key => object[key] !== undefined).length;
-}
-
-type AuthContext = {
-  userSession: Session | undefined;
-  startSession: (email: string, password: string) => Promise<OperationResponse>;
-  endSession: () => Promise<OperationResponse>;
-};
-export const authContext = createContext<AuthContext | undefined>({
-  userSession: undefined,
-  startSession: async () => ({ error: new Error("not implemented") }),
-  endSession: async () => ({ error: new Error("not implemented") }),
-});
-export function useAuthContext() {
-  const context = useContext(authContext);
-  if (context === undefined) {
-    throw new Error(
-      "useAuthContext must be used within an AuthContextProvider"
-    );
-  }
-  return context;
-}
-
-type AppContext = {
-  notifyUser: (message: string) => void;
-};
-export const appContext = createContext<AppContext | undefined>({
-  notifyUser: () => undefined,
-});
-export function useAppContext() {
-  const context = useContext(appContext);
-  if (context === undefined) {
-    throw new Error("useAppContext must be used within an AppContextProvider");
-  }
-  return context;
 }

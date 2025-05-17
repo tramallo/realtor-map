@@ -12,10 +12,10 @@ import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
-  useAppContext,
-  useAuthContext,
 } from "../../utils/helperFunctions";
 import { FormTextField } from "../form/FormTextField";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 
 export interface UpdateClientProps {
   clientId: Client["id"];

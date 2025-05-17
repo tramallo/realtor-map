@@ -1,6 +1,5 @@
 import { memo, useMemo, useState } from "react";
-import { Button } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import Navigation, { NavigationSlide } from "./components/Navigation";
 import { PropertiesLayout } from "./layouts/PropertiesLayout";
@@ -24,15 +23,17 @@ export function App() {
   );
 
   return (
-    <Navigation slides={slides}>
-      <Button
-        variant="contained"
-        color="info"
-        onClick={() => setUserMenuOpen(true)}
-        sx={{ flex: 1 }}
-      >
-        <PersonIcon />
-      </Button>
+    <>
+      <Navigation
+        slides={slides}
+        actions={[
+          {
+            label: "menu",
+            icon: <SettingsIcon />,
+            callback: () => setUserMenuOpen(true),
+          },
+        ]}
+      />
       <CustomModal
         title="User menu"
         open={userMenuOpen}
@@ -41,7 +42,7 @@ export function App() {
       >
         <UserMenu />
       </CustomModal>
-    </Navigation>
+    </>
   );
 }
 
