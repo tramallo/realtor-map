@@ -1,8 +1,11 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { Button, Stack } from "@mui/material";
 
 import { useAuthContext } from "../components/AuthContext";
+import { AppSettingsPane } from "../components/AppSettingsPane";
 
 export function UserMenu() {
+  const { t } = useTranslation();
   const { endSession } = useAuthContext();
 
   return (
@@ -13,9 +16,9 @@ export function UserMenu() {
       boxSizing="border-box"
       justifyContent="space-between"
     >
-      <Typography>Content...</Typography>
+      <AppSettingsPane />
       <Button variant="contained" color="warning" onClick={endSession}>
-        Logout
+        {t("components.layouts.userMenu.logoutButton")}
       </Button>
     </Stack>
   );
