@@ -26,7 +26,6 @@ export function CustomSelectField({
         {...selectProps}
         sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
       >
-        <MenuItem value={undefined}>_</MenuItem>
         {options.map(({ label, value }, index) => (
           <MenuItem key={`select-${label}-${index}`} value={value}>
             {label}
