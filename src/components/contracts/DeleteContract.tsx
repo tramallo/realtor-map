@@ -6,7 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 import {
   useContractStore,
@@ -23,6 +23,7 @@ import PropertyChip from "../PropertyChip";
 import ComponentsField from "../ComponentsField";
 import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
+import DateField from "../DateField";
 
 export interface DeleteContractProps {
   contractId: Contract["id"];
@@ -35,8 +36,7 @@ export default function DeleteContract({
   onSoftDelete,
   onRestore,
 }: DeleteContractProps) {
-  console.log(`DeleteContract -> render`);
-
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchContract = useContractStore((store) => store.fetchContract);
@@ -64,15 +64,15 @@ export default function DeleteContract({
     setSoftDeletingContract(false);
 
     if (deleteResponse.error) {
-      notifyUser("Error. Contract not deleted.");
+      notifyUser(t("errorMessages.contractNotDeleted"));
       return;
     }
 
-    notifyUser("Contract deleted.");
+    notifyUser(t("notifications.contractDeleted"));
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [contractId, updateContract, notifyUser, onSoftDelete, userSession]);
+  }, [contractId, updateContract, notifyUser, onSoftDelete, userSession, t]);
 
   const restoreContract = useCallback(async () => {
     console.log(`DeleteContract -> restoreContract ${contractId}`);
@@ -86,15 +86,15 @@ export default function DeleteContract({
     setRestoringContract(false);
 
     if (restoreResponse.error) {
-      notifyUser("Error. Contract not restored.");
+      notifyUser(t("errorMessages.contractNotRestored"));
       return;
     }
 
-    notifyUser("Contract restored.");
+    notifyUser(t("notifications.contractRestored"));
     if (onRestore) {
       onRestore();
     }
-  }, [contractId, updateContract, notifyUser, onRestore, userSession]);
+  }, [contractId, updateContract, notifyUser, onRestore, userSession, t]);
 
   useEffect(() => {
     console.log(`DeleteContract -> effect [fetchContract]`);
@@ -121,33 +121,39 @@ export default function DeleteContract({
         >
           {fetchContractResponse?.error
             ? fetchContractResponse.error.message
-            : `Contract (id: ${contractId}) not found`}
+            : t("errorMessages.contractNotFound", { contractId: contractId })}
         </Typography>
       )}
       {!fetchingContract && cachedContract && (
         <>
           {cachedContract.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           <ComponentsField
-            label="Property"
+            label={t("entities.contract.property")}
             components={[<PropertyChip propertyId={cachedContract.property} />]}
           />
           <ComponentsField
-            label="Client"
+            label={t("entities.contract.client")}
             components={[<ClientChip clientId={cachedContract.client} />]}
           />
-          <CustomTextField
-            label="Start Date"
-            value={format(new Date(cachedContract.start), "PP")}
+          <DateField
+            label={t("entities.contract.start")}
+            value={cachedContract.start}
+            readOnly
           />
-          <CustomTextField
-            label="End Date"
-            value={format(new Date(cachedContract.end), "PP")}
+          <DateField
+            label={t("entities.contract.end")}
+            value={cachedContract.end}
+            readOnly
           />
           {cachedContract.description && (
             <CustomTextField
-              label="Description"
+              label={t("entities.contract.description")}
               value={cachedContract.description}
               multiline
             />
@@ -161,11 +167,13 @@ export default function DeleteContract({
         alignItems="center"
         justifyContent="end"
       >
-        {cachedContract?.deleted && (
+        {cachedContract && (
           <Button
             variant="contained"
-            color="success"
-            onClick={restoreContract}
+            color={cachedContract.deleted ? "success" : "error"}
+            onClick={
+              cachedContract.deleted ? restoreContract : softDeleteContract
+            }
             disabled={
               !cachedContract ||
               fetchingContract ||
@@ -173,22 +181,12 @@ export default function DeleteContract({
               softDeletingContract
             }
           >
-            {restoringContract ? <CircularProgress size="1.4em" /> : "Restore"}
-          </Button>
-        )}
-        {cachedContract?.deleted !== true && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={softDeleteContract}
-            disabled={
-              fetchingContract || restoringContract || softDeletingContract
-            }
-          >
-            {softDeletingContract ? (
+            {restoringContract || softDeletingContract ? (
               <CircularProgress size="1.4em" />
+            ) : cachedContract.deleted ? (
+              t("buttons.restoreButton.label")
             ) : (
-              "Delete"
+              t("buttons.deleteButton.label")
             )}
           </Button>
         )}

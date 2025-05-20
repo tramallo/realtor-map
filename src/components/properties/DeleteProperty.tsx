@@ -22,6 +22,7 @@ import {
 import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { CustomTextField } from "../CustomTextField";
+import { useTranslation } from "react-i18next";
 
 export interface DeletePropertyProps {
   propertyId: Property["id"];
@@ -34,8 +35,7 @@ export default function DeleteProperty({
   onSoftDelete,
   onRestore,
 }: DeletePropertyProps) {
-  console.log(`DeleteProperty -> render`);
-
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
@@ -63,15 +63,15 @@ export default function DeleteProperty({
     setSoftDeletingProperty(false);
 
     if (deleteResponse.error) {
-      notifyUser("Error. Property not deleted.");
+      notifyUser(t("errorMessages.propertyNotDeleted"));
       return;
     }
 
-    notifyUser("Property deleted.");
+    notifyUser(t("notifications.propertyDeleted"));
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [propertyId, updateProperty, notifyUser, onSoftDelete, userSession]);
+  }, [propertyId, updateProperty, notifyUser, onSoftDelete, userSession, t]);
 
   const restoreProperty = useCallback(async () => {
     console.log(`DeleteProperty -> restoreProperty ${propertyId}`);
@@ -85,15 +85,15 @@ export default function DeleteProperty({
     setRestoringProperty(false);
 
     if (restoreResponse.error) {
-      notifyUser("Error. Property not restored.");
+      notifyUser(t("errorMessages.propertyNotRestored"));
       return;
     }
 
-    notifyUser("Property restored.");
+    notifyUser(t("notifications.propertyRestored"));
     if (onRestore) {
       onRestore();
     }
-  }, [propertyId, updateProperty, notifyUser, onRestore, userSession]);
+  }, [propertyId, updateProperty, notifyUser, onRestore, userSession, t]);
 
   //fetchProperty effect
   useEffect(() => {
@@ -121,28 +121,35 @@ export default function DeleteProperty({
         >
           {fetchPropertyResponse?.error
             ? fetchPropertyResponse.error.message
-            : `Property (id: ${propertyId}) not found`}
+            : t("errorMessages.propertyNotFound", { propertyId: propertyId })}
         </Typography>
       )}
       {!fetchingProperty && cachedProperty && (
         <>
           {cachedProperty.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           <CustomTextField
-            label="address"
+            label={t("entities.property.address")}
             value={cachedProperty.address ?? ""}
           />
-          <CustomTextField label="type" value={cachedProperty.type} />
+          <CustomTextField
+            label={t("entities.property.type")}
+            value={cachedProperty.type}
+          />
           {cachedProperty.owner && (
             <ComponentsField
-              label="owner"
+              label={t("entities.property.owner")}
               components={[<ClientChip clientId={cachedProperty.owner} />]}
             />
           )}
           {cachedProperty.exclusiveRealtor && (
             <ComponentsField
-              label="realtor"
+              label={t("entities.property.exclusiveRealtor")}
               components={[
                 <RealtorChip realtorId={cachedProperty.exclusiveRealtor} />,
               ]}
@@ -150,7 +157,7 @@ export default function DeleteProperty({
           )}
           {cachedProperty.relatedRealtorIds && (
             <ComponentsField
-              label="realtors"
+              label={t("entities.property.relatedRealtorIds")}
               components={cachedProperty.relatedRealtorIds.map(
                 (relatedRealtorId) => (
                   <RealtorChip realtorId={relatedRealtorId} />
@@ -159,11 +166,14 @@ export default function DeleteProperty({
             />
           )}
           {cachedProperty.state && (
-            <CustomTextField label="state" value={cachedProperty.state ?? ""} />
+            <CustomTextField
+              label={t("entities.property.state")}
+              value={cachedProperty.state ?? ""}
+            />
           )}
           {cachedProperty.description && (
             <CustomTextField
-              label="description"
+              label={t("entities.property.description")}
               value={cachedProperty.description ?? ""}
               multiline
             />
@@ -177,11 +187,13 @@ export default function DeleteProperty({
         alignItems="center"
         justifyContent="end"
       >
-        {cachedProperty?.deleted && (
+        {cachedProperty && (
           <Button
             variant="contained"
-            color="success"
-            onClick={restoreProperty}
+            color={cachedProperty.deleted ? "success" : "error"}
+            onClick={
+              cachedProperty.deleted ? restoreProperty : softDeleteProperty
+            }
             disabled={
               !cachedProperty ||
               fetchingProperty ||
@@ -189,22 +201,12 @@ export default function DeleteProperty({
               softDeletingProperty
             }
           >
-            {restoringProperty ? <CircularProgress size="1.4em" /> : "Restore"}
-          </Button>
-        )}
-        {cachedProperty?.deleted !== true && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={softDeleteProperty}
-            disabled={
-              fetchingProperty || restoringProperty || softDeletingProperty
-            }
-          >
-            {softDeletingProperty ? (
+            {restoringProperty || softDeletingProperty ? (
               <CircularProgress size="1.4em" />
+            ) : cachedProperty.deleted ? (
+              t("buttons.restoreButton.label")
             ) : (
-              "Delete"
+              t("buttons.deleteButton.label")
             )}
           </Button>
         )}

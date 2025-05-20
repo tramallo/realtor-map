@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
 import { Realtor } from "../../utils/data-schema";
@@ -21,6 +22,7 @@ export interface ViewRealtorProps {
 }
 
 export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
+  const { t } = useTranslation();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
 
   const [fetchingRealtor, setFetchingRealtor] = useState(false);
@@ -35,8 +37,6 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
 
   // fetchRealtor effect
   useEffect(() => {
-    console.log(`ViewRealtor -> effect [fetchRealtor]`);
-
     setFetchRealtorResponse(undefined);
     setFetchingRealtor(true);
     fetchRealtor(realtorId)
@@ -59,41 +59,48 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
         >
           {fetchRealtorResponse?.error
             ? fetchRealtorResponse.error.message
-            : `Realtor (id: ${realtorId}) not found`}
+            : t("errorMessages.realtorNotFound", { realtorId: realtorId })}
         </Typography>
       )}
       {!fetchingRealtor && cachedRealtor && (
         <>
           {cachedRealtor.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           {cachedRealtor.name && (
-            <CustomTextField value={cachedRealtor.name ?? ""} label="Name" />
+            <CustomTextField
+              value={cachedRealtor.name ?? ""}
+              label={t("entities.realtor.name")}
+            />
           )}
           {cachedRealtor.createdBy && (
             <CustomTextField
-              label="Created by"
+              label={t("entities.base.createdBy")}
               value={cachedRealtor.createdBy}
               disabled
             />
           )}
           {cachedRealtor.createdAt && (
             <DateField
-              label="Created at"
+              label={t("entities.base.createdAt")}
               value={cachedRealtor.createdAt}
               disabled
             />
           )}
           {cachedRealtor.updatedBy && (
             <CustomTextField
-              label="Updated by"
+              label={t("entities.base.updatedBy")}
               value={cachedRealtor.updatedBy}
               disabled
             />
           )}
           {cachedRealtor.updatedAt && (
             <DateField
-              label="Updated at"
+              label={t("entities.base.updatedAt")}
               value={cachedRealtor.updatedAt}
               disabled
             />
@@ -110,7 +117,9 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
               color={cachedRealtor.deleted ? "success" : "error"}
               onClick={() => setDeleteRealtorModalOpen(true)}
             >
-              {cachedRealtor.deleted ? "Restore" : "Delete"}
+              {cachedRealtor.deleted
+                ? t("buttons.restoreButton.label")
+                : t("buttons.deleteButton.label")}
             </Button>
             {!cachedRealtor.deleted && (
               <Button
@@ -118,12 +127,12 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
                 color="warning"
                 onClick={() => setUpdateRealtorModalOpen(true)}
               >
-                Update
+                {t("buttons.updateButton.label")}
               </Button>
             )}
           </Stack>
           <CustomModal
-            title={`Delete Realtor: ${realtorId}`}
+            title={t("titles.deleteRealtor")}
             open={deleteRealtorModalOpen}
             onClose={() => setDeleteRealtorModalOpen(false)}
           >
@@ -134,7 +143,7 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
             />
           </CustomModal>
           <CustomModal
-            title={`Update Realtor: ${realtorId}`}
+            title={t("titles.updateRealtor")}
             open={updateRealtorModalOpen}
             onClose={() => setUpdateRealtorModalOpen(false)}
           >

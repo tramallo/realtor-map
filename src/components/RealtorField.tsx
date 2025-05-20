@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Realtor } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
@@ -24,6 +25,8 @@ export default function RealtorField({
   errorMessage,
   readOnly,
 }: RealtorFieldProps) {
+  const { t } = useTranslation();
+
   const [selectRealtorModalOpen, setSelectRealtorModalOpen] = useState(false);
 
   const removeSelected = useCallback(
@@ -61,7 +64,7 @@ export default function RealtorField({
         ))}
       />
       <CustomModal
-        title="Select realtor(s)"
+        title={t("titles.selectRealtor")}
         open={selectRealtorModalOpen}
         onClose={() => setSelectRealtorModalOpen(false)}
       >

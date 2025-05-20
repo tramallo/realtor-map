@@ -96,11 +96,11 @@ const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
   if (filter.idEq) {
     query.in("id", filter.idEq);
   }
-  if (filter.idNot) {
-    query.not("id", "in", `${filter.idNot.join(",")}`);
+  if (filter.idNeq) {
+    query.not("id", "in", `${filter.idNeq.join(",")}`);
   }
-  if (filter.createdBy) {
-    query.eq("createdBy", filter.createdBy);
+  if (filter.createdByEq) {
+    query.eq("createdBy", filter.createdByEq);
   }
   if (filter.createdAtAfter) {
     query.gte("createdAt", filter.createdAtAfter);
@@ -108,8 +108,8 @@ const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
   if (filter.createdAtBefore) {
     query.lte("createdAt", filter.createdAtBefore);
   }
-  if (filter.updatedBy) {
-    query.eq("updatedBy", filter.updatedBy);
+  if (filter.updatedByEq) {
+    query.eq("updatedBy", filter.updatedByEq);
   }
   if (filter.updatedAtAfter) {
     query.gte("updatedAt", filter.updatedAtAfter);
@@ -117,8 +117,8 @@ const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
   if (filter.updatedAtBefore) {
     query.lte("updatedAt", filter.updatedAtBefore);
   }
-  if (filter.deleted != undefined) {
-    query.eq("deleted", filter.deleted);
+  if (filter.deletedEq != undefined) {
+    query.eq("deleted", filter.deletedEq);
   }
 
   return query;
@@ -127,15 +127,15 @@ const queryConstructor = {
   searchPropertyIdsQuery: (filter: PropertyFilter) => {
     const query = searchBaseDataIdsQuery(filter, "property");
 
-    if (filter.address) {
-      const filterWords = filter.address.split(" ");
+    if (filter.addressLike) {
+      const filterWords = filter.addressLike.split(" ");
       filterWords.forEach((word) => query.ilike("address", `%${word}%`));
     }
-    if (filter.type) {
-      query.eq("type", filter.type);
+    if (filter.typeEq) {
+      query.eq("type", filter.typeEq);
     }
-    if (filter.state) {
-      query.eq("state", filter.state);
+    if (filter.stateEq) {
+      query.eq("state", filter.stateEq);
     }
     if (filter.ownerEq) {
       query.eq("owner", filter.ownerEq);
@@ -143,8 +143,8 @@ const queryConstructor = {
     if (filter.exclusiveRealtorEq) {
       query.eq("exclusiveRealtor", filter.exclusiveRealtorEq);
     }
-    if (filter.relatedRealtorIds) {
-      query.contains("relatedRealtorIds", filter.relatedRealtorIds);
+    if (filter.relatedRealtorIdsHas) {
+      query.contains("relatedRealtorIds", filter.relatedRealtorIdsHas);
     }
 
     return query;
@@ -152,8 +152,8 @@ const queryConstructor = {
   searchRealtorIdsQuery: (filter: RealtorFilter) => {
     const query = searchBaseDataIdsQuery(filter, "realtor");
 
-    if (filter.name) {
-      const filterWords = filter.name.split(" ");
+    if (filter.nameLike) {
+      const filterWords = filter.nameLike.split(" ");
       filterWords.forEach((word) => query.ilike("name", `%${word}%`));
     }
 
@@ -162,15 +162,15 @@ const queryConstructor = {
   searchClientIdsQuery: (filter: ClientFilter) => {
     const query = searchBaseDataIdsQuery(filter, "client");
 
-    if (filter.name) {
-      const filterWords = filter.name.split(" ");
+    if (filter.nameLike) {
+      const filterWords = filter.nameLike.split(" ");
       filterWords.forEach((word) => query.ilike("name", `%${word}%`));
     }
-    if (filter.email) {
-      query.eq("email", filter.email);
+    if (filter.emailLike) {
+      query.ilike("email", `%${filter.emailLike}%`);
     }
-    if (filter.mobile) {
-      query.eq("mobile", filter.mobile);
+    if (filter.mobileLike) {
+      query.ilike("mobile", filter.mobileLike);
     }
 
     return query;
@@ -178,11 +178,11 @@ const queryConstructor = {
   searchContractIdsQuery: (filter: ContractFilter) => {
     const query = searchBaseDataIdsQuery(filter, "contract");
 
-    if (filter.property) {
-      query.eq("property", filter.property);
+    if (filter.propertyEq) {
+      query.eq("property", filter.propertyEq);
     }
-    if (filter.client) {
-      query.eq("client", filter.client);
+    if (filter.clientEq) {
+      query.eq("client", filter.clientEq);
     }
     if (filter.startAfter) {
       query.gte("start", filter.startAfter);

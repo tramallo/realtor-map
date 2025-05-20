@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
@@ -26,6 +27,7 @@ export default function CreateContract({
   prefillContract,
   onCreate,
 }: CreateContractProps) {
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createContract = useContractStore((store) => store.createContract);
@@ -50,14 +52,14 @@ export default function CreateContract({
 
       if (error) {
         console.log(error);
-        notifyUser("Error. Contract not created.");
+        notifyUser(t("errorMessages.contractNotCreated"));
         return;
       }
 
-      notifyUser("Contract created.");
+      notifyUser(t("notifications.contractCreated"));
       onCreate?.();
     },
-    [createContract, notifyUser, onCreate]
+    [createContract, notifyUser, onCreate, t]
   );
 
   return (
@@ -65,27 +67,27 @@ export default function CreateContract({
       <Stack spacing={2} padding={1}>
         <FormPropertyField
           fieldName="property"
-          label="Property"
+          label={t("entities.contract.property")}
           readOnly={creatingContract}
         />
         <FormPersonField
           fieldName="client"
-          label="Client"
+          label={t("entities.contract.client")}
           readOnly={creatingContract}
         />
         <FormDateField
           fieldName="start"
-          label="Start"
+          label={t("entities.contract.start")}
           disabled={creatingContract}
         />
         <FormDateField
           fieldName="end"
-          label="End"
+          label={t("entities.contract.end")}
           disabled={creatingContract}
         />
         <FormTextField
           fieldName="description"
-          label="Description"
+          label={t("entities.contract.description")}
           multiline
           disabled={creatingContract}
         />
@@ -93,7 +95,7 @@ export default function CreateContract({
         <Stack direction="row" spacing={2} justifyContent="end">
           <MemoSubmitButton
             onSubmit={onSubmit}
-            label="Create"
+            label={t("buttons.confirmButton.label")}
             loading={creatingContract}
             disabled={creatingContract}
             color="success"

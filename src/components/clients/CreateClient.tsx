@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { CreateClientDTO, createClientDTO } from "../../utils/data-schema";
 import { MemoForm } from "../form/Form";
@@ -19,6 +20,7 @@ export default function CreateClient({
   prefillClient,
   onCreate,
 }: CreateClientProps) {
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createClient = useClientStore((store) => store.createClient);
@@ -42,16 +44,16 @@ export default function CreateClient({
       setCreatingClient(false);
 
       if (createResponse.error) {
-        notifyUser("Error. Client not created.");
+        notifyUser(t("errorMessages.clientNotCreated"));
         return;
       }
 
-      notifyUser("Client created.");
+      notifyUser(t("notifications.clientCreated"));
       if (onCreate) {
         onCreate();
       }
     },
-    [createClient, notifyUser, onCreate]
+    [createClient, notifyUser, onCreate, t]
   );
 
   return (
@@ -60,9 +62,9 @@ export default function CreateClient({
       prefillData={prefillData}
     >
       <Stack spacing={2} padding={1}>
-        <FormTextField fieldName="name" label="Name" />
-        <FormTextField fieldName="mobile" label="Mobile" />
-        <FormTextField fieldName="email" label="Email" />
+        <FormTextField fieldName="name" label={t("entities.client.name")} />
+        <FormTextField fieldName="mobile" label={t("entities.client.mobile")} />
+        <FormTextField fieldName="email" label={t("entities.client.email")} />
 
         <Stack
           direction="row"
@@ -72,7 +74,7 @@ export default function CreateClient({
         >
           <MemoSubmitButton
             onSubmit={onSubmit}
-            label="Create"
+            label={t("buttons.confirmButton.label")}
             color="success"
             loading={creatingClient}
             disabled={creatingClient}

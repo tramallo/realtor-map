@@ -9,8 +9,11 @@ import { ListContracts } from "../components/contracts/ListContracts";
 import CustomModal from "../components/CustomModal";
 import CreateContract from "../components/contracts/CreateContract";
 import { CalendarContracts } from "../components/contracts/CalendarContracts";
+import { useTranslation } from "react-i18next";
 
 export function ContractsLayout() {
+  const { t } = useTranslation();
+
   const [view, setView] = useState("list" as "list" | "calendar");
   const [searchResults, setSearchResults] = useState(
     [] as Array<Contract["id"]>
@@ -68,11 +71,11 @@ export function ContractsLayout() {
             color="success"
             onClick={() => setCreateContractModalOpen(true)}
           >
-            New Contract
+            {t("buttons.newContractButton.label")}
           </Button>
         </Stack>
         <CustomModal
-          title="New Contract"
+          title={t("titles.newContract")}
           open={createContractModalOpen}
           onClose={() => setCreateContractModalOpen(false)}
         >

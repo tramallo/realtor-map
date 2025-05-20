@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CircularProgress, Stack, Typography } from "@mui/material";
+import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   Contract,
@@ -32,6 +33,7 @@ export default function UpdateContract({
   contractId,
   onUpdate,
 }: UpdateContractProps) {
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchContract = useContractStore((store) => store.fetchContract);
@@ -69,21 +71,20 @@ export default function UpdateContract({
       setUpdatingContract(false);
 
       if (updateResponse.error) {
-        notifyUser("Error. Contract not updated.");
+        notifyUser(t("errorMessages.contractNotUpdated"));
         return;
       }
 
-      notifyUser("Contract updated.");
+      notifyUser(t("notifications.contractUpdated"));
       if (onUpdate) {
         onUpdate();
       }
     },
-    [contractId, updateContract, notifyUser, onUpdate]
+    [contractId, updateContract, notifyUser, onUpdate, t]
   );
 
+  //fetchContract effect
   useEffect(() => {
-    console.log(`UpdateContract -> effect [fetchContract]`);
-
     setFetchContractResponse(undefined);
     setFetchingContract(true);
     fetchContract(contractId)
@@ -107,18 +108,34 @@ export default function UpdateContract({
           >
             {fetchContractResponse?.error
               ? fetchContractResponse.error.message
-              : `Contract (id: ${contractId}) not found`}
+              : t("errorMessages.contractNotFound", { contractId: contractId })}
           </Typography>
         )}
         {!fetchingContract && cachedContract && (
           <>
-            <FormPropertyField fieldName="property" label="Property" />
-            <FormPersonField fieldName="client" label="Client" />
-            <FormDateField fieldName="start" label="Start" />
-            <FormDateField fieldName="end" label="End" />
+            {cachedContract.deleted && (
+              <Chip
+                label={t("entities.base.deleted")}
+                color="error"
+                variant="outlined"
+              />
+            )}
+            <FormPropertyField
+              fieldName="property"
+              label={t("entities.contract.property")}
+            />
+            <FormPersonField
+              fieldName="client"
+              label={t("entities.contract.client")}
+            />
+            <FormDateField
+              fieldName="start"
+              label={t("entities.contract.start")}
+            />
+            <FormDateField fieldName="end" label={t("entities.contract.end")} />
             <FormTextField
               fieldName="description"
-              label="Description"
+              label={t("entities.contract.description")}
               multiline
             />
           </>
@@ -132,7 +149,7 @@ export default function UpdateContract({
         >
           <MemoSubmitButton
             onSubmit={submitUpdate}
-            label="Confirm update"
+            label={t("buttons.confirmButton.label")}
             color="warning"
             loading={updatingContract}
           />

@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { useClientStore, fetchByIdSelector } from "../../stores/clientsStore";
 import { Client, UpdateClientDTO } from "../../utils/data-schema";
@@ -28,8 +29,7 @@ export default function DeleteClient({
   onSoftDelete,
   onRestore,
 }: DeleteClientProps) {
-  console.log(`DeleteClient -> render`);
-
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchClient = useClientStore((store) => store.fetchClient);
@@ -57,15 +57,15 @@ export default function DeleteClient({
     setSoftDeletingClient(false);
 
     if (softDeleteResponse.error) {
-      notifyUser("Error. Client not deleted.");
+      notifyUser(t("errorMessages.clientNotDeleted"));
       return;
     }
 
-    notifyUser("Client deleted.");
+    notifyUser(t("notifications.clientDeleted"));
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [updateClient, clientId, notifyUser, onSoftDelete, userSession]);
+  }, [updateClient, clientId, notifyUser, onSoftDelete, userSession, t]);
 
   const restoreClient = useCallback(async () => {
     console.log(`DeleteClient -> restoreClient - clientId: ${clientId}`);
@@ -79,15 +79,15 @@ export default function DeleteClient({
     setRestoringClient(false);
 
     if (restoreResponse.error) {
-      notifyUser("Error. Client not restored.");
+      notifyUser(t("errorMessages.clientNotRestored"));
       return;
     }
 
-    notifyUser("Client restored.");
+    notifyUser(t("notifications.clientRestored"));
     if (onRestore) {
       onRestore();
     }
-  }, [clientId, updateClient, notifyUser, onRestore, userSession]);
+  }, [clientId, updateClient, notifyUser, onRestore, userSession, t]);
 
   //fetchClient effect
   useEffect(() => {
@@ -115,22 +115,35 @@ export default function DeleteClient({
         >
           {fetchClientResponse?.error
             ? fetchClientResponse.error.message
-            : `Client (id: ${clientId}) not found`}
+            : t("errorMessages.clientNotFound", { clientId: clientId })}
         </Typography>
       )}
       {!fetchingClient && cachedClient && (
         <>
           {cachedClient.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           {cachedClient.name && (
-            <CustomTextField label="Name" value={cachedClient.name ?? ""} />
+            <CustomTextField
+              label={t("entities.client.name")}
+              value={cachedClient.name ?? ""}
+            />
           )}
           {cachedClient.mobile && (
-            <CustomTextField label="Mobile" value={cachedClient.mobile ?? ""} />
+            <CustomTextField
+              label={t("entities.client.mobile")}
+              value={cachedClient.mobile ?? ""}
+            />
           )}
           {cachedClient.email && (
-            <CustomTextField label="Email" value={cachedClient.email ?? ""} />
+            <CustomTextField
+              label={t("entities.client.email")}
+              value={cachedClient.email ?? ""}
+            />
           )}
         </>
       )}
@@ -141,24 +154,18 @@ export default function DeleteClient({
         alignItems="center"
         justifyContent="end"
       >
-        {cachedClient?.deleted && (
+        {cachedClient && (
           <Button
             variant="contained"
-            color="success"
-            onClick={restoreClient}
+            color={cachedClient.deleted ? "success" : "error"}
+            onClick={cachedClient.deleted ? restoreClient : softDeleteClient}
             disabled={fetchingClient || restoringClient || softDeletingClient}
           >
-            {restoringClient ? <CircularProgress /> : "Restore"}
-          </Button>
-        )}
-        {cachedClient?.deleted !== true && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={softDeleteClient}
-            disabled={fetchingClient || restoringClient || softDeletingClient}
-          >
-            {softDeletingClient ? <CircularProgress /> : "Delete"}
+            {softDeletingClient || restoringClient ? (
+              <CircularProgress size="1.4em" />
+            ) : (
+              t("buttons.confirmButton.label")
+            )}
           </Button>
         )}
       </Stack>

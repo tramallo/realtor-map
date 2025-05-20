@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Chip, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Client } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
@@ -13,6 +14,7 @@ export interface ClientChipProps {
 }
 
 export default function ClientChip({ clientId, onClose }: ClientChipProps) {
+  const { t } = useTranslation();
   const fetchClient = useClientStore((store) => store.fetchClient);
 
   const [fetchingClient, setFetchingClient] = useState(false);
@@ -46,7 +48,7 @@ export default function ClientChip({ clientId, onClose }: ClientChipProps) {
             ? "Error"
             : cachedClient
             ? cachedClient.name
-            : "Not found"
+            : t("errorMessages.clientNotFound", { clientId: clientId })
         }
         color={
           !fetchClientResponse
@@ -62,7 +64,7 @@ export default function ClientChip({ clientId, onClose }: ClientChipProps) {
         size="small"
       />
       <CustomModal
-        title={`View client: ${clientId}`}
+        title={t("titles.viewClient")}
         open={viewClientModalOpen}
         onClose={() => setViewClientModalOpen(false)}
       >

@@ -1,5 +1,6 @@
 import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import FilterBaseData from "../FilterBaseData";
 import { CustomTextField } from "../CustomTextField";
@@ -11,9 +12,7 @@ export interface FilterRealtorsProps {
 }
 
 export function FilterRealtors({ filter, onChange }: FilterRealtorsProps) {
-  console.log(
-    `FilterRealtors -> render - defaultFilter: ${JSON.stringify(filter)}`
-  );
+  const { t } = useTranslation();
 
   const setFilterValue = useCallback(
     (value: Partial<RealtorFilter>) => {
@@ -26,11 +25,10 @@ export function FilterRealtors({ filter, onChange }: FilterRealtorsProps) {
     <Grid2 container spacing={1}>
       <Grid2 size={12}>
         <CustomTextField
-          label="Name"
-          variant="outlined"
-          value={filter.name || ""}
+          label={t("entities.realtor.filter.nameLike")}
+          value={filter.nameLike || ""}
+          onChange={(value) => setFilterValue({ nameLike: value || undefined })}
           delay={500}
-          onChange={(value) => setFilterValue({ name: value || undefined })}
           fullWidth
         />
       </Grid2>

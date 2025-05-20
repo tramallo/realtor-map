@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { CreateRealtorDTO, createRealtorDTO } from "../../utils/data-schema";
 import { dateToTimestamp } from "../../utils/helperFunctions";
@@ -19,6 +20,7 @@ export default function CreateRealtor({
   prefillRealtor,
   onCreate,
 }: CreateRealtorProps) {
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createRealtor = useRealtorStore((store) => store.createRealtor);
@@ -42,16 +44,16 @@ export default function CreateRealtor({
       setCreatingRealtor(false);
 
       if (createResponse.error) {
-        notifyUser("Error. Realtor not created.");
+        notifyUser(t("errorMessages.realtorNotCreated"));
         return;
       }
 
-      notifyUser("Realtor created");
+      notifyUser(t("notifications.realtorCreated"));
       if (onCreate) {
         onCreate();
       }
     },
-    [createRealtor, notifyUser, onCreate]
+    [createRealtor, notifyUser, onCreate, t]
   );
 
   return (
@@ -70,7 +72,7 @@ export default function CreateRealtor({
         >
           <MemoSubmitButton
             onSubmit={onSubmit}
-            label="Create"
+            label={t("buttons.confirmButton.label")}
             color="success"
             loading={creatingRealtor}
             disabled={creatingRealtor}

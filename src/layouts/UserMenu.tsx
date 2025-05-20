@@ -18,7 +18,7 @@ export function UserMenu() {
     >
       <AppSettingsPane />
       <Button variant="contained" color="warning" onClick={endSession}>
-        {t("components.layouts.userMenu.logoutButton")}
+        {t("buttons.logoutButton.label")}
       </Button>
     </Stack>
   );

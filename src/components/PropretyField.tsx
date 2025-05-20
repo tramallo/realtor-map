@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
@@ -24,6 +25,8 @@ export default function PropertyField({
   errorMessage,
   readOnly,
 }: PropertyFieldProps) {
+  const { t } = useTranslation();
+
   const [selectPropertyModalOpen, setSelectPropertyModalOpen] = useState(false);
 
   const removeSelected = useCallback(
@@ -65,7 +68,7 @@ export default function PropertyField({
         )}
       />
       <CustomModal
-        title="Select property(s)"
+        title={t("titles.selectProperty")}
         open={selectPropertyModalOpen}
         onClose={() => setSelectPropertyModalOpen(false)}
       >

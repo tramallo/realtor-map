@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   useContractStore,
@@ -26,6 +27,7 @@ export interface ViewContractProps {
 }
 
 export default function ViewContract({ contractId }: ViewContractProps) {
+  const { t } = useTranslation();
   const fetchContract = useContractStore((store) => store.fetchContract);
 
   const [fetchingContract, setFetchingContract] = useState(false);
@@ -40,8 +42,6 @@ export default function ViewContract({ contractId }: ViewContractProps) {
 
   // fetchContract effect
   useEffect(() => {
-    console.log(`ViewContract -> effect [fetchContract]`);
-
     setFetchContractResponse(undefined);
     setFetchingContract(true);
     fetchContract(contractId)
@@ -64,52 +64,68 @@ export default function ViewContract({ contractId }: ViewContractProps) {
         >
           {fetchContractResponse?.error
             ? fetchContractResponse.error.message
-            : `Contract (id: ${contractId}) not found`}
+            : t("errorMessages.contractNotFound", { contractId: contractId })}
         </Typography>
       )}
       {!fetchingContract && cachedContract && (
         <>
           {cachedContract.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
-
           <PropertyField
-            label="Property"
+            label={t("entities.contract.property")}
             selected={[cachedContract.property]}
             onSelect={() => undefined}
           />
           <ClientField
-            label="Client"
+            label={t("entities.contract.client")}
             selected={[cachedContract.client]}
             onSelect={() => undefined}
           />
-          <DateField label="Start" value={cachedContract.start} readOnly />
-          <DateField label="End" value={cachedContract.end} readOnly />
-
+          <DateField
+            label={t("entities.contract.start")}
+            value={cachedContract.start}
+            readOnly
+          />
+          <DateField
+            label={t("entities.contract.end")}
+            value={cachedContract.end}
+            readOnly
+          />
           {cachedContract.description && (
             <CustomTextField
               value={cachedContract.description}
-              label="Description"
+              label={t("entities.contract.description")}
               multiline
             />
           )}
           {cachedContract.createdBy && (
             <CustomTextField
-              label="Created by"
+              label={t("entities.base.createdBy")}
               value={cachedContract.createdBy}
             />
           )}
           {cachedContract.createdAt && (
-            <DateField label="Created at" value={cachedContract.createdAt} />
+            <DateField
+              label={t("entities.base.createdAt")}
+              value={cachedContract.createdAt}
+            />
           )}
           {cachedContract.updatedBy && (
             <CustomTextField
-              label="Updated by"
+              label={t("entities.base.updatedBy")}
               value={cachedContract.updatedBy}
             />
           )}
           {cachedContract.updatedAt && (
-            <DateField label="Updated at" value={cachedContract.updatedAt} />
+            <DateField
+              label={t("entities.base.updatedAt")}
+              value={cachedContract.updatedAt}
+            />
           )}
 
           <Stack
@@ -123,7 +139,9 @@ export default function ViewContract({ contractId }: ViewContractProps) {
               color={cachedContract.deleted ? "success" : "error"}
               onClick={() => setDeleteContractModalOpen(true)}
             >
-              {cachedContract.deleted ? "Restore" : "Delete"}
+              {cachedContract.deleted
+                ? t("buttons.restoreButton.label")
+                : t("buttons.deleteButton.label")}
             </Button>
             {!cachedContract.deleted && (
               <Button
@@ -131,12 +149,16 @@ export default function ViewContract({ contractId }: ViewContractProps) {
                 color="warning"
                 onClick={() => setUpdateContractModalOpen(true)}
               >
-                Update
+                {t("buttons.updateButton.label")}
               </Button>
             )}
           </Stack>
           <CustomModal
-            title={`Delete Contract: ${contractId}`}
+            title={
+              cachedContract.deleted
+                ? t("titles.restoreContract")
+                : t("titles.deleteContract")
+            }
             open={deleteContractModalOpen}
             onClose={() => setDeleteContractModalOpen(false)}
           >
@@ -147,7 +169,7 @@ export default function ViewContract({ contractId }: ViewContractProps) {
             />
           </CustomModal>
           <CustomModal
-            title={`Update Contract: ${contractId}`}
+            title={t("titles.updateContract")}
             open={updateContractModalOpen}
             onClose={() => setUpdateContractModalOpen(false)}
           >

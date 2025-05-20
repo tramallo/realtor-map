@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import { FieldValues, useFormContext } from "react-hook-form";
 import { ZodSchema, TypeOf as ZTypeOf } from "zod";
+import { useTranslation } from "react-i18next";
 
 export interface SubmitButtonProps<
   Schema extends ZodSchema,
@@ -21,13 +22,11 @@ export function SubmitButton<Schema extends ZodSchema>({
   loading,
   disabled,
 }: SubmitButtonProps<Schema>) {
-  console.log(`SubmitButton -> render`);
-
+  const { t } = useTranslation();
   const { handleSubmit } = useFormContext<Schema>();
 
   const submit = useMemo(() => {
     return handleSubmit((data) => {
-      console.log(`SubmitButton -> submit - formData: ${JSON.stringify(data)}`);
       onSubmit(data);
     });
   }, [handleSubmit, onSubmit]);
@@ -39,7 +38,11 @@ export function SubmitButton<Schema extends ZodSchema>({
       color={color}
       disabled={loading || disabled}
     >
-      {loading ? <CircularProgress size="1.4em" /> : label ?? "Submit"}
+      {loading ? (
+        <CircularProgress size="1.4em" />
+      ) : (
+        label ?? t("buttons.submitButton.label")
+      )}
     </Button>
   );
 }

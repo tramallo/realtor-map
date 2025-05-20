@@ -4,38 +4,38 @@ import { dataIdSchema, propertyStates, propertyTypes, timestampSchema, userIdSch
 
 export const baseDataFilterSchema = z.object({
     idEq: dataIdSchema.array().optional(),
-    idNot: dataIdSchema.array().optional(),
-    createdBy: userIdSchema.optional(),
+    idNeq: dataIdSchema.array().optional(),
+    createdByEq: userIdSchema.optional(),
     createdAtBefore: timestampSchema.optional(),
     createdAtAfter: timestampSchema.optional(),
-    updatedBy: userIdSchema.optional(),
+    updatedByEq: userIdSchema.optional(),
     updatedAtBefore: timestampSchema.optional(),
     updatedAtAfter: timestampSchema.optional(),
-    deleted: z.boolean().optional(),
+    deletedEq: z.boolean().optional(),
 })
 
 export const clientFilterSchema = baseDataFilterSchema.extend({
-    name: z.string().optional(),
-    mobile: z.string().optional(),
-    email: z.string().optional(),
+    nameLike: z.string().optional(),
+    mobileLike: z.string().optional(),
+    emailLike: z.string().optional(),
 })
 
 export const realtorFilterSchema = baseDataFilterSchema.extend({
-    name: z.string().optional(),
+    nameLike: z.string().optional(),
 })
 
 export const propertyFilterSchema = baseDataFilterSchema.extend({
-    address: z.string().optional(),
-    type: z.enum(propertyTypes).optional(),
-    state: z.enum(propertyStates).optional(),
+    addressLike: z.string().optional(),
+    typeEq: z.enum(propertyTypes).optional(),
+    stateEq: z.enum(propertyStates).optional(),
     ownerEq: dataIdSchema.optional(),
-    relatedRealtorIds: dataIdSchema.array().optional(),
+    relatedRealtorIdsHas: dataIdSchema.array().optional(),
     exclusiveRealtorEq: dataIdSchema.optional(),
 })
 
 export const contractFilterSchema = baseDataFilterSchema.extend({
-    client: dataIdSchema.optional(),
-    property: dataIdSchema.optional(),
+    clientEq: dataIdSchema.optional(),
+    propertyEq: dataIdSchema.optional(),
     startBefore: timestampSchema.optional(),
     startAfter: timestampSchema.optional(),
     endBefore: timestampSchema.optional(),

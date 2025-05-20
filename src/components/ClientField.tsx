@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Client } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
@@ -24,6 +25,8 @@ export default function ClientField({
   errorMessage,
   readOnly,
 }: ClientFieldProps) {
+  const { t } = useTranslation();
+
   const [selectClientModalOpen, setSelectClientModalOpen] = useState(false);
 
   const removeSelected = useCallback(
@@ -61,7 +64,7 @@ export default function ClientField({
         ))}
       />
       <CustomModal
-        title="Select client(s)"
+        title={t("titles.selectClient")}
         open={selectClientModalOpen}
         onClose={() => setSelectClientModalOpen(false)}
       >

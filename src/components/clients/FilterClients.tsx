@@ -1,5 +1,6 @@
 import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import FilterBaseData from "../FilterBaseData";
 import { CustomTextField } from "../CustomTextField";
@@ -11,9 +12,7 @@ export interface FilterClientsProps {
 }
 
 export function FilterClients({ filter, onChange }: FilterClientsProps) {
-  console.log(
-    `FilterClients -> render - defaultFilter: ${JSON.stringify(filter)}`
-  );
+  const { t } = useTranslation();
 
   const setFilterValue = useCallback(
     (value: Partial<ClientFilter>) => {
@@ -26,29 +25,33 @@ export function FilterClients({ filter, onChange }: FilterClientsProps) {
     <Grid2 container spacing={1}>
       <Grid2 size={6}>
         <CustomTextField
-          label="Name"
+          label={t("entities.client.filter.nameLike")}
           variant="outlined"
-          value={filter.name || ""}
+          value={filter.nameLike || ""}
           delay={500}
-          onChange={(value) => setFilterValue({ name: value || undefined })}
+          onChange={(value) => setFilterValue({ nameLike: value || undefined })}
           fullWidth
         />
       </Grid2>
       <Grid2 size={3}>
         <CustomTextField
-          label="Mobile"
+          label={t("entities.client.filter.mobileLike")}
           variant="outlined"
-          value={filter.mobile || ""}
-          onChange={(value) => setFilterValue({ mobile: value || undefined })}
+          value={filter.mobileLike || ""}
+          onChange={(value) =>
+            setFilterValue({ mobileLike: value || undefined })
+          }
           fullWidth
         />
       </Grid2>
       <Grid2 size={3}>
         <CustomTextField
-          label="Email"
+          label={t("entities.client.filter.emailLike")}
           variant="outlined"
-          value={filter.email || ""}
-          onChange={(value) => setFilterValue({ email: value || undefined })}
+          value={filter.emailLike || ""}
+          onChange={(value) =>
+            setFilterValue({ emailLike: value || undefined })
+          }
           fullWidth
         />
       </Grid2>

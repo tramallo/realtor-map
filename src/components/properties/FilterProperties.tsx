@@ -1,11 +1,6 @@
 import { memo, useCallback } from "react";
-import {
-  FormControl,
-  Grid2,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { Grid2 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   PropertyState,
@@ -18,6 +13,7 @@ import RealtorField from "../RealtorField";
 import FilterBaseData from "../FilterBaseData";
 import { CustomTextField } from "../CustomTextField";
 import { PropertyFilter } from "../../utils/data-filter-schema";
+import { CustomSelectField } from "../CustomSelectField";
 
 export interface FilterPropertiesProps {
   filter: PropertyFilter;
@@ -25,9 +21,7 @@ export interface FilterPropertiesProps {
 }
 
 export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
-  console.log(
-    `FilterProperties -> render - defaultFilter: ${JSON.stringify(filter)}`
-  );
+  const { t } = useTranslation();
 
   const setFilterValue = useCallback(
     (value: Partial<PropertyFilter>) => {
@@ -40,69 +34,45 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
     <Grid2 container spacing={1}>
       <Grid2 size={6}>
         <CustomTextField
-          label="Address"
+          label={t("entities.property.filter.addressLike")}
           variant="outlined"
-          value={filter.address || ""}
+          value={filter.addressLike || ""}
           delay={500}
-          onChange={(value) => setFilterValue({ address: value || undefined })}
+          onChange={(value) =>
+            setFilterValue({ addressLike: value || undefined })
+          }
           fullWidth
         />
       </Grid2>
       <Grid2 size={3}>
-        <FormControl fullWidth>
-          <InputLabel id="FilterProperties-Select-State-label">
-            State
-          </InputLabel>
-          <Select
-            labelId="FilterProperties-Select-State-label"
-            label="State"
-            value={filter.state || ""}
-            variant="outlined"
-            onChange={(e) =>
-              setFilterValue({ state: e.target.value as PropertyState })
-            }
-            sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
-          >
-            <MenuItem value={undefined}>_</MenuItem>
-            {propertyStates.map((propertyState, index) => (
-              <MenuItem
-                key={`select-${propertyState}-${index}`}
-                value={propertyState}
-              >
-                {propertyState}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <CustomSelectField
+          label={t("entities.property.filter.stateEq")}
+          value={filter.stateEq || ""}
+          onChange={(e) =>
+            setFilterValue({ stateEq: e.target.value as PropertyState })
+          }
+          options={propertyStates.map((propertyState) => ({
+            label: propertyState,
+            value: propertyState,
+          }))}
+        />
       </Grid2>
       <Grid2 size={3}>
-        <FormControl fullWidth>
-          <InputLabel id="FilterProperties-Select-Type-label">Type</InputLabel>
-          <Select
-            labelId="FilterProperties-Select-Type-label"
-            label="Type"
-            value={filter.type || ""}
-            variant="outlined"
-            onChange={(e) =>
-              setFilterValue({ type: e.target.value as PropertyType })
-            }
-            sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
-          >
-            <MenuItem value={undefined}>_</MenuItem>
-            {propertyTypes.map((propertyType, index) => (
-              <MenuItem
-                key={`select-${propertyType}-${index}`}
-                value={propertyType}
-              >
-                {propertyType}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <CustomSelectField
+          label={t("entities.property.filter.typeEq")}
+          value={filter.typeEq || ""}
+          onChange={(e) =>
+            setFilterValue({ typeEq: e.target.value as PropertyType })
+          }
+          options={propertyTypes.map((propertyType) => ({
+            label: propertyType,
+            value: propertyType,
+          }))}
+        />
       </Grid2>
       <Grid2 size={3}>
         <ClientField
-          label="Owner"
+          label={t("entities.property.filter.ownerEq")}
           selected={filter.ownerEq ? [filter.ownerEq] : []}
           onSelect={(newValue) =>
             setFilterValue({
@@ -113,7 +83,7 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
       </Grid2>
       <Grid2 size={4}>
         <RealtorField
-          label="Exclusive realtor"
+          label={t("entities.property.filter.exclusiveRealtorEq")}
           selected={
             filter.exclusiveRealtorEq ? [filter.exclusiveRealtorEq] : []
           }
@@ -126,12 +96,12 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
       </Grid2>
       <Grid2 size={5}>
         <RealtorField
-          label="Related realtors"
+          label={t("entities.property.filter.relatedRealtorIdsHas")}
           multiple
-          selected={filter.relatedRealtorIds ?? []}
+          selected={filter.relatedRealtorIdsHas ?? []}
           onSelect={(newValue) =>
             setFilterValue({
-              relatedRealtorIds: newValue.length ? newValue : undefined,
+              relatedRealtorIdsHas: newValue.length ? newValue : undefined,
             })
           }
         />

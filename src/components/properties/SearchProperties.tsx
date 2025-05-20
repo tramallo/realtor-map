@@ -6,6 +6,7 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   searchResultByStringFilter,
@@ -26,8 +27,9 @@ export interface SearchPropertiesProps {
 
 export default function SearchProperties({
   onSearch,
-  defaultFilter = { deleted: false },
+  defaultFilter = { deletedEq: false },
 }: SearchPropertiesProps) {
+  const { t } = useTranslation();
   const searchProperties = usePropertyStore((store) => store.searchProperties);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -74,7 +76,9 @@ export default function SearchProperties({
                 ? undefined
                 : searchPropertiesResponse?.error
                 ? searchPropertiesResponse?.error.message
-                : `Filters (${countDefinedAttributes(propertiesFilter)})`
+                : `${t("fields.searchLabel.text")} (${countDefinedAttributes(
+                    propertiesFilter
+                  )})`
             }
             disabled={searchingProperties}
             color={

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../../utils/data-schema";
 import { CardProperty } from "./CardProperty";
@@ -20,7 +21,7 @@ export function ListProperties({
   multiselect,
   ...stackProps
 }: ListPropertiesProps) {
-  console.log(`ListProperties -> render`);
+  const { t } = useTranslation();
 
   const togglePropertySelection = useCallback(
     (propertyId: Property["id"]) => {
@@ -71,7 +72,7 @@ export function ListProperties({
       </Box>
       {onSelect && (
         <ComponentsField
-          label="Selected"
+          label={t("fields.selectedField.label")}
           components={selected.map((selectedId) => (
             <PropertyChip
               propertyId={selectedId}

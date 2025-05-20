@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useTranslation } from "react-i18next";
 
 import { Client } from "../../utils/data-schema";
 import { fetchByIdSelector, useClientStore } from "../../stores/clientsStore";
@@ -21,6 +22,7 @@ export interface CardClientProps {
 }
 
 export function CardClient({ clientId, onClick, selected }: CardClientProps) {
+  const { t } = useTranslation();
   const fetchClient = useClientStore((store) => store.fetchClient);
 
   const [fetchingClient, setFetchingClient] = useState(false);
@@ -58,7 +60,7 @@ export function CardClient({ clientId, onClick, selected }: CardClientProps) {
         <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchClientResponse?.error
             ? fetchClientResponse?.error.message
-            : "Client not found"}
+            : t("errorMessages.clientNotFound", { clientId: clientId })}
         </Typography>
       )}
       {!fetchingClient && cachedClient && (
@@ -87,7 +89,7 @@ export function CardClient({ clientId, onClick, selected }: CardClientProps) {
           </Stack>
 
           <CustomModal
-            title={`View client: ${cachedClient.name}`}
+            title={t("titles.viewClient")}
             open={viewClientModalOpen}
             onClose={() => setViewClientModalOpen(false)}
           >

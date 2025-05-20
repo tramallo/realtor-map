@@ -1,8 +1,10 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Stack } from "@mui/material";
+
 import { Client } from "../../utils/data-schema";
 import { ListPersons } from "./ListClients";
 import SearchClients from "./SearchClients";
-import { useState } from "react";
 
 export interface SelectClientProps {
   onSelect: (selected: Array<Client["id"]>) => void;
@@ -15,6 +17,8 @@ export function SelectClient({
   defaultSelected,
   multiselect,
 }: SelectClientProps) {
+  const { t } = useTranslation();
+
   const [searchResult, setSearchResult] = useState([] as Array<Client["id"]>);
   const [selected, setSelected] = useState(defaultSelected ?? []);
 
@@ -42,7 +46,7 @@ export function SelectClient({
           spacing={2}
         >
           <Button variant="contained" onClick={() => onSelect(selected)}>
-            Confirm
+            {t("buttons.confirmButton.label")}
           </Button>
         </Stack>
       </Stack>

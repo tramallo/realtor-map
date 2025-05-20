@@ -1,5 +1,6 @@
 import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { ContractFilter } from "../../utils/data-filter-schema";
 import FilterBaseData from "../FilterBaseData";
@@ -13,9 +14,7 @@ export interface FilterContractsProps {
 }
 
 export function FilterContracts({ filter, onChange }: FilterContractsProps) {
-  console.log(
-    `FilterContracts -> render - defaultFilter: ${JSON.stringify(filter)}`
-  );
+  const { t } = useTranslation();
 
   const setFilterValue = useCallback(
     (value: Partial<ContractFilter>) => {
@@ -28,14 +27,14 @@ export function FilterContracts({ filter, onChange }: FilterContractsProps) {
     <Grid2 container spacing={1}>
       <Grid2 size={4}>
         <ClientField
-          label="Client"
-          selected={filter.client ? [filter.client] : []}
-          onSelect={(newValue) => setFilterValue({ client: newValue[0] })}
+          label={t("entities.contract.filter.clientEq")}
+          selected={filter.clientEq ? [filter.clientEq] : []}
+          onSelect={(newValue) => setFilterValue({ clientEq: newValue[0] })}
         />
       </Grid2>
       <Grid2 size={4}>
         <DateField
-          label="Start before"
+          label={t("entities.contract.filter.startBefore")}
           value={filter.startBefore}
           onChange={(newValue) =>
             setFilterValue({ startBefore: newValue ?? undefined })
@@ -44,7 +43,7 @@ export function FilterContracts({ filter, onChange }: FilterContractsProps) {
       </Grid2>
       <Grid2 size={4}>
         <DateField
-          label="Start after"
+          label={t("entities.contract.filter.startAfter")}
           value={filter.startAfter}
           onChange={(newValue) =>
             setFilterValue({ startAfter: newValue ?? undefined })
@@ -53,14 +52,14 @@ export function FilterContracts({ filter, onChange }: FilterContractsProps) {
       </Grid2>
       <Grid2 size={4}>
         <PropertyField
-          label="Property"
-          selected={filter.property ? [filter.property] : []}
-          onSelect={(newValue) => setFilterValue({ property: newValue[0] })}
+          label={t("entities.contract.filter.propertyEq")}
+          selected={filter.propertyEq ? [filter.propertyEq] : []}
+          onSelect={(newValue) => setFilterValue({ propertyEq: newValue[0] })}
         />
       </Grid2>
       <Grid2 size={4}>
         <DateField
-          label="End before"
+          label={t("entities.contract.filter.endBefore")}
           value={filter.endBefore}
           onChange={(newValue) =>
             setFilterValue({ endBefore: newValue ?? undefined })
@@ -69,7 +68,7 @@ export function FilterContracts({ filter, onChange }: FilterContractsProps) {
       </Grid2>
       <Grid2 size={4}>
         <DateField
-          label="End after"
+          label={t("entities.contract.filter.endAfter")}
           value={filter.endAfter}
           onChange={(newValue) =>
             setFilterValue({ endAfter: newValue ?? undefined })

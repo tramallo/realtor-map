@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, BoxProps, CircularProgress, Typography } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers";
+import { useTranslation } from "react-i18next";
 
 import {
   CustomCalendarDay,
@@ -24,6 +25,7 @@ export function CalendarContracts({
   contractIds,
   ...boxProps
 }: CalendarContractsProps) {
+  const { t } = useTranslation();
   const contracts = useContractStore((store) => store.contracts);
   const fetchContracts = useContractStore((store) => store.fetchContracts);
 
@@ -33,7 +35,7 @@ export function CalendarContracts({
   );
 
   //controls modal open state
-  const [viewContractsDate, setViewContractsDate] = useState(
+  const [selectedDateString, setSelectedDateString] = useState(
     undefined as string | undefined
   );
 
@@ -129,20 +131,20 @@ export function CalendarContracts({
 
             return {
               highlightColors: highlightDay.colors,
-              onClick: () => setViewContractsDate(ownerDayAsString),
+              onClick: () => setSelectedDateString(ownerDayAsString),
             };
           },
         }}
       />
       <CustomModal
-        title={`Contracts at ${viewContractsDate}`}
-        open={viewContractsDate != undefined}
-        onClose={() => setViewContractsDate(undefined)}
+        title={t("titles.contractsAtDay", { dateString: selectedDateString })}
+        open={selectedDateString != undefined}
+        onClose={() => setSelectedDateString(undefined)}
       >
         <Box padding={1}>
           <ListContracts
             contractIds={
-              highlightedDates[viewContractsDate!]?.contractIds ?? []
+              highlightedDates[selectedDateString!]?.contractIds ?? []
             }
           />
         </Box>

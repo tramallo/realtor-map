@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Realtor } from "../utils/data-schema";
 import { ListRealtors } from "../components/realtors/ListRealtors";
@@ -8,6 +9,8 @@ import CustomModal from "../components/CustomModal";
 import CreateRealtor from "../components/realtors/CreateRealtor";
 
 export function RealtorsLayout() {
+  const { t } = useTranslation();
+
   const [searchResults, setSearchResults] = useState(
     [] as Array<Realtor["id"]>
   );
@@ -40,11 +43,11 @@ export function RealtorsLayout() {
             color="success"
             onClick={() => setCreateRealtorModalOpen(true)}
           >
-            New realtor
+            {t("buttons.newRealtorButton.label")}
           </Button>
         </Stack>
         <CustomModal
-          title="New realtor"
+          title={t("titles.newRealtor")}
           open={createRealtorModalOpen}
           onClose={() => setCreateRealtorModalOpen(false)}
         >
