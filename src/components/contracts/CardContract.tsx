@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useTranslation } from "react-i18next";
 
 import { Contract } from "../../utils/data-schema";
 import {
@@ -33,6 +34,7 @@ export function CardContract({
   onClick,
   selected,
 }: CardContractProps) {
+  const { t } = useTranslation();
   const fetchContract = useContractStore((store) => store.fetchContract);
 
   const [fetchingContract, setFetchingContract] = useState(false);
@@ -71,7 +73,7 @@ export function CardContract({
         <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchContractResponse?.error
             ? fetchContractResponse?.error.message
-            : "Contract not found"}
+            : t("errorMessages.contractNotFound", { contractId: contractId })}
         </Typography>
       )}
       {!fetchingContract && contract && (
@@ -103,7 +105,7 @@ export function CardContract({
             </IconButton>
           </Stack>
           <CustomModal
-            title={`View Contract: ${contractId}`}
+            title={t("titles.viewContract")}
             open={viewContractModalOpen}
             onClose={() => setViewContractModalOpen(false)}
           >

@@ -1,5 +1,6 @@
 import { Chip, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../utils/data-schema";
 import ViewProperty from "./properties/ViewProperty";
@@ -16,6 +17,7 @@ export default function PropertyChip({
   propertyId,
   onClose,
 }: PropertyChipProps) {
+  const { t } = useTranslation();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
 
   const [fetchingProperty, setFetchingProperty] = useState(false);
@@ -49,7 +51,7 @@ export default function PropertyChip({
             ? "Error"
             : cachedProperty
             ? cachedProperty.address
-            : "Not found"
+            : t("errorMessages.propertyNotFound")
         }
         color={
           !fetchPropertyResponse
@@ -67,7 +69,7 @@ export default function PropertyChip({
         size="small"
       />
       <CustomModal
-        title={`View property: ${propertyId}`}
+        title={t("titles.viewProperty")}
         open={viewPropertyModalOpen}
         onClose={() => setViewPropertyModalOpen(false)}
       >

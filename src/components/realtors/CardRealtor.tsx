@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useTranslation } from "react-i18next";
 
 import { Realtor } from "../../utils/data-schema";
 import { fetchByIdSelector, useRealtorStore } from "../../stores/realtorsStore";
@@ -25,6 +26,7 @@ export function CardRealtor({
   onClick,
   selected,
 }: CardRealtorProps) {
+  const { t } = useTranslation();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
 
   const [fetchingRealtor, setFetchingRealtor] = useState(false);
@@ -61,7 +63,7 @@ export function CardRealtor({
         <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchRealtorResponse?.error
             ? fetchRealtorResponse?.error.message
-            : "Realtor not found"}
+            : t("errorMessages.realtorNotFound", { realtorId: realtorId })}
         </Typography>
       )}
       {!fetchingRealtor && realtor && (
@@ -87,7 +89,7 @@ export function CardRealtor({
           </Stack>
 
           <CustomModal
-            title={`View Realtor: ${realtor.name}`}
+            title={t("titles.viewRealtor")}
             open={viewRealtorModalOpen}
             onClose={() => setViewRealtorModalOpen(false)}
           >

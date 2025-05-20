@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CircularProgress, Stack, Typography } from "@mui/material";
+import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   Realtor,
@@ -26,6 +27,7 @@ export default function UpdateRealtor({
   realtorId,
   onUpdate,
 }: UpdateRealtorProps) {
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
@@ -62,22 +64,20 @@ export default function UpdateRealtor({
       setUpdatingRealtor(false);
 
       if (updateResponse.error) {
-        notifyUser("Error. Realtor not updated.");
+        notifyUser(t("errorMessages.realtorNotUpdated"));
         return;
       }
 
-      notifyUser("Realtor updated");
+      notifyUser(t("notifications.realtorUpdated"));
       if (onUpdate) {
         onUpdate();
       }
     },
-    [realtorId, cachedRealtor, updateRealtor, notifyUser, onUpdate]
+    [realtorId, cachedRealtor, updateRealtor, notifyUser, onUpdate, t]
   );
 
   // fetchRealtor effect
   useEffect(() => {
-    console.log(`UpdateRealtor -> effect [fetchRealtor]`);
-
     setFetchRealtorResponse(undefined);
     setFetchingRealtor(true);
     fetchRealtor(realtorId)
@@ -101,12 +101,22 @@ export default function UpdateRealtor({
           >
             {fetchRealtorResponse?.error
               ? fetchRealtorResponse.error.message
-              : `Realtor (id: ${realtorId}) not found`}
+              : t("errorMessages.realtorNotFound", { realtorId: realtorId })}
           </Typography>
         )}
         {!fetchingRealtor && cachedRealtor && (
           <>
-            <FormTextField fieldName="name" label="Name" />
+            {cachedRealtor.deleted && (
+              <Chip
+                label={t("entities.base.deleted")}
+                color="error"
+                variant="outlined"
+              />
+            )}
+            <FormTextField
+              fieldName="name"
+              label={t("entities.realtor.name")}
+            />
           </>
         )}
 
@@ -118,7 +128,7 @@ export default function UpdateRealtor({
         >
           <MemoSubmitButton
             onSubmit={submitUpdate}
-            label="Confirm update"
+            label={t("buttons.confirmButton.label")}
             color="warning"
             loading={updatingRealtor}
           />

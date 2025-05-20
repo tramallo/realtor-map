@@ -1,5 +1,6 @@
-import { Chip, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Chip, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Contract } from "../utils/data-schema";
 import ViewContract from "./contracts/ViewContract";
@@ -16,6 +17,7 @@ export default function ContractChip({
   contractId,
   onClose,
 }: ContractChipProps) {
+  const { t } = useTranslation();
   const fetchContract = useContractStore((store) => store.fetchContract);
 
   const [fetchingContract, setFetchingContract] = useState(false);
@@ -49,7 +51,7 @@ export default function ContractChip({
             ? "Error"
             : cachedContract
             ? `${cachedContract.property}:${cachedContract.client}`
-            : "Not found"
+            : t("errorMessages.contractNotFound")
         }
         color={
           !fetchContractResponse
@@ -67,7 +69,7 @@ export default function ContractChip({
         size="small"
       />
       <CustomModal
-        title={`View contract: ${contractId}`}
+        title={t("titles.viewContract")}
         open={viewContractModalOpen}
         onClose={() => setViewContractModalOpen(false)}
       >

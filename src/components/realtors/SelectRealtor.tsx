@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Button, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
+
 import { Realtor } from "../../utils/data-schema";
 import { ListRealtors } from "./ListRealtors";
 import SearchRealtors from "./SearchRealtors";
-import { useState } from "react";
 
 export interface SelectRealtorProps {
   onSelect: (selected: Array<Realtor["id"]>) => void;
@@ -15,6 +17,8 @@ export function SelectRealtor({
   defaultSelected,
   multiselect,
 }: SelectRealtorProps) {
+  const { t } = useTranslation();
+
   const [searchResult, setSearchResult] = useState([] as Array<Realtor["id"]>);
   const [selected, setSelected] = useState(defaultSelected ?? []);
 
@@ -42,7 +46,7 @@ export function SelectRealtor({
           spacing={2}
         >
           <Button variant="contained" onClick={() => onSelect(selected)}>
-            Confirm
+            {t("buttons.confirmButton.label")}
           </Button>
         </Stack>
       </Stack>

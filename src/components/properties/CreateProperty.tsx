@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   CreatePropertyDTO,
@@ -28,8 +29,7 @@ export default function CreateProperty({
   prefillProperty,
   onCreate,
 }: CreatePropertyProps) {
-  console.log(`CreateProperty -> render`);
-
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createProperty = usePropertyStore((store) => store.createProperty);
@@ -57,16 +57,16 @@ export default function CreateProperty({
       setCreatingProperty(false);
 
       if (createResponse.error) {
-        notifyUser("Error. Property not created.");
+        notifyUser(t("errorMessages.propertyNotCreated"));
         return;
       }
 
-      notifyUser("Property created.");
+      notifyUser(t("notifications.propertyCreated"));
       if (onCreate) {
         onCreate();
       }
     },
-    [createProperty, notifyUser, onCreate]
+    [createProperty, notifyUser, onCreate, t]
   );
 
   return (
@@ -78,48 +78,48 @@ export default function CreateProperty({
         <FormLocationField
           addressFieldName="address"
           coordinatesFieldName="coordinates"
-          label="Address"
+          label={t("entities.property.address")}
           readOnly={creatingProperty}
         />
         <FormSelectField
           fieldName="type"
-          label="Type"
+          label={t("entities.property.type")}
           readOnly={creatingProperty}
           options={propertyTypes.map((propertyType) => ({
             label: propertyType,
             value: propertyType,
           }))}
-          emptyOptionLabel="select a type"
+          emptyOptionLabel="_"
         />
         <FormSelectField
           fieldName="state"
-          label="State"
+          label={t("entities.property.state")}
           readOnly={creatingProperty}
           options={propertyStates.map((propertyState) => ({
             label: propertyState,
             value: propertyState,
           }))}
-          emptyOptionLabel="select a state"
+          emptyOptionLabel="_"
         />
         <FormPersonField
           fieldName="owner"
-          label="Owner"
+          label={t("entities.property.owner")}
           readOnly={creatingProperty}
         />
         <FormTextField
           fieldName="description"
-          label="Description"
+          label={t("entities.property.description")}
           disabled={creatingProperty}
           multiline
         />
         <FormRealtorField
           fieldName="exclusiveRealtor"
-          label="Exclusive realtor"
+          label={t("entities.property.exclusiveRealtor")}
           readOnly={creatingProperty}
         />
         <FormRealtorField
           fieldName="relatedRealtorIds"
-          label="Associated realtors"
+          label={t("entities.property.relatedRealtorIds")}
           readOnly={creatingProperty}
           multiple
         />
@@ -132,7 +132,7 @@ export default function CreateProperty({
         >
           <MemoSubmitButton
             onSubmit={submitProperty}
-            label="Create"
+            label={t("buttons.confirmButton.label")}
             color="success"
             loading={creatingProperty}
           />

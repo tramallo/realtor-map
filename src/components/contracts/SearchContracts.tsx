@@ -6,6 +6,7 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   searchResultByStringFilter,
@@ -26,8 +27,9 @@ export interface SearchContractsProps {
 
 export default function SearchContracts({
   onSearch,
-  defaultFilter = { deleted: false },
+  defaultFilter = { deletedEq: false },
 }: SearchContractsProps) {
+  const { t } = useTranslation();
   const searchContracts = useContractStore((store) => store.searchContracts);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -74,7 +76,9 @@ export default function SearchContracts({
                 ? undefined
                 : searchContractsResponse?.error
                 ? searchContractsResponse?.error.message
-                : `Filters (${countDefinedAttributes(contractsFilter)})`
+                : `${t("fields.searchLabel.text")} (${countDefinedAttributes(
+                    contractsFilter
+                  )})`
             }
             disabled={searchingContracts}
             color={

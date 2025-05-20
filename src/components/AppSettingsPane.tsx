@@ -9,7 +9,7 @@ export function AppSettingsPane() {
   return (
     <Stack>
       <CustomSelectField
-        label={t("components.appSettingsPane.languageSelector.label")}
+        label={t("fields.languageField.label")}
         value={i18n.language}
         onChange={(e) => i18n.changeLanguage(e.target.value as string)}
         options={supportedLanguages.map((supportedLang) => ({

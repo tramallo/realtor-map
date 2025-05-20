@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Client } from "../../utils/data-schema";
 import { CardClient } from "./CardClient";
@@ -20,7 +21,7 @@ export function ListPersons({
   multiselect,
   ...stackProps
 }: ListClientsProps) {
-  console.log(`ListClients -> render`);
+  const { t } = useTranslation();
 
   const toggleClientSelection = useCallback(
     (clientId: Client["id"]) => {
@@ -71,7 +72,7 @@ export function ListPersons({
       </Box>
       {onSelect && (
         <ComponentsField
-          label="Selected"
+          label={t("fields.selectedField.label")}
           components={selected.map((selectedId) => (
             <ClientChip
               clientId={selectedId}

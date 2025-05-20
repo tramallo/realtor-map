@@ -6,6 +6,7 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   searchResultByStringFilter,
@@ -26,8 +27,9 @@ export interface SearchClientProps {
 
 export default function SearchClients({
   onSearch,
-  defaultFilter = { deleted: false },
+  defaultFilter = { deletedEq: false },
 }: SearchClientProps) {
+  const { t } = useTranslation();
   const searchClients = useClientStore((store) => store.searchClients);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -74,7 +76,9 @@ export default function SearchClients({
                 ? undefined
                 : searchClientsResponse?.error
                 ? searchClientsResponse?.error.message
-                : `Filters (${countDefinedAttributes(clientsFilter)})`
+                : `${t("fields.searchLabel.text")} (${countDefinedAttributes(
+                    clientsFilter
+                  )})`
             }
             disabled={searchingClients}
             color={

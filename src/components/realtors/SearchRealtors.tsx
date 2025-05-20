@@ -6,6 +6,7 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   searchResultByStringFilter,
@@ -26,8 +27,9 @@ export interface SearchRealtorsProps {
 
 export default function SearchRealtors({
   onSearch,
-  defaultFilter = { deleted: false },
+  defaultFilter = { deletedEq: false },
 }: SearchRealtorsProps) {
+  const { t } = useTranslation();
   const searchRealtors = useRealtorStore((store) => store.searchRealtors);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -74,7 +76,9 @@ export default function SearchRealtors({
                 ? undefined
                 : searchRealtorsResponse?.error
                 ? searchRealtorsResponse?.error.message
-                : `Filters (${countDefinedAttributes(realtorsFilter)})`
+                : `${t("fields.searchLabel.text")} (${countDefinedAttributes(
+                    realtorsFilter
+                  )})`
             }
             disabled={searchingRealtors}
             color={

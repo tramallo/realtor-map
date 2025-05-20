@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../utils/data-schema";
 import SearchProperties from "../components/properties/SearchProperties";
@@ -11,6 +12,8 @@ import CustomModal from "../components/CustomModal";
 import CreateProperty from "../components/properties/CreateProperty";
 
 export function PropertiesLayout() {
+  const { t } = useTranslation();
+
   const [view, setView] = useState("list" as "list" | "map");
   const [searchResults, setSearchResults] = useState(
     [] as Array<Property["id"]>
@@ -69,11 +72,11 @@ export function PropertiesLayout() {
             color="success"
             onClick={() => setCreatePropertyModalOpen(true)}
           >
-            New property
+            {t("buttons.newPropertyButton.label")}
           </Button>
         </Stack>
         <CustomModal
-          title="New property"
+          title={t("titles.newProperty")}
           open={createPropertyModalOpen}
           onClose={() => setCreatePropertyModalOpen(false)}
         >

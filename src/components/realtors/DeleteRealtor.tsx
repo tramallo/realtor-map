@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
 import { Realtor, UpdateRealtorDTO } from "../../utils/data-schema";
@@ -28,8 +29,7 @@ export default function DeleteRealtor({
   onSoftDelete,
   onRestore,
 }: DeleteRealtorProps) {
-  console.log(`DeleteRealtor -> render`);
-
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
@@ -57,15 +57,15 @@ export default function DeleteRealtor({
     setSoftDeletingRealtor(false);
 
     if (softDeleteResponse.error) {
-      notifyUser("Error. Realtor not deleted.");
+      notifyUser(t("errorMessages.realtorNotDeleted"));
       return;
     }
 
-    notifyUser("Realtor deleted.");
+    notifyUser(t("notifications.realtorDeleted"));
     if (onSoftDelete) {
       onSoftDelete();
     }
-  }, [realtorId, updateRealtor, notifyUser, onSoftDelete, userSession]);
+  }, [realtorId, updateRealtor, notifyUser, onSoftDelete, userSession, t]);
 
   const restoreRealtor = useCallback(async () => {
     console.log(`DeleteRealtor -> restoreRealtor ${realtorId}`);
@@ -79,20 +79,18 @@ export default function DeleteRealtor({
     setRestoringRealtor(false);
 
     if (restoreResponse.error) {
-      notifyUser("Error. Realtor not restored.");
+      notifyUser(t("errorMessages.realtorNotRestored"));
       return;
     }
 
-    notifyUser("Realtor restored.");
+    notifyUser(t("notifications.realtorRestored"));
     if (onRestore) {
       onRestore();
     }
-  }, [realtorId, updateRealtor, notifyUser, onRestore, userSession]);
+  }, [realtorId, updateRealtor, notifyUser, onRestore, userSession, t]);
 
   // fetchRealtor effect
   useEffect(() => {
-    console.log(`DeleteRealtor -> effect [fetchRealtor]`);
-
     setFetchRealtorResponse(undefined);
     setFetchingRealtor(true);
     fetchRealtor(realtorId)
@@ -115,15 +113,22 @@ export default function DeleteRealtor({
         >
           {fetchRealtorResponse?.error
             ? fetchRealtorResponse.error.message
-            : `Realtor (id: ${realtorId}) not found`}
+            : t("errorMessages.realtorNotFound", { realtorId: realtorId })}
         </Typography>
       )}
       {!fetchingRealtor && cachedRealtor && (
         <>
           {cachedRealtor.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
-          <CustomTextField label="Name" value={cachedRealtor.name ?? ""} />
+          <CustomTextField
+            label={t("entities.realtor.name")}
+            value={cachedRealtor.name ?? ""}
+          />
         </>
       )}
 
@@ -133,28 +138,22 @@ export default function DeleteRealtor({
         alignItems="center"
         justifyContent="end"
       >
-        {cachedRealtor?.deleted && (
+        {cachedRealtor && (
           <Button
             variant="contained"
-            color="success"
-            onClick={restoreRealtor}
+            color={cachedRealtor.deleted ? "success" : "error"}
+            onClick={cachedRealtor.deleted ? restoreRealtor : softDeleteRealtor}
             disabled={
               fetchingRealtor || restoringRealtor || softDeletingRealtor
             }
           >
-            {restoringRealtor ? <CircularProgress /> : "Restore"}
-          </Button>
-        )}
-        {cachedRealtor?.deleted !== true && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={softDeleteRealtor}
-            disabled={
-              fetchingRealtor || restoringRealtor || softDeletingRealtor
-            }
-          >
-            {softDeletingRealtor ? <CircularProgress /> : "Delete"}
+            {restoringRealtor || softDeletingRealtor ? (
+              <CircularProgress />
+            ) : cachedRealtor.deleted ? (
+              t("buttons.restoreButton.label")
+            ) : (
+              t("buttons.deleteButton.label")
+            )}
           </Button>
         )}
       </Stack>

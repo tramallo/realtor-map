@@ -6,11 +6,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { useClientStore, fetchByIdSelector } from "../../stores/clientsStore";
 import { Client } from "../../utils/data-schema";
 import DeleteClient from "./DeleteClient";
-import UpdatePerson from "./UpdateClient";
+import UpdateClient from "./UpdateClient";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import { CustomTextField } from "../CustomTextField";
@@ -21,6 +22,7 @@ export interface ViewClientProps {
 }
 
 export default function ViewClient({ clientId }: ViewClientProps) {
+  const { t } = useTranslation();
   const fetchClient = useClientStore((store) => store.fetchClient);
 
   const [fetchingClient, setFetchingClient] = useState(false);
@@ -35,8 +37,6 @@ export default function ViewClient({ clientId }: ViewClientProps) {
 
   //fetchClient effect
   useEffect(() => {
-    console.log(`ViewClient -> effect [fetchClient]`);
-
     setFetchClientResponse(undefined);
     setFetchingClient(true);
     fetchClient(clientId)
@@ -59,40 +59,59 @@ export default function ViewClient({ clientId }: ViewClientProps) {
         >
           {fetchClientResponse?.error
             ? fetchClientResponse.error.message
-            : `Client (id: ${clientId}) not found`}
+            : t("errorMessages.clientNotFound", { clientId: clientId })}
         </Typography>
       )}
       {!fetchingClient && cachedClient && (
         <>
           {cachedClient.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           {cachedClient.name && (
-            <CustomTextField value={cachedClient.name ?? ""} label="Name" />
+            <CustomTextField
+              value={cachedClient.name ?? ""}
+              label={t("entities.client.name")}
+            />
           )}
           {cachedClient.mobile && (
-            <CustomTextField value={cachedClient.mobile ?? ""} label="Mobile" />
+            <CustomTextField
+              value={cachedClient.mobile ?? ""}
+              label={t("entities.client.mobile")}
+            />
           )}
           {cachedClient.email && (
-            <CustomTextField value={cachedClient.email ?? ""} label="Email" />
+            <CustomTextField
+              value={cachedClient.email ?? ""}
+              label={t("entities.client.email")}
+            />
           )}
           {cachedClient.createdBy && (
             <CustomTextField
-              label="Created by"
+              label={t("entities.base.createdBy")}
               value={cachedClient.createdBy}
             />
           )}
           {cachedClient.createdAt && (
-            <DateField label="Created at" value={cachedClient.createdAt} />
+            <DateField
+              label={t("entities.base.createdAt")}
+              value={cachedClient.createdAt}
+            />
           )}
           {cachedClient.updatedBy && (
             <CustomTextField
-              label="Updated by"
+              label={t("entities.base.updatedBy")}
               value={cachedClient.updatedBy}
             />
           )}
           {cachedClient.updatedAt && (
-            <DateField label="Updated at" value={cachedClient.updatedAt} />
+            <DateField
+              label={t("entities.base.updatedAt")}
+              value={cachedClient.updatedAt}
+            />
           )}
 
           <Stack
@@ -106,7 +125,9 @@ export default function ViewClient({ clientId }: ViewClientProps) {
               color={cachedClient.deleted ? "success" : "error"}
               onClick={() => setDeleteClientModalOpen(true)}
             >
-              {cachedClient.deleted ? "Restore" : "Delete"}
+              {cachedClient.deleted
+                ? t("buttons.restoreButton.label")
+                : t("buttons.deleteButton.label")}
             </Button>
             {!cachedClient.deleted && (
               <Button
@@ -114,12 +135,16 @@ export default function ViewClient({ clientId }: ViewClientProps) {
                 color="warning"
                 onClick={() => setUpdateClientModalOpen(true)}
               >
-                Update
+                {t("buttons.updateButton.label")}
               </Button>
             )}
           </Stack>
           <CustomModal
-            title={`Delete client: ${clientId}`}
+            title={
+              cachedClient.deleted
+                ? t("titles.restoreClient")
+                : t("titles.deleteClient")
+            }
             open={deleteClientModalOpen}
             onClose={() => setDeleteClientModalOpen(false)}
           >
@@ -130,11 +155,11 @@ export default function ViewClient({ clientId }: ViewClientProps) {
             />
           </CustomModal>
           <CustomModal
-            title={`Update client: ${clientId}`}
+            title={t("titles.updateClient")}
             open={updateClientModalOpen}
             onClose={() => setUpdateClientModalOpen(false)}
           >
-            <UpdatePerson
+            <UpdateClient
               clientId={clientId}
               onUpdate={() => setUpdateClientModalOpen(false)}
             />

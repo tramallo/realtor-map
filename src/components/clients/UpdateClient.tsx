@@ -1,5 +1,6 @@
-import { CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   Client,
@@ -22,10 +23,11 @@ export interface UpdateClientProps {
   onUpdate?: () => void;
 }
 
-export default function UpdatePerson({
+export default function UpdateClient({
   clientId,
   onUpdate,
 }: UpdateClientProps) {
+  const { t } = useTranslation();
   const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchClient = useClientStore((store) => store.fetchClient);
@@ -60,22 +62,20 @@ export default function UpdatePerson({
       setUpdatingClient(false);
 
       if (updateResponse.error) {
-        notifyUser("Error. Client not updated.");
+        notifyUser(t("errorMessages.clientNotUpdated"));
         return;
       }
 
-      notifyUser("Client updated.");
+      notifyUser(t("notifications.clientUpdated"));
       if (onUpdate) {
         onUpdate();
       }
     },
-    [clientId, cachedClient, updateClient, notifyUser, onUpdate]
+    [clientId, cachedClient, updateClient, notifyUser, onUpdate, t]
   );
 
   //fetchClient effect
   useEffect(() => {
-    console.log(`UpdateClient -> effect [fetchClient]`);
-
     setFetchClientResponse(undefined);
     setFetchingClient(true);
     fetchClient(clientId)
@@ -99,14 +99,27 @@ export default function UpdatePerson({
           >
             {fetchClientResponse?.error
               ? fetchClientResponse.error.message
-              : `Client (id: ${clientId}) not found`}
+              : t("errorMessages.clientNotFound", { clientId: clientId })}
           </Typography>
         )}
         {!fetchingClient && cachedClient && (
           <>
-            <FormTextField fieldName="name" label="Name" />
-            <FormTextField fieldName="mobile" label="Mobile" />
-            <FormTextField fieldName="email" label="Email" />
+            {cachedClient.deleted && (
+              <Chip
+                label={t("entities.base.deleted")}
+                color="error"
+                variant="outlined"
+              />
+            )}
+            <FormTextField fieldName="name" label={t("entities.client.name")} />
+            <FormTextField
+              fieldName="mobile"
+              label={t("entities.client.mobile")}
+            />
+            <FormTextField
+              fieldName="email"
+              label={t("entities.client.email")}
+            />
           </>
         )}
 
@@ -118,7 +131,7 @@ export default function UpdatePerson({
         >
           <MemoSubmitButton
             onSubmit={submitUpdate}
-            label="Confirm update"
+            label={t("buttons.confirmButton.label")}
             color="warning"
             loading={updatingClient}
           />

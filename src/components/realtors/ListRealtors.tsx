@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Realtor } from "../../utils/data-schema";
 import { CardRealtor } from "./CardRealtor";
@@ -20,7 +21,7 @@ export function ListRealtors({
   multiselect,
   ...stackProps
 }: ListRealtorsProps) {
-  console.log(`ListRealtors -> render`);
+  const { t } = useTranslation();
 
   const toggleRealtorSelection = useCallback(
     (realtorId: Realtor["id"]) => {
@@ -71,7 +72,7 @@ export function ListRealtors({
       </Box>
       {onSelect && (
         <ComponentsField
-          label="Selected"
+          label={t("fields.selectedField.label")}
           components={selected.map((selectedId) => (
             <RealtorChip
               key={selectedId}

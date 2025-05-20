@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Contract } from "../../utils/data-schema";
 import { CardContract } from "./CardContract";
@@ -20,7 +21,7 @@ export function ListContracts({
   multiselect,
   ...stackProps
 }: ListContractsProps) {
-  console.log(`ListContracts -> render`);
+  const { t } = useTranslation();
 
   const toggleContractSelection = useCallback(
     (contractId: Contract["id"]) => {
@@ -71,7 +72,7 @@ export function ListContracts({
       </Box>
       {onSelect && (
         <ComponentsField
-          label="Selected"
+          label={t("fields.selectedField.label")}
           components={selected.map((selectedId) => (
             <ContractChip
               contractId={selectedId}

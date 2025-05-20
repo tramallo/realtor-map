@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../../utils/data-schema";
 import { MemoMap } from "../Map";
@@ -25,6 +26,7 @@ export default function MapProperties({
   propertyIds,
   ...boxProps
 }: MapProperties) {
+  const { t } = useTranslation();
   const cachedProperties = usePropertyStore((store) => store.properties);
   const fetchProperties = usePropertyStore((store) => store.fetchProperties);
 
@@ -66,7 +68,7 @@ export default function MapProperties({
                     onClick={() => setViewPropertyModalId(propertyId)}
                     fullWidth
                   >
-                    View
+                    {t("buttons.viewButton.label")}
                   </Button>
                 </Popup>
               </Marker>
@@ -100,7 +102,7 @@ export default function MapProperties({
         </Box>
       )}
       <CustomModal
-        title={`View property: ${viewPropertyModalId ?? ""}`}
+        title={t("titles.viewProperty")}
         open={viewPropertyModalId != undefined}
         onClose={() => setViewPropertyModalId(undefined)}
       >

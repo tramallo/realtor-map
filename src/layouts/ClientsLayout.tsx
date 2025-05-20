@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Client } from "../utils/data-schema";
 import { ListPersons } from "../components/clients/ListClients";
@@ -8,6 +9,8 @@ import CustomModal from "../components/CustomModal";
 import CreateClient from "../components/clients/CreateClient";
 
 export function ClientsLayout() {
+  const { t } = useTranslation();
+
   const [searchResults, setSearchResults] = useState([] as Array<Client["id"]>);
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
 
@@ -38,11 +41,11 @@ export function ClientsLayout() {
             color="success"
             onClick={() => setCreateClientModalOpen(true)}
           >
-            New client
+            {t("buttons.newClientButton.label")}
           </Button>
         </Stack>
         <CustomModal
-          title="New client"
+          title={t("titles.newClient")}
           open={createClientModalOpen}
           onClose={() => setCreateClientModalOpen(false)}
         >

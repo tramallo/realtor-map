@@ -6,11 +6,15 @@ import {
   useState,
 } from "react";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { useTranslation } from "react-i18next";
 
 import CustomSnackbar from "./CustomSnackbar";
 import { LoginPane } from "./LoginPane";
 import CustomModal from "./CustomModal";
 import { useAuthContext } from "./AuthContext";
+import { SupportedLanguage, supportedLocales } from "../translations";
 
 type AppContext = {
   notifyUser: (message: string) => void;
@@ -26,11 +30,13 @@ export interface AppContenxtProviderProps {
 }
 
 export function AppContextProvider({ children }: AppContenxtProviderProps) {
+  const { i18n } = useTranslation();
+  const locale = supportedLocales[i18n.language as SupportedLanguage];
   const { userSession } = useAuthContext();
 
   const [currentMessage, setCurrentMessage] = useState("");
 
-  const [theme, setTheme] = useState(createTheme());
+  const [theme] = useState(createTheme());
 
   const notifyUser = useCallback((message: string) => {
     setCurrentMessage(message);
@@ -38,21 +44,23 @@ export function AppContextProvider({ children }: AppContenxtProviderProps) {
 
   return (
     <ThemeProvider theme={theme}>
-      <appContext.Provider value={{ notifyUser }}>
-        {userSession && children}
-        <CustomSnackbar
-          open={currentMessage != ""}
-          onClose={() => setCurrentMessage("")}
-          message={currentMessage}
-        />
-        <CustomModal
-          title="Login"
-          open={userSession == undefined}
-          slideDirection="down"
-        >
-          <LoginPane />
-        </CustomModal>
-      </appContext.Provider>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+        <appContext.Provider value={{ notifyUser }}>
+          {userSession && children}
+          <CustomSnackbar
+            open={currentMessage != ""}
+            onClose={() => setCurrentMessage("")}
+            message={currentMessage}
+          />
+          <CustomModal
+            title="Login"
+            open={userSession == undefined}
+            slideDirection="down"
+          >
+            <LoginPane />
+          </CustomModal>
+        </appContext.Provider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

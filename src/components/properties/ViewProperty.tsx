@@ -6,6 +6,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   usePropertyStore,
@@ -27,8 +28,7 @@ export interface ViewPropertyProps {
 }
 
 export default function ViewProperty({ propertyId }: ViewPropertyProps) {
-  console.log(`ViewProperty -> render`);
-
+  const { t } = useTranslation();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
 
   const [fetchingProperty, setFetchingProperty] = useState(false);
@@ -43,8 +43,6 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
 
   //fetchProperty effect
   useEffect(() => {
-    console.log(`ViewProperty -> effect [fetchProperty]`);
-
     setFetchPropertyResponse(undefined);
     setFetchingProperty(true);
     fetchProperty(propertyId)
@@ -67,29 +65,39 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
         >
           {fetchPropertyResponse?.error
             ? fetchPropertyResponse.error.message
-            : `Property (id: ${propertyId}) not found`}
+            : t("errorMessages.propertyNotFound", { propertyId: propertyId })}
         </Typography>
       )}
       {!fetchingProperty && cachedProperty && (
         <>
           {cachedProperty.deleted && (
-            <Chip label="Deleted" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           {cachedProperty.address && (
             <CustomTextField
               value={cachedProperty.address ?? ""}
-              label="Address"
+              label={t("entities.property.address")}
             />
           )}
           {cachedProperty.type && (
-            <CustomTextField value={cachedProperty.type ?? ""} label="Type" />
+            <CustomTextField
+              value={cachedProperty.type ?? ""}
+              label={t("entities.property.type")}
+            />
           )}
           {cachedProperty.state && (
-            <CustomTextField value={cachedProperty.state ?? ""} label="State" />
+            <CustomTextField
+              value={cachedProperty.state ?? ""}
+              label={t("entities.property.state")}
+            />
           )}
           {cachedProperty.owner && (
             <ComponentsField
-              label="Owner"
+              label={t("entities.property.owner")}
               components={
                 cachedProperty.owner
                   ? [<ClientChip clientId={cachedProperty.owner} />]
@@ -99,7 +107,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
           )}
           {cachedProperty.relatedRealtorIds && (
             <ComponentsField
-              label="Realtors"
+              label={t("entities.property.relatedRealtorIds")}
               components={(cachedProperty.relatedRealtorIds ?? []).map(
                 (realtorId, index) => (
                   <RealtorChip
@@ -112,7 +120,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
           )}
           {cachedProperty.exclusiveRealtor && (
             <ComponentsField
-              label="Exclusive realtor"
+              label={t("entities.property.exclusiveRealtor")}
               components={
                 cachedProperty.exclusiveRealtor
                   ? [
@@ -127,34 +135,34 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
           {cachedProperty.description && (
             <CustomTextField
               value={cachedProperty.description ?? ""}
-              label="Description"
+              label={t("entities.property.description")}
               multiline
             />
           )}
           {cachedProperty.createdBy && (
             <CustomTextField
-              label="Created by"
+              label={t("entities.base.createdBy")}
               value={cachedProperty.createdBy}
               disabled
             />
           )}
           {cachedProperty.createdAt && (
             <DateField
-              label="Created at"
+              label={t("entities.base.createdAt")}
               value={cachedProperty.createdAt}
               disabled
             />
           )}
           {cachedProperty.updatedBy && (
             <CustomTextField
-              label="Updated by"
+              label={t("entities.base.updatedBy")}
               value={cachedProperty.updatedBy}
               disabled
             />
           )}
           {cachedProperty.updatedAt && (
             <DateField
-              label="Updated at"
+              label={t("entities.base.updatedAt")}
               value={cachedProperty.updatedAt}
               disabled
             />
@@ -170,7 +178,9 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               color={cachedProperty.deleted ? "success" : "error"}
               onClick={() => setDeletePropertyModalOpen(true)}
             >
-              {cachedProperty.deleted ? "Restore" : "Delete"}
+              {cachedProperty.deleted
+                ? t("buttons.restoreButton.label")
+                : t("buttons.deleteButton.label")}
             </Button>
             {!cachedProperty.deleted && (
               <Button
@@ -178,12 +188,12 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
                 color="warning"
                 onClick={() => setUpdatePropertyModalOpen(true)}
               >
-                Update
+                {t("buttons.updateButton.label")}
               </Button>
             )}
           </Stack>
           <CustomModal
-            title={`Delete property: ${propertyId}`}
+            title={t("titles.deleteProperty")}
             open={deletePropertyModalOpen}
             onClose={() => setDeletePropertyModalOpen(false)}
           >
@@ -194,7 +204,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
             />
           </CustomModal>
           <CustomModal
-            title={`Update property: ${propertyId}`}
+            title={t("titles.updateProperty")}
             open={updatePropertyModalOpen}
             onClose={() => setUpdatePropertyModalOpen(false)}
           >

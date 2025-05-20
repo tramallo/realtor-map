@@ -1,5 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { Button, FormGroup, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Location } from "../../utils/services-interface";
 import { useCallback, useState } from "react";
@@ -24,6 +25,7 @@ export default function FormLocationField({
   defaultValue,
   readOnly,
 }: FormLocationFieldProps) {
+  const { t } = useTranslation();
   const { setValue } = useFormContext();
 
   const [selectLocationModalOpen, setSelectLocationModalOpen] = useState(false);
@@ -61,11 +63,11 @@ export default function FormLocationField({
           onClick={() => setSelectLocationModalOpen(true)}
           disabled={readOnly}
         >
-          Select
+          {t("buttons.selectButton.label")}
         </Button>
       </FormGroup>
       <CustomModal
-        title="Select location"
+        title={t("titles.selectLocation")}
         open={selectLocationModalOpen}
         onClose={() => setSelectLocationModalOpen(false)}
       >

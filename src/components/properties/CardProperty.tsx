@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../../utils/data-schema";
 import {
@@ -28,6 +29,7 @@ export function CardProperty({
   onClick,
   selected,
 }: CardPropertyProps) {
+  const { t } = useTranslation();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
 
   const [fetchingProperty, setFetchingProperty] = useState(false);
@@ -66,7 +68,7 @@ export function CardProperty({
         <Typography color="error" fontWeight="bold" sx={{ padding: 1 }}>
           {fetchPropertyResponse?.error
             ? fetchPropertyResponse?.error.message
-            : "Property not found"}
+            : t("errorMessages.propertyNotFound", { propertyId: propertyId })}
         </Typography>
       )}
       {!fetchingProperty && property && (
@@ -92,7 +94,7 @@ export function CardProperty({
           </Stack>
 
           <CustomModal
-            title={`View Property: ${property.address}`}
+            title={t("titles.viewProperty")}
             open={viewPropertyModalOpen}
             onClose={() => setViewPropertyModalOpen(false)}
           >

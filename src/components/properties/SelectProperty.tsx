@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { Button, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { Property } from "../../utils/data-schema";
 import { ListProperties } from "./ListProperties";
 import SearchProperties from "./SearchProperties";
-import { useState } from "react";
 
 export interface SelectPropertyProps {
   onSelect: (selected: Array<Property["id"]>) => void;
@@ -16,6 +17,8 @@ export function SelectProperty({
   defaultSelected,
   multiselect,
 }: SelectPropertyProps) {
+  const { t } = useTranslation();
+
   const [searchResult, setSearchResult] = useState([] as Array<Property["id"]>);
   const [selected, setSelected] = useState(defaultSelected ?? []);
 
@@ -43,7 +46,7 @@ export function SelectProperty({
           spacing={2}
         >
           <Button variant="contained" onClick={() => onSelect(selected)}>
-            Confirm
+            {t("buttons.confirmButton.label")}
           </Button>
         </Stack>
       </Stack>
