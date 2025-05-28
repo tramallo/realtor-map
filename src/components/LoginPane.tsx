@@ -3,11 +3,11 @@ import { Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { CustomTextField } from "./CustomTextField";
-import { useAuthContext } from "./AuthContext";
+import { useAuthStore } from "../stores/authStore";
 
 export function LoginPane() {
   const { t } = useTranslation();
-  const { startSession } = useAuthContext();
+  const startSession = useAuthStore(store => store.startSession);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

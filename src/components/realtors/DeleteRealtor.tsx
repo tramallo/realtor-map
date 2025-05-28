@@ -14,9 +14,9 @@ import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { CustomTextField } from "../CustomTextField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface DeleteRealtorProps {
   realtorId: Realtor["id"];
@@ -30,7 +30,7 @@ export default function DeleteRealtor({
   onRestore,
 }: DeleteRealtorProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
   const updateRealtor = useRealtorStore((store) => store.updateRealtor);

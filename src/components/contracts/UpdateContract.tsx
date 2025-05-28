@@ -17,12 +17,12 @@ import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { FormTextField } from "../form/FormTextField";
 import FormPropertyField from "../form/FormPropertyField";
 import FormPersonField from "../form/FormPersonField";
 import FormDateField from "../form/FormDateField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface UpdateContractProps {
   contractId: Contract["id"];
@@ -34,7 +34,7 @@ export default function UpdateContract({
   onUpdate,
 }: UpdateContractProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchContract = useContractStore((store) => store.fetchContract);
   const updateContract = useContractStore((store) => store.updateContract);

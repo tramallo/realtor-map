@@ -10,7 +10,9 @@ import { Contract,
     UpdateContractDTO, 
     UpdateClientDTO, 
     UpdatePropertyDTO, 
-    UpdateRealtorDTO 
+    UpdateRealtorDTO,
+    UserProfile,
+    UpdateUserProfileDTO,
 } from "./data-schema";
 import { OperationResponse } from "./helperFunctions";
 
@@ -80,5 +82,19 @@ export interface GeocodingService {
 
 export interface MapTilesService {
     getMapTilesUrl: () => Promise<OperationResponse<string>>;
-    attribution: string
+    attribution: string;
+}
+
+export interface User { id: string };
+export interface UserSession { user: User };
+export interface OnAuthStateChangeSubscription {
+  unsubscribe: () => void;
+}
+export interface AuthService {
+  getUserSession: () => Promise<OperationResponse<UserSession | undefined>>;
+  startSession: (email: string, password: string) => Promise<OperationResponse>;
+  endSession: () => Promise<OperationResponse>;
+  onAuthStateChange: (callback: (newSession: UserSession | undefined) => void) => OperationResponse<OnAuthStateChangeSubscription>;
+  fetchUserProfiles: (userIds: string[]) => Promise<OperationResponse<UserProfile[]>>;
+  updateUserProfile: (userId: string, updateData: UpdateUserProfileDTO) => Promise<OperationResponse>;
 }

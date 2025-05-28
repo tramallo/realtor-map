@@ -13,8 +13,8 @@ import { useTranslation } from "react-i18next";
 import CustomSnackbar from "./CustomSnackbar";
 import { LoginPane } from "./LoginPane";
 import CustomModal from "./CustomModal";
-import { useAuthContext } from "./AuthContext";
 import { SupportedLanguage, supportedLocales } from "../translations";
+import { useAuthStore } from "../stores/authStore";
 
 type AppContext = {
   notifyUser: (message: string) => void;
@@ -32,7 +32,7 @@ export interface AppContenxtProviderProps {
 export function AppContextProvider({ children }: AppContenxtProviderProps) {
   const { i18n } = useTranslation();
   const locale = supportedLocales[i18n.language as SupportedLanguage];
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
 
   const [currentMessage, setCurrentMessage] = useState("");
 

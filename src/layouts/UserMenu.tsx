@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { Button, Stack } from "@mui/material";
 
-import { useAuthContext } from "../components/AuthContext";
 import { AppSettingsPane } from "../components/AppSettingsPane";
+import { useAuthStore } from "../stores/authStore";
 
 export function UserMenu() {
   const { t } = useTranslation();
-  const { endSession } = useAuthContext();
+  const endSession = useAuthStore(store => store.endSession);
 
   return (
     <Stack

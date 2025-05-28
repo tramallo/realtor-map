@@ -14,9 +14,9 @@ import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { FormTextField } from "../form/FormTextField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface UpdateRealtorProps {
   realtorId: Realtor["id"];
@@ -28,7 +28,7 @@ export default function UpdateRealtor({
   onUpdate,
 }: UpdateRealtorProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
   const updateRealtor = useRealtorStore((store) => store.updateRealtor);

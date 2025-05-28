@@ -22,10 +22,10 @@ import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import FormLocationField from "../form/FormLocationField";
 import { FormTextField } from "../form/FormTextField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface UpdatePropertyProps {
   propertyId: Property["id"];
@@ -37,7 +37,7 @@ export default function UpdateProperty({
   onUpdate,
 }: UpdatePropertyProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
   const updateProperty = usePropertyStore((store) => store.updateProperty);

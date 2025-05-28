@@ -14,11 +14,11 @@ import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import { dateToTimestamp } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import FormLocationField from "../form/FormLocationField";
 import { usePropertyStore } from "../../stores/propertiesStore";
 import { FormTextField } from "../form/FormTextField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface CreatePropertyProps {
   prefillProperty?: Partial<CreatePropertyDTO>;
@@ -30,7 +30,7 @@ export default function CreateProperty({
   onCreate,
 }: CreatePropertyProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const createProperty = usePropertyStore((store) => store.createProperty);
 

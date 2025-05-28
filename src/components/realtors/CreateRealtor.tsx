@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 
 import { CreateRealtorDTO, createRealtorDTO } from "../../utils/data-schema";
 import { dateToTimestamp } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import { useRealtorStore } from "../../stores/realtorsStore";
 import { FormTextField } from "../form/FormTextField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface CreateRealtorProps {
   prefillRealtor?: Partial<CreateRealtorDTO>;
@@ -21,7 +21,7 @@ export default function CreateRealtor({
   onCreate,
 }: CreateRealtorProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const createRealtor = useRealtorStore((store) => store.createRealtor);
 

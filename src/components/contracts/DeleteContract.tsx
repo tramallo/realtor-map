@@ -21,9 +21,9 @@ import { CustomTextField } from "../CustomTextField";
 import ClientChip from "../ClientChip";
 import PropertyChip from "../PropertyChip";
 import ComponentsField from "../ComponentsField";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import DateField from "../DateField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface DeleteContractProps {
   contractId: Contract["id"];
@@ -37,7 +37,7 @@ export default function DeleteContract({
   onRestore,
 }: DeleteContractProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchContract = useContractStore((store) => store.fetchContract);
   const updateContract = useContractStore((store) => store.updateContract);

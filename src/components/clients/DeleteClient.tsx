@@ -15,8 +15,8 @@ import {
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { CustomTextField } from "../CustomTextField";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface DeleteClientProps {
   clientId: Client["id"];
@@ -30,7 +30,7 @@ export default function DeleteClient({
   onRestore,
 }: DeleteClientProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchClient = useClientStore((store) => store.fetchClient);
   const updateClient = useClientStore((store) => store.updateClient);

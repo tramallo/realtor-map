@@ -110,3 +110,16 @@ export type CreateRealtorDTO = z.infer<typeof createRealtorDTO>;
 export type UpdateRealtorDTO = z.infer<typeof updateRealtorDTO>;
 export type CreateContractDTO = z.infer<typeof createContractDTO>;
 export type UpdateContractDTO = z.infer<typeof updateContractDTO>;
+
+//auth
+export const userProfileSchema = z.object({
+  id: userIdSchema,
+  name: z.string(),
+})
+
+export const updateUserProfileDTO = userProfileSchema.omit({
+  id: true,
+})
+
+export type UserProfile = z.infer<typeof userProfileSchema>;
+export type UpdateUserProfileDTO = z.infer<typeof updateUserProfileDTO>;

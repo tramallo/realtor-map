@@ -1,8 +1,6 @@
 import {
-  AuthChangeEvent,
   createClient as createSupabaseClient,
   RealtimeChannel,
-  Session,
   Subscription,
 } from "@supabase/supabase-js";
 
@@ -20,8 +18,10 @@ import {
   UpdateClientDTO,
   UpdatePropertyDTO,
   UpdateRealtorDTO,
+  UserProfile,
+  UpdateUserProfileDTO,
 } from "../utils/data-schema";
-import { BackendApi } from "../utils/services-interface";
+import { AuthService, BackendApi, UserSession } from "../utils/services-interface";
 import {
   BaseDataFilter,
   ContractFilter,
@@ -36,58 +36,102 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createSupabaseClient(supabaseUrl, key);
 
 // AUTH
-export const getSession = async (): Promise<OperationResponse<Session>> => {
-  console.log(`supabase -> getSession`);
+const getUserSession = async (): Promise<OperationResponse<UserSession | undefined>> => {
+  console.log(`supabase -> getSessionUserId`);
 
   const { data, error } = await supabase.auth.getSession();
 
-  if (!data.session) {
-    const e = new Error(`getSession -> Session not found. Error: ${error}`);
+  if (error) {
+    const e = new Error(`getSession -> error: ${error}`);
     console.log(e);
     return { error: e };
   }
 
-  return { data: data.session };
+  return { data: data.session ?? undefined };
 };
 
-export const onAuthStateChange = (
-  callback: (event: AuthChangeEvent, session: Session | null) => void
+const onAuthStateChange = (
+  callback: (newSession: UserSession | undefined) => void
 ): OperationResponse<Subscription> => {
-  console.log(`supabase -> onAuthStateChange: register callback`);
+  console.log(`supabase -> onAuthStateChange - register callback`);
 
-  const { data } = supabase.auth.onAuthStateChange(callback);
+  const { data } = supabase.auth.onAuthStateChange((_changeEvent, newSession) => {
+    console.log(`supabase -> onAuthStateChange - session change`);
+    callback(newSession ?? undefined);
+  })
   return { data: data.subscription };
 };
 
-export const signInWithPassword = async (
+const signInWithPassword = async (
   email: string,
   password: string
-): Promise<OperationResponse<Session>> => {
-  console.log(`supabase -> signInWithPassword: sign in user: ${email}`);
+): Promise<OperationResponse> => {
+  console.log(`supabase -> signInWithPassword - email: ${email}`);
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  if (!data.session) {
-    return { error: error ?? new Error("No session") };
+  if (error) {
+    const e = new Error(`signInWithPassword -> error: ${error}`);
+    console.log(e);
+    return { error: e };
   }
 
-  return { data: data.session };
+  if (!data.session) {
+    const e = new Error(`signInWithPassword -> error: Session not created`);
+    console.log(e);
+    return { error: e };
+  }
+
+  return { data: undefined };
 };
 
-export const logout = async (): Promise<OperationResponse> => {
+const logout = async (): Promise<OperationResponse> => {
   console.log(`supabase -> logout`);
 
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return { error };
+    const e = new Error(`logout -> error: ${error}`);
+    console.log(e);
+    return { error: e };
   }
 
   return { data: undefined };
 };
+
+const fetchUserProfiles = async (userIds: Array<UserProfile["id"]>): Promise<OperationResponse<Array<UserProfile>>> => {
+  console.log(`supabase -> fetchUserProfiles - userIds: ${userIds}`);
+
+  const { error, data } = await supabase
+    .from("user_profiles")
+    .select()
+    .in("id", userIds);
+
+  if (error) {
+    const e = new Error(`fetchUserProfiles -> error: ${error}`);
+    console.log(e);
+    return { error: e };
+  }
+
+  return { data };
+}
+
+const updateUserProfile = async (userId: UserProfile["id"], updateData: UpdateUserProfileDTO): Promise<OperationResponse> => {
+  //TODO: fill up this function
+  return { data: undefined };
+}
+
+export const supabaseAuth: AuthService = {
+  getUserSession,
+  startSession: signInWithPassword,
+  endSession: logout,
+  onAuthStateChange,
+  fetchUserProfiles,
+  updateUserProfile,
+}
 
 // SQL
 const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {

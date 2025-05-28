@@ -7,7 +7,6 @@ import { MemoSubmitButton } from "../form/SubmitButton";
 import FormDateField from "../form/FormDateField";
 import FormPersonField from "../form/FormPersonField";
 import { FormTextField } from "../form/FormTextField";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { dateToTimestamp } from "../../utils/helperFunctions";
 import {
@@ -17,6 +16,7 @@ import {
 } from "../../utils/data-schema";
 import { useContractStore } from "../../stores/contractsStore";
 import FormPropertyField from "../form/FormPropertyField";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface CreateContractProps {
   prefillContract?: Partial<CreateContractDTO>;
@@ -28,7 +28,7 @@ export default function CreateContract({
   onCreate,
 }: CreateContractProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const createContract = useContractStore((store) => store.createContract);
 

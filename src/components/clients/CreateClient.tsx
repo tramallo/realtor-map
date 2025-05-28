@@ -8,8 +8,8 @@ import { MemoSubmitButton } from "../form/SubmitButton";
 import { dateToTimestamp } from "../../utils/helperFunctions";
 import { useClientStore } from "../../stores/clientsStore";
 import { FormTextField } from "../form/FormTextField";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface CreateClientProps {
   prefillClient?: Partial<CreateClientDTO>;
@@ -21,7 +21,7 @@ export default function CreateClient({
   onCreate,
 }: CreateClientProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const createClient = useClientStore((store) => store.createClient);
 

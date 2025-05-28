@@ -19,10 +19,10 @@ import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
 import { CustomTextField } from "../CustomTextField";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "../../stores/authStore";
 
 export interface DeletePropertyProps {
   propertyId: Property["id"];
@@ -36,7 +36,7 @@ export default function DeleteProperty({
   onRestore,
 }: DeletePropertyProps) {
   const { t } = useTranslation();
-  const { userSession } = useAuthContext();
+  const userSession = useAuthStore(store => store.userSession);
   const { notifyUser } = useAppContext();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
   const updateProperty = usePropertyStore((store) => store.updateProperty);
