@@ -45,6 +45,7 @@ export type AppTranslation = {
         languageField: { label: string },
         addressField: { label: string },
         selectedField: { label: string },
+        sortByField: { label: string },
         searchLabel: { text: string },
     },
     buttons: {
@@ -241,6 +242,7 @@ export const translations: Record<SupportedLanguage, TranslationNamespace> = {
                 languageField: { label: "Language" },
                 addressField: { label: "Address" },
                 selectedField: { label: "Selected" },
+                sortByField: { label: "Order by" },
                 searchLabel: { text: "Search" },
             },
             buttons: {
@@ -421,6 +423,7 @@ export const translations: Record<SupportedLanguage, TranslationNamespace> = {
                 languageField: { label: "Idioma" },
                 addressField: { label: "Dirección" },
                 selectedField: { label: "Seleccionado(s)" },
+                sortByField: { label: "Ordenar por" },
                 searchLabel: { text: "Buscar" },
             },
             buttons: {

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -7,21 +7,31 @@ import { CardProperty } from "./CardProperty";
 import ComponentsField from "../ComponentsField";
 import PropertyChip from "../PropertyChip";
 
-export type ListPropertiesProps = Omit<StackProps, "onSelect"> & {
-  propertyIds: Array<Property["id"]>;
+export type ListPropertiesProps = {
+  propertyIds: Array<Property["id"]> | undefined;
+  onReachScrollEnd?: () => void;
   selected?: Array<Property["id"]>;
   onSelect?: (selected: Array<Property["id"]>) => void;
   multiselect?: boolean;
+} & Omit<StackProps, "onSelect">;
+const defaults = {
+  selected: [],
 };
 
 export function ListProperties({
   propertyIds,
-  selected = [],
+  onReachScrollEnd,
+  selected = defaults.selected,
   onSelect,
   multiselect,
   ...stackProps
 }: ListPropertiesProps) {
+  const bottomRef = useRef(null as HTMLLIElement | null);
+
   const { t } = useTranslation();
+
+  console.log(`ListProperties -> render - 
+    propertyIds: ${propertyIds}`);
 
   const togglePropertySelection = useCallback(
     (propertyId: Property["id"]) => {
@@ -44,6 +54,40 @@ export function ListProperties({
     [selected, multiselect, onSelect]
   );
 
+  // onReachScrollEnd effect
+  useEffect(() => {
+    const bottomItem = bottomRef.current;
+    if (!bottomItem || !onReachScrollEnd) {
+      return;
+    }
+    console.log(
+      `ListProperties -> onReachScrollEnd [effect] - register callback`
+    );
+
+    const onScrollEnd = () => {
+      console.log(
+        `ListProperties -> onReachScrollEnd [effect] - execute callback`
+      );
+      onReachScrollEnd();
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => (entries[0].isIntersecting ? onScrollEnd() : undefined),
+      {
+        root: null,
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(bottomItem);
+    return () => {
+      console.log(
+        `ListProperties -> onReachScrollEnd [effect] - unregister callback`
+      );
+      observer.unobserve(bottomItem);
+    };
+  }, [onReachScrollEnd]);
+
   return (
     <Stack
       spacing={1}
@@ -52,13 +96,11 @@ export function ListProperties({
       {...stackProps}
     >
       <Box overflow="auto">
-        <List>
-          {propertyIds.map((propertyId, index) => (
+        <List disablePadding>
+          {(propertyIds ?? []).map((propertyId, propertyIndex) => (
             <ListItem
-              key={`list-property-${index}`}
-              sx={{
-                "&:not(:last-child)": { marginBottom: 1 },
-              }}
+              key={propertyIndex}
+              sx={{ marginBottom: 1 }}
               disablePadding
             >
               <CardProperty
@@ -68,13 +110,15 @@ export function ListProperties({
               />
             </ListItem>
           ))}
+          <ListItem ref={bottomRef}></ListItem>
         </List>
       </Box>
       {onSelect && (
         <ComponentsField
           label={t("fields.selectedField.label")}
-          components={selected.map((selectedId) => (
+          components={selected.map((selectedId, selectedIndex) => (
             <PropertyChip
+              key={selectedIndex}
               propertyId={selectedId}
               onClose={() => togglePropertySelection(selectedId)}
             />

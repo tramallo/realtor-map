@@ -6,7 +6,7 @@ import { Client } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
 import ViewClient from "./clients/ViewClient";
 import CustomModal from "./CustomModal";
-import { useClientStore, fetchByIdSelector } from "../stores/clientsStore";
+import { useClientStore, selectClientById } from "../stores/clientsStore";
 
 export interface ClientChipProps {
   clientId: Client["id"];
@@ -24,7 +24,7 @@ export default function ClientChip({ clientId, onClose }: ClientChipProps) {
 
   const [viewClientModalOpen, setViewClientModalOpen] = useState(false);
 
-  const cachedClient = useClientStore(fetchByIdSelector(clientId));
+  const cachedClient = useClientStore(selectClientById(clientId));
 
   //fetchClient effect
   useEffect(() => {

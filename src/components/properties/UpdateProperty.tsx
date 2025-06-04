@@ -11,7 +11,7 @@ import {
 } from "../../utils/data-schema";
 import {
   usePropertyStore,
-  fetchByIdSelector,
+  selectPropertyById,
 } from "../../stores/propertiesStore";
 import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
@@ -49,7 +49,7 @@ export default function UpdateProperty({
 
   const [updatingProperty, setUpdatingProperty] = useState(false);
 
-  const cachedProperty = usePropertyStore(fetchByIdSelector(propertyId));
+  const cachedProperty = usePropertyStore(selectPropertyById(propertyId));
 
   const prefillData = useMemo(() => {
     const updateMetadata = {

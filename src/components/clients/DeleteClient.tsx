@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { useClientStore, fetchByIdSelector } from "../../stores/clientsStore";
+import { useClientStore, selectClientById } from "../../stores/clientsStore";
 import { Client, UpdateClientDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
@@ -43,7 +43,7 @@ export default function DeleteClient({
   const [softDeletingClient, setSoftDeletingClient] = useState(false);
   const [restoringClient, setRestoringClient] = useState(false);
 
-  const cachedClient = useClientStore(fetchByIdSelector(clientId));
+  const cachedClient = useClientStore(selectClientById(clientId));
 
   const softDeleteClient = useCallback(async () => {
     console.log(`DeleteClient -> softDeleteClient - clientId: ${clientId}`);

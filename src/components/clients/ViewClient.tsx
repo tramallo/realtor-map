@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { useClientStore, fetchByIdSelector } from "../../stores/clientsStore";
+import { useClientStore, selectClientById } from "../../stores/clientsStore";
 import { Client } from "../../utils/data-schema";
 import DeleteClient from "./DeleteClient";
 import UpdateClient from "./UpdateClient";
@@ -33,7 +33,7 @@ export default function ViewClient({ clientId }: ViewClientProps) {
   const [deleteClientModalOpen, setDeleteClientModalOpen] = useState(false);
   const [updateClientModalOpen, setUpdateClientModalOpen] = useState(false);
 
-  const cachedClient = useClientStore(fetchByIdSelector(clientId));
+  const cachedClient = useClientStore(selectClientById(clientId));
 
   //fetchClient effect
   useEffect(() => {

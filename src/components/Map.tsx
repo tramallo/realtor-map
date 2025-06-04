@@ -39,8 +39,6 @@ export function Map({
   maxZoom = defaults.maxZoom,
   maxBounds = defaults.maxBounds,
 }: MapProps) {
-  console.log(`Map -> render`);
-
   const [fetchingMapTilesUrl, setFetchingMapTilesUrl] = useState(false);
   const [fetchMapTilesUrlResponse, setFetchMapTilesUrlResponse] = useState(
     undefined as OperationResponse<string> | undefined

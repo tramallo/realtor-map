@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   useContractStore,
-  fetchByIdSelector,
+  selectContractById,
 } from "../../stores/contractsStore";
 import { Contract } from "../../utils/data-schema";
 import DeleteContract from "./DeleteContract";
@@ -38,7 +38,7 @@ export default function ViewContract({ contractId }: ViewContractProps) {
   const [deleteContractModalOpen, setDeleteContractModalOpen] = useState(false);
   const [updateContractModalOpen, setUpdateContractModalOpen] = useState(false);
 
-  const cachedContract = useContractStore(fetchByIdSelector(contractId));
+  const cachedContract = useContractStore(selectContractById(contractId));
 
   // fetchContract effect
   useEffect(() => {

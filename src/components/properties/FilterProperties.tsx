@@ -2,12 +2,7 @@ import { memo, useCallback } from "react";
 import { Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import {
-  PropertyState,
-  propertyStates,
-  PropertyType,
-  propertyTypes,
-} from "../../utils/data-schema";
+import { propertyStates, propertyTypes } from "../../utils/data-schema";
 import ClientField from "../ClientField";
 import RealtorField from "../RealtorField";
 import FilterBaseData from "../FilterBaseData";
@@ -47,10 +42,8 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
       <Grid2 size={3}>
         <CustomSelectField
           label={t("entities.property.filter.stateEq")}
-          value={filter.stateEq || ""}
-          onChange={(e) =>
-            setFilterValue({ stateEq: e.target.value as PropertyState })
-          }
+          value={filter.stateEq}
+          onChange={(newValue) => setFilterValue({ stateEq: newValue })}
           options={propertyStates.map((propertyState) => ({
             label: propertyState,
             value: propertyState,
@@ -60,10 +53,8 @@ export function FilterProperties({ filter, onChange }: FilterPropertiesProps) {
       <Grid2 size={3}>
         <CustomSelectField
           label={t("entities.property.filter.typeEq")}
-          value={filter.typeEq || ""}
-          onChange={(e) =>
-            setFilterValue({ typeEq: e.target.value as PropertyType })
-          }
+          value={filter.typeEq}
+          onChange={(newValue) => setFilterValue({ typeEq: newValue })}
           options={propertyTypes.map((propertyType) => ({
             label: propertyType,
             value: propertyType,

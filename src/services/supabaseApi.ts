@@ -20,6 +20,7 @@ import {
   UpdateClientDTO,
   UpdatePropertyDTO,
   UpdateRealtorDTO,
+  BaseData,
 } from "../utils/data-schema";
 import { BackendApi } from "../utils/services-interface";
 import {
@@ -28,6 +29,9 @@ import {
   ClientFilter,
   PropertyFilter,
   RealtorFilter,
+  SortConfig,
+  PaginationCursor,
+  SortConfigEntry,
 } from "../utils/data-filter-schema";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
@@ -90,14 +94,18 @@ export const logout = async (): Promise<OperationResponse> => {
 };
 
 // SQL
-const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
-  const query = supabase.from(tableName).select("id");
 
-  if (filter.idEq) {
+//FIXME: add typing for 'query' parameters
+const addBaseDataFilters = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any, 
+  filter: BaseDataFilter
+) => {
+  if (filter.idEq?.length) {
     query.in("id", filter.idEq);
   }
-  if (filter.idNeq) {
-    query.not("id", "in", `${filter.idNeq.join(",")}`);
+  if (filter.idNeq?.length) {
+    query.not("id", "in", `(${filter.idNeq.join(",")})`);
   }
   if (filter.createdByEq) {
     query.eq("createdBy", filter.createdByEq);
@@ -122,92 +130,189 @@ const searchBaseDataIdsQuery = (filter: BaseDataFilter, tableName: string) => {
   }
 
   return query;
+}
+const addPaginationCursorFilter = <T extends BaseData>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any,
+  sortConfig: SortConfig<T>,
+  paginationCursor: PaginationCursor<T>,
+) => {
+  const conditions: string[] = [];
+
+  sortConfig.forEach((sortEntry, sortEntryIndex) => {
+    const parts: string[] = [];
+    
+    // Add equality checks for previous columns
+    for (let prevColumnIndex = 0; prevColumnIndex < sortEntryIndex; prevColumnIndex++) {
+      const prevSortEntry = sortConfig[prevColumnIndex] as SortConfigEntry<T>;
+
+      if (!paginationCursor[prevSortEntry.column]) {
+        console.error(`supabaseApi -> addPaginationCursorFilter -
+          error: expected cursor value (${String(prevSortEntry.column)}) is undefined, search results might not be consistent.
+          check that cursor is reset between searches`)
+        continue;
+      } 
+      
+      parts.push(`${String(prevSortEntry.column)}.eq.${paginationCursor[prevSortEntry.column]}`);
+    }
+    
+    // Add current column inequality
+    const operator = sortEntry.direction === 'asc' ? 'gt' : 'lt';
+    parts.push(`${String(sortEntry.column)}.${operator}.${paginationCursor[sortEntry.column]}`);
+    conditions.push(`and(${parts.join(',')})`);
+  })
+
+  query.or(conditions.join(','));
 };
-const queryConstructor = {
-  searchPropertyIdsQuery: (filter: PropertyFilter) => {
-    const query = searchBaseDataIdsQuery(filter, "property");
+const addOrdering = <T extends BaseData>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any, 
+  sortConfig: SortConfig<T>
+) => {
+  sortConfig.forEach(({ column, direction }) => {
+    query.order(String(column), { ascending: direction === "asc" });
+  });
+}
 
-    if (filter.addressLike) {
-      const filterWords = filter.addressLike.split(" ");
-      filterWords.forEach((word) => query.ilike("address", `%${word}%`));
-    }
-    if (filter.typeEq) {
-      query.eq("type", filter.typeEq);
-    }
-    if (filter.stateEq) {
-      query.eq("state", filter.stateEq);
-    }
-    if (filter.ownerEq) {
-      query.eq("owner", filter.ownerEq);
-    }
-    if (filter.exclusiveRealtorEq) {
-      query.eq("exclusiveRealtor", filter.exclusiveRealtorEq);
-    }
-    if (filter.relatedRealtorIdsHas) {
-      query.contains("relatedRealtorIds", filter.relatedRealtorIdsHas);
-    }
+const buildSearchPropertyIdsQuery = (
+  filter: PropertyFilter, 
+  sortConfig: SortConfig<Property>, 
+  recordsPerPage: number,
+  paginationCursor: PaginationCursor<Property> | undefined,
+) => {
+  const query = supabase.from("property").select("id");
+
+  if (filter.addressLike) {
+    const filterWords = filter.addressLike.split(" ");
+    filterWords.forEach((word) => query.ilike("address", `%${word}%`));
+  }
+  if (filter.typeEq) {
+    query.eq("type", filter.typeEq);
+  }
+  if (filter.stateEq) {
+    query.eq("state", filter.stateEq);
+  }
+  if (filter.ownerEq) {
+    query.eq("owner", filter.ownerEq);
+  }
+  if (filter.exclusiveRealtorEq) {
+    query.eq("exclusiveRealtor", filter.exclusiveRealtorEq);
+  }
+  if (filter.relatedRealtorIdsHas) {
+    query.contains("relatedRealtorIds", filter.relatedRealtorIdsHas);
+  }
+
+  addBaseDataFilters(query, filter);
+  if (paginationCursor) {
+    addPaginationCursorFilter(query, sortConfig, paginationCursor);
+  }
+  addOrdering(query, sortConfig);
+  query.limit(recordsPerPage);
+
+  return query;
+}
+const buildSearchRealtorIdsQuery = (
+  filter: RealtorFilter, 
+  sortConfig: SortConfig<Realtor>, 
+  recordsPerPage: number, 
+  paginationCursor: PaginationCursor<Realtor> | undefined
+) => {
+  const query = supabase.from("realtor").select("id");
+
+  if (filter.nameLike) {
+    const filterWords = filter.nameLike.split(" ");
+    filterWords.forEach((word) => query.ilike("name", `%${word}%`));
+  }
+
+  addBaseDataFilters(query, filter);
+  if (paginationCursor) {
+    addPaginationCursorFilter(query, sortConfig, paginationCursor);
+  }
+  addOrdering(query, sortConfig);
+  query.limit(recordsPerPage);
+
+  return query;
+}
+const buildSearchClientIdsQuery = (
+  filter: ClientFilter, 
+  sortConfig: SortConfig<Client>, 
+  recordsPerPage: number, 
+  paginationCursor: PaginationCursor<Client> | undefined
+) => {
+  const query = supabase.from("client").select("id");
+
+  if (filter.nameLike) {
+    const filterWords = filter.nameLike.split(" ");
+    filterWords.forEach((word) => query.ilike("name", `%${word}%`));
+  }
+  if (filter.emailLike) {
+    query.ilike("email", `%${filter.emailLike}%`);
+  }
+  if (filter.mobileLike) {
+    query.ilike("mobile", filter.mobileLike);
+  }
+
+  addBaseDataFilters(query, filter);
+  if (paginationCursor) {
+    addPaginationCursorFilter(query, sortConfig, paginationCursor);
+  }
+  addOrdering(query, sortConfig);
+  query.limit(recordsPerPage);
 
     return query;
-  },
-  searchRealtorIdsQuery: (filter: RealtorFilter) => {
-    const query = searchBaseDataIdsQuery(filter, "realtor");
+}
+const buildSearchContractIdsQuery = (
+  filter: ContractFilter,
+  sortConfig: SortConfig<Contract>,
+  recordsPerPage: number,
+  paginationCursor: PaginationCursor<Contract> | undefined,
+) => {
+  const query = supabase.from("contract").select("id");
 
-    if (filter.nameLike) {
-      const filterWords = filter.nameLike.split(" ");
-      filterWords.forEach((word) => query.ilike("name", `%${word}%`));
-    }
+  if (filter.propertyEq) {
+    query.eq("property", filter.propertyEq);
+  }
+  if (filter.clientEq) {
+    query.eq("client", filter.clientEq);
+  }
+  if (filter.startAfter) {
+    query.gte("start", filter.startAfter);
+  }
+  if (filter.startBefore) {
+    query.lte("start", filter.startBefore);
+  }
+  if (filter.endAfter) {
+    query.gte("end", filter.endAfter);
+  }
+  if (filter.endBefore) {
+    query.lte("end", filter.endBefore);
+  }
 
-    return query;
-  },
-  searchClientIdsQuery: (filter: ClientFilter) => {
-    const query = searchBaseDataIdsQuery(filter, "client");
-
-    if (filter.nameLike) {
-      const filterWords = filter.nameLike.split(" ");
-      filterWords.forEach((word) => query.ilike("name", `%${word}%`));
-    }
-    if (filter.emailLike) {
-      query.ilike("email", `%${filter.emailLike}%`);
-    }
-    if (filter.mobileLike) {
-      query.ilike("mobile", filter.mobileLike);
-    }
-
-    return query;
-  },
-  searchContractIdsQuery: (filter: ContractFilter) => {
-    const query = searchBaseDataIdsQuery(filter, "contract");
-
-    if (filter.propertyEq) {
-      query.eq("property", filter.propertyEq);
-    }
-    if (filter.clientEq) {
-      query.eq("client", filter.clientEq);
-    }
-    if (filter.startAfter) {
-      query.gte("start", filter.startAfter);
-    }
-    if (filter.startBefore) {
-      query.lte("start", filter.startBefore);
-    }
-    if (filter.endAfter) {
-      query.gte("end", filter.endAfter);
-    }
-    if (filter.endBefore) {
-      query.lte("end", filter.endBefore);
-    }
+  addBaseDataFilters(query, filter);
+  if (paginationCursor) {
+    addPaginationCursorFilter(query, sortConfig, paginationCursor);
+  }
+  addOrdering(query, sortConfig);
+  query.limit(recordsPerPage);
 
     return query;
-  },
-};
+}
 
 // property
 let propertyChannel = undefined as RealtimeChannel | undefined;
 const searchPropertyIds = async (
-  filter: PropertyFilter
+  filter: PropertyFilter,
+  sortConfig: SortConfig<Property>,
+  recordsPerPage: number,
+  paginationCursor: PaginationCursor<Property> | undefined,
 ): Promise<OperationResponse<Array<Property["id"]>>> => {
-  console.log(`supabase -> searchPropertyIds`);
-  const query = queryConstructor.searchPropertyIdsQuery(filter);
+  console.log(`supabase -> searchPropertyIds - 
+    filter: ${JSON.stringify(filter)} 
+    sortConfig: ${JSON.stringify(sortConfig)} 
+    recordsPerPage: ${recordsPerPage}
+    paginationCursor: ${JSON.stringify(paginationCursor)}`
+  );
+  const query = buildSearchPropertyIdsQuery(filter, sortConfig, recordsPerPage, paginationCursor);
   const { data, error } = await query;
 
   if (error) {
@@ -217,12 +322,16 @@ const searchPropertyIds = async (
   }
 
   const propertyIds = data.map((idObj) => idObj.id);
+
+  console.log(`searchPropertyIds - 
+    return: ${propertyIds}`);
   return { data: propertyIds };
 };
 const getProperties = async (
   propertyIds: Array<Property["id"]>
 ): Promise<OperationResponse<Array<Property>>> => {
-  console.log(`supabase -> getProperties propertyIds: ${propertyIds}`);
+  console.log(`supabase -> getProperties - 
+    propertyIds: ${propertyIds}`);
   const { data, error } = await supabase
     .from("property")
     .select()
@@ -234,6 +343,8 @@ const getProperties = async (
     return { error: e };
   }
 
+  console.log(`getProperties -> 
+    return: ${JSON.stringify(data)}`);
   return { data };
 };
 const createProperty = async (
@@ -384,10 +495,18 @@ const propertiesUnsubscribe = async (): Promise<OperationResponse> => {
 // realtor
 let realtorChannel = undefined as RealtimeChannel | undefined;
 const searchRealtorIds = async (
-  filter: RealtorFilter
+  filter: RealtorFilter,
+  sortConfig: SortConfig<Realtor>,
+  recordsPerPage: number,
+  paginationCursor: PaginationCursor<Realtor> | undefined,
 ): Promise<OperationResponse<Array<Realtor["id"]>>> => {
-  console.log(`supabase -> searchRealtorIds`);
-  const query = queryConstructor.searchRealtorIdsQuery(filter);
+  console.log(`supabase -> searchRealtorIds - 
+    filter: ${JSON.stringify(filter)} 
+    sortConfig: ${JSON.stringify(sortConfig)} 
+    recordsPerPage: ${recordsPerPage}
+    paginationCursor: ${JSON.stringify(paginationCursor)}`
+  );
+  const query = buildSearchRealtorIdsQuery(filter, sortConfig, recordsPerPage, paginationCursor);
   const { data, error } = await query;
 
   if (error) {
@@ -397,6 +516,8 @@ const searchRealtorIds = async (
   }
 
   const realtorIds = data.map((idObj) => idObj.id);
+  console.log(`searchRealtorIds - 
+    return: ${realtorIds}`);
   return { data: realtorIds };
 };
 const getRealtors = async (
@@ -559,10 +680,18 @@ const realtorsUnsubscribe = async (): Promise<OperationResponse> => {
 // client
 let clientChannel = undefined as RealtimeChannel | undefined;
 const searchClientIds = async (
-  filter: ClientFilter
+  filter: ClientFilter,
+  sortConfig: SortConfig<Client>,
+  recordsPerPage: number,
+  paginationCursor: PaginationCursor<Client> | undefined,
 ): Promise<OperationResponse<Array<Client["id"]>>> => {
-  console.log(`supabase -> searchClientIds`);
-  const query = queryConstructor.searchClientIdsQuery(filter);
+  console.log(`supabase -> searchClientIds - 
+    filter: ${JSON.stringify(filter)} 
+    sortConfig: ${JSON.stringify(sortConfig)} 
+    recordsPerPage: ${recordsPerPage}
+    paginationCursor: ${JSON.stringify(paginationCursor)}`
+  );
+  const query = buildSearchClientIdsQuery(filter, sortConfig, recordsPerPage, paginationCursor);
   const { data, error } = await query;
 
   if (error) {
@@ -572,6 +701,8 @@ const searchClientIds = async (
   }
 
   const clientIds = data.map((idObj) => idObj.id);
+  console.log(`searchRealtorIds - 
+    return: ${clientIds}`);
   return { data: clientIds };
 };
 const getClients = async (
@@ -735,10 +866,18 @@ const clientsUnsubscribe = async (): Promise<OperationResponse> => {
 // contract
 let contractChannel = undefined as RealtimeChannel | undefined;
 const searchContractIds = async (
-  filter: ContractFilter
+  filter: ContractFilter,
+  sortConfig: SortConfig<Contract>,
+  recordsPerPage: number,
+  paginationCursor: PaginationCursor<Contract> | undefined,
 ): Promise<OperationResponse<Array<Contract["id"]>>> => {
-  console.log(`supabase -> searchContractIds`);
-  const query = queryConstructor.searchContractIdsQuery(filter);
+  console.log(`supabase -> searchContractIds - 
+    filter: ${JSON.stringify(filter)} 
+    sortConfig: ${JSON.stringify(sortConfig)} 
+    recordsPerPage: ${recordsPerPage}
+    paginationCursor: ${JSON.stringify(paginationCursor)}`
+  );
+  const query = buildSearchContractIdsQuery(filter, sortConfig, recordsPerPage, paginationCursor);
   const { data, error } = await query;
 
   if (error) {
@@ -748,6 +887,8 @@ const searchContractIds = async (
   }
 
   const contractIds = data.map((idObj) => idObj.id);
+  console.log(`searchRealtorIds - 
+    return: ${contractIds}`);
   return { data: contractIds };
 };
 const getContracts = async (

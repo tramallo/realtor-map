@@ -12,7 +12,7 @@ import {
     UpdateRealtorDTO 
 } from "../utils/data-schema";
 import { OperationResponse } from "../utils/helperFunctions";
-import { BackendApi, BackendEvent } from "../utils/services-interface";
+import { BackendApi } from "../utils/services-interface";
 import { ClientFilter, PropertyFilter, RealtorFilter } from "../utils/data-filter-schema";
 
 const realtorMapServiceUrl = import.meta.env.VITE_REALTOR_MAP_SERVICE_URL;

@@ -7,7 +7,7 @@ import {
   UpdateClientDTO,
   updateClientDTO,
 } from "../../utils/data-schema";
-import { useClientStore, fetchByIdSelector } from "../../stores/clientsStore";
+import { useClientStore, selectClientById } from "../../stores/clientsStore";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
@@ -40,7 +40,7 @@ export default function UpdateClient({
 
   const [updatingClient, setUpdatingClient] = useState(false);
 
-  const cachedClient = useClientStore(fetchByIdSelector(clientId));
+  const cachedClient = useClientStore(selectClientById(clientId));
 
   const prefillData = useMemo(() => {
     const updateMetadata = {

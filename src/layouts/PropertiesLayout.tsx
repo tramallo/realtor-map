@@ -1,25 +1,62 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import { useTranslation } from "react-i18next";
 
-import { Property } from "../utils/data-schema";
 import SearchProperties from "../components/properties/SearchProperties";
 import { ListProperties } from "../components/properties/ListProperties";
 import MapProperties from "../components/properties/MapProperties";
 import CustomModal from "../components/CustomModal";
 import CreateProperty from "../components/properties/CreateProperty";
+import { Property } from "../utils/data-schema";
+import {
+  selectSearchResultsBySearchIndex,
+  usePropertyStore,
+} from "../stores/propertiesStore";
+
+const MAP_VIEW_RECORDS_PER_PAGE = 100000;
 
 export function PropertiesLayout() {
   const { t } = useTranslation();
 
   const [view, setView] = useState("list" as "list" | "map");
-  const [searchResults, setSearchResults] = useState(
-    [] as Array<Property["id"]>
+  const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
+
+  const [searchIndex, setSearchIndex] = useState("");
+  const [listRecordsPerPage] = useState(3);
+  const [listPaginationId, setListPaginationId] = useState(
+    undefined as Property["id"] | undefined
+  );
+  const [mapRecordsPerPage] = useState(MAP_VIEW_RECORDS_PER_PAGE);
+  const [mapPaginationId] = useState(undefined as Property["id"] | undefined);
+
+  const searchResult = usePropertyStore(
+    selectSearchResultsBySearchIndex(searchIndex)
+  );
+  const lastPropertyId = useMemo(
+    () => (searchResult ?? []).at(-1),
+    [searchResult]
   );
 
-  const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
+  const loadMoreProperties = useCallback(() => {
+    if (!lastPropertyId) {
+      return;
+    }
+
+    setListPaginationId(lastPropertyId);
+  }, [lastPropertyId]);
+
+  const onPropertiesSearch = useCallback(
+    (newSearchIndex: string) => {
+      setSearchIndex(newSearchIndex);
+
+      if (view == "list") {
+        setListPaginationId(undefined);
+      }
+    },
+    [view]
+  );
 
   return (
     <Stack
@@ -53,14 +90,23 @@ export function PropertiesLayout() {
         </Stack>
         <Box overflow="auto" height="100%">
           {view == "map" ? (
-            <MapProperties propertyIds={searchResults} height="100%" />
+            <MapProperties propertyIds={searchResult} height="100%" />
           ) : (
-            <ListProperties propertyIds={searchResults} />
+            <ListProperties
+              propertyIds={searchResult}
+              onReachScrollEnd={loadMoreProperties}
+            />
           )}
         </Box>
       </Stack>
       <Stack spacing={1} minHeight="auto">
-        <SearchProperties onSearch={setSearchResults} />
+        <SearchProperties
+          onSearch={onPropertiesSearch}
+          recordsPerPage={
+            view == "list" ? listRecordsPerPage : mapRecordsPerPage
+          }
+          paginationId={view == "list" ? listPaginationId : mapPaginationId}
+        />
         <Stack
           direction="row"
           alignItems="center"

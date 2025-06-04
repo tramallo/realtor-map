@@ -17,9 +17,9 @@ import { Contract } from "../../utils/data-schema";
 import CustomModal from "../CustomModal";
 import { ListContracts } from "./ListContracts";
 
-export type CalendarContractsProps = BoxProps & {
-  contractIds: Array<Contract["id"]>;
-};
+export type CalendarContractsProps = {
+  contractIds: Array<Contract["id"]> | undefined;
+} & BoxProps;
 
 export function CalendarContracts({
   contractIds,
@@ -43,6 +43,10 @@ export function CalendarContracts({
     string,
     { colors: string[]; contractIds: Array<Contract["id"]> }
   > = useMemo(() => {
+    if (!contractIds) {
+      return {};
+    }
+
     const highlightsObject = {} as Record<
       string,
       { colors: string[]; contractIds: Array<Contract["id"]> }
@@ -86,6 +90,10 @@ export function CalendarContracts({
 
   // fetchContracts effect
   useEffect(() => {
+    if (!contractIds) {
+      return;
+    }
+
     setFetchContractsResponse(undefined);
     setFetchingContracts(true);
     fetchContracts(contractIds)

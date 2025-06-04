@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 
 import { Property } from "../../utils/data-schema";
 import {
-  fetchByIdSelector,
+  selectPropertyById,
   usePropertyStore,
 } from "../../stores/propertiesStore";
 import { OperationResponse } from "../../utils/helperFunctions";
@@ -39,7 +39,7 @@ export function CardProperty({
 
   const [viewPropertyModalOpen, setViewPropertyModalOpen] = useState(false);
 
-  const property = usePropertyStore(fetchByIdSelector(propertyId));
+  const property = usePropertyStore(selectPropertyById(propertyId));
 
   // fetchProperty effect
   useEffect(() => {

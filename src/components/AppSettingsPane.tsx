@@ -11,7 +11,7 @@ export function AppSettingsPane() {
       <CustomSelectField
         label={t("fields.languageField.label")}
         value={i18n.language}
-        onChange={(e) => i18n.changeLanguage(e.target.value as string)}
+        onChange={i18n.changeLanguage}
         options={supportedLanguages.map((supportedLang) => ({
           label: supportedLang,
           value: supportedLang,

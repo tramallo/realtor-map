@@ -9,7 +9,7 @@ import {
 
 import {
   usePropertyStore,
-  fetchByIdSelector,
+  selectPropertyById,
 } from "../../stores/propertiesStore";
 import { Property, UpdatePropertyDTO } from "../../utils/data-schema";
 import ComponentsField from "../ComponentsField";
@@ -49,7 +49,7 @@ export default function DeleteProperty({
   const [softDeletingProperty, setSoftDeletingProperty] = useState(false);
   const [restoringProperty, setRestoringProperty] = useState(false);
 
-  const cachedProperty = usePropertyStore(fetchByIdSelector(propertyId));
+  const cachedProperty = usePropertyStore(selectPropertyById(propertyId));
 
   const softDeleteProperty = useCallback(async () => {
     console.log(`DeleteProperty -> softDeleteProperty ${propertyId}`);

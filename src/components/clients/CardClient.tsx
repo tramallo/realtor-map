@@ -10,7 +10,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useTranslation } from "react-i18next";
 
 import { Client } from "../../utils/data-schema";
-import { fetchByIdSelector, useClientStore } from "../../stores/clientsStore";
+import { selectClientById, useClientStore } from "../../stores/clientsStore";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import ViewClient from "./ViewClient";
@@ -32,7 +32,7 @@ export function CardClient({ clientId, onClick, selected }: CardClientProps) {
 
   const [viewClientModalOpen, setViewClientModalOpen] = useState(false);
 
-  const cachedClient = useClientStore(fetchByIdSelector(clientId));
+  const cachedClient = useClientStore(selectClientById(clientId));
 
   // fetchClient effect
   useEffect(() => {

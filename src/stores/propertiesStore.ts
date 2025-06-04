@@ -1,52 +1,49 @@
 import { create } from "zustand";
 
 import { CreatePropertyDTO, Property, UpdatePropertyDTO } from "../utils/data-schema";
-import { OperationResponse } from "../utils/helperFunctions";
+import { getLocalStorageData, objectsToString, OperationResponse, stringToObjects } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
-import { PropertyFilter } from "../utils/data-filter-schema";
+import { SortConfig, PaginationCursor, PropertyFilter } from "../utils/data-filter-schema";
 import { propertyCompliesFilter } from "../utils/filter-evaluators";
+import { orderBy } from "lodash";
+
+const PROPERTIES_LOCAL_STORAGE_KEY = "properties";
+export type PropertiesStorage = Record<Property["id"], Property | undefined>;
+export type SearchPropertiesResults = Record<string, Array<Property["id"]>>;
 
 export interface PropertyStore {
-    properties: Record<Property["id"], Property | undefined>;
-    searchResults: Record<string, Array<Property["id"]> | undefined>;
+    properties: PropertiesStorage;
+    searchResults: SearchPropertiesResults;
     fetchProperty: (propertyId: Property["id"]) => Promise<OperationResponse>;
     fetchProperties: (propertyIds: Array<Property["id"]>) => Promise<OperationResponse>;
-    searchProperties: (filter: PropertyFilter) => Promise<OperationResponse>;
+    searchProperties: (
+        filter: PropertyFilter, 
+        sortConfig: SortConfig<Property>, 
+        recordsPerPage: number,
+        paginationCursor?: PaginationCursor<Property>,
+    ) => Promise<OperationResponse>;
     createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
     updateProperty: (propertyId: Property['id'], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
     deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;
 }
 
-const PROPERTIES_LOCAL_STORAGE_KEY = "properties-store";
-const fetchLocalStorageProperties = (): OperationResponse<Record<Property["id"], Property> | undefined> => {
-    console.log(`propertiesStore -> fetchLocalStorageProperties`);
-
-    const rawLocalStorageData = localStorage.getItem(PROPERTIES_LOCAL_STORAGE_KEY);
-
-    if (!rawLocalStorageData) {
-        return { data: undefined };
-    }
-
-    try {
-        const parsedLocalStorageData = JSON.parse(rawLocalStorageData);
-        return { data: parsedLocalStorageData };
-    } catch (error) {
-        return { error: new Error(`fetchLocalStorageProperties -> error: ${error}`) };
-    }
-}
-
 export const usePropertyStore = create<PropertyStore>((set, get) => {
     console.log(`propertiesStore -> create`);
+    
+    let setInitialized: () => void;
+    const initializedFlag = new Promise<void>((resolve) => {
+        setInitialized = resolve;
+    });
 
-    const storeProperties = (properties: Property[]) => {
-        const { properties: propertiesCache } = get();
-        const cacheCopy = { ...propertiesCache };
+    const storeProperties = (newProperties: Property[]) => {
+        const { properties: storedProperties } = get();
+        const storedPropertiesCopy = { ...storedProperties };
 
-        properties.forEach((property) => {
-            cacheCopy[property.id] = property;
+        newProperties.forEach((property) => {
+            storedPropertiesCopy[property.id] = property;
         });
     
-        set({ properties: cacheCopy });
+        set({ properties: storedPropertiesCopy });
     };
     const removeProperties = (propertyIds: Array<Property['id']>) => {
         const { properties: storedProperties } = get();
@@ -59,39 +56,95 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         set({ properties: storedPropertiesCopy });
     };
 
-    const storeSearchResult = (filter: string, result: Array<Property["id"]>) => {
-        const { searchResults } = get();
-        const searchResultsCopy = { ...searchResults };
+    const storeSearchResult = (
+        searchIndex: string, 
+        paginationCursor: PaginationCursor<Property> | undefined, 
+        newSearchResult: Array<Property["id"]>
+    ) => {
+        const { searchResults: storedSearchResults } = get();
+        const storedSearchResultsCopy = { ...storedSearchResults };
 
-        const storedFilterResults = searchResults[filter];
-        if (storedFilterResults) {
-            searchResultsCopy[filter] = [...storedFilterResults, ...result];
-        } else {
-            searchResultsCopy[filter] = result;
+        if (!storedSearchResultsCopy[searchIndex]) {
+            storedSearchResultsCopy[searchIndex] = newSearchResult;
+            set({ searchResults: storedSearchResultsCopy });
+            return;
         }
 
-        set({ searchResults: searchResultsCopy });
+        const paginationCursorIndex = storedSearchResultsCopy[searchIndex].findIndex(
+            (propertyId) => propertyId == paginationCursor?.id
+        );
+
+        storedSearchResultsCopy[searchIndex] = [ 
+            ...storedSearchResultsCopy[searchIndex].slice(0, paginationCursorIndex + 1), 
+            ...newSearchResult 
+        ];
+
+        set({ searchResults: storedSearchResultsCopy });
     };
-    const removeSearchResult = (filter: string, result: Array<Property["id"]>) => {
+    /* const removeSearchResult = (searchIndex: string) => {
         const { searchResults } = get();
-        if (!searchResults[filter]) return;
+        if (!searchResults[searchIndex]) return;
 
         const searchResultsCopy = { ...searchResults };
-        searchResultsCopy[filter] = searchResultsCopy[filter]!.filter(
-            propertyId => !result.includes(propertyId)
-        );
+        delete searchResultsCopy[searchIndex];
+
         set({ searchResults: searchResultsCopy });
-    };
+    }; */
+    const removePropertyFromSearchResult = (searchIndex: string, propertyId: Property["id"]) => {
+        const { searchResults: storedSearchResults } = get();
+        const storedSearchResultsCopy = { ...storedSearchResults };
+
+        if (!storedSearchResultsCopy[searchIndex]) {
+            return;
+        }
+
+        storedSearchResultsCopy[searchIndex].filter(searchResultId => searchResultId != propertyId);
+        set({ searchResults: storedSearchResultsCopy });
+    }
+    const sortSearchResults = (searchIndex: string) => {
+        const { properties: storedProperties, searchResults: storedSearchResults } = get();
+        if (!storedSearchResults[searchIndex]) {
+            return;
+        }
+        const storedSearchResultsCopy = { ...storedSearchResults };
+
+        const [, sortConfig] = stringToObjects<[PropertyFilter, SortConfig<Property>]>(searchIndex);
+        
+        const currentResults = storedSearchResultsCopy[searchIndex];
+        if (currentResults.length == 0) {
+            return;
+        }
+
+        const properties = currentResults.map(resultId => {
+            if (!storedProperties[resultId]) {
+                console.warn(`propertyStore -> sortSearchResults -
+                    warn: property (id: ${resultId}) is not present, cannot be sorted. will be set at final`)
+            }
+            return storedProperties[resultId];
+        }).filter(property => property != undefined)
+        const nonPresentPropertyIds = currentResults.filter(resultId => storedProperties[resultId] == undefined);
+
+        const sortColumns = sortConfig.map(sortEntry => sortEntry.column);
+        const sortDirections = sortConfig.map(sortEntry => sortEntry.direction);
+        const sortedProperties = orderBy(properties, sortColumns, sortDirections);
+        const sortedResults = sortedProperties.map(property => property.id);
+
+        storedSearchResultsCopy[searchIndex] = [...sortedResults, ...nonPresentPropertyIds];
+        set({ searchResults: storedSearchResultsCopy });
+    }
 
     const newPropertyHandler = (newProperty: Property) => {
         console.log(`event -> [new-property] ${newProperty.address} `);
         storeProperties([newProperty]);
 
         const { searchResults } = get();
-        Object.keys(searchResults).forEach((filterAsString) => {
-            const filter = JSON.parse(filterAsString) as PropertyFilter;
+        Object.keys(searchResults).forEach((searchIndex) => {
+            const [filter] = stringToObjects<[PropertyFilter]>(searchIndex);
+
             if (propertyCompliesFilter(newProperty, filter)) {
-                storeSearchResult(filterAsString, [newProperty.id]);
+                const prevResults = searchResults[searchIndex];
+                storeSearchResult(searchIndex, undefined, [...prevResults, newProperty.id]);
+                sortSearchResults(searchIndex);
             }
         });
     };
@@ -100,15 +153,17 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         storeProperties([updatedProperty]);
 
         const { searchResults } = get();
-        Object.keys(searchResults).forEach((filterAsString) => {
-            const filter = JSON.parse(filterAsString) as PropertyFilter;
-            if (searchResults[filterAsString]!.includes(updatedProperty.id)) {
+        Object.keys(searchResults).forEach((searchIndex) => {
+            const [filter] = stringToObjects<[PropertyFilter]>(searchIndex);
+            
+            if (searchResults[searchIndex]!.includes(updatedProperty.id)) {
                 if (!propertyCompliesFilter(updatedProperty, filter)) {
-                    removeSearchResult(filterAsString, [updatedProperty.id]);
+                    removePropertyFromSearchResult(searchIndex, updatedProperty.id)
                 }
             } else {
                 if (propertyCompliesFilter(updatedProperty, filter)) {
-                    storeSearchResult(filterAsString, [updatedProperty.id]);
+                    const prevResults = searchResults[searchIndex];
+                    storeSearchResult(searchIndex, undefined, [...prevResults, updatedProperty.id]);
                 }
             }
         });
@@ -118,9 +173,9 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         removeProperties([deletedProperty.id]);
 
         const { searchResults } = get();
-        Object.keys(searchResults).forEach((filterAsString) => {
-            if (searchResults[filterAsString]!.includes(deletedProperty.id)) {
-                removeSearchResult(filterAsString, [deletedProperty.id]);
+        Object.keys(searchResults).forEach((searchIndex) => {
+            if (searchResults[searchIndex]!.includes(deletedProperty.id)) {
+                removePropertyFromSearchResult(searchIndex, deletedProperty.id);
             }
         });
     };
@@ -129,55 +184,52 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
     const syncLocalStorageState = async () => {
         console.log(`propertiesStorage -> syncLocalStorageState`);
     
-        const { error, data: localStorageProperties} = fetchLocalStorageProperties();
-            
+        const { error, data: localStorageProperties} = getLocalStorageData<PropertiesStorage>(PROPERTIES_LOCAL_STORAGE_KEY);
         if (error) {
-            console.log('propertiesStorage -> syncLocalStorageState -> error: ', error);
+            console.log('syncLocalStorageState -> error: ', error);
             localStorage.removeItem(PROPERTIES_LOCAL_STORAGE_KEY);
             return;
         }
-
         if (!localStorageProperties) {
             return;
         }
     
-        const localStoragePropertyIds = Object.keys(localStorageProperties!) as unknown as Array<Property["id"]>;
-    
+        const localStoragePropertyIds = Object.keys(localStorageProperties) as unknown as Array<Property["id"]>;
         if (localStoragePropertyIds.length == 0) {
             return;
         }
     
-        const { data: validIds, error: invalidatePropertiesError } = await backendApi.invalidateProperties(localStoragePropertyIds, Date.now());
-    
+        const { data: validIds, error: invalidatePropertiesError } = 
+            await backendApi.invalidateProperties(localStoragePropertyIds, Date.now());
         if (invalidatePropertiesError) {
-            console.error('propertiesStorage -> syncLocalStorageState -> error: ', invalidatePropertiesError);
+            console.error('syncLocalStorageState -> error: ', invalidatePropertiesError);
             return;
         }
     
-        const validProperties: Record<Property["id"], Property> = {};
+        const validProperties: PropertiesStorage = {};
         validIds.forEach((validId) => {
-            validProperties[validId] = localStorageProperties![validId];
+            validProperties[validId] = localStorageProperties[validId];
         })
     
         set({ properties: validProperties });
     }
-    syncLocalStorageState();
+    syncLocalStorageState()
+        .finally(() => setInitialized())
 
     return {
         properties: {},
         searchResults: {},
         fetchProperty: async (propertyId: Property["id"]) => {
-            console.log(`propertyStore -> fetchProperty - propertyId: ${propertyId}`)
-
+            console.log(`propertyStore -> fetchProperty - 
+                propertyId: ${propertyId}`)
+            await initializedFlag;
+            
             const { properties: storedProperties } = get();
-            const storedProperty = storedProperties[propertyId];
-
-            if (storedProperty) {
+            if (storedProperties[propertyId]) {
                 return { data: undefined };
             }
 
             const { data: properties, error } = await backendApi.getProperties([propertyId]);
-
             if (error) {
                 return { error };
             }
@@ -185,22 +237,20 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             if (properties) {
                 storeProperties(properties);
             }
-
             return { data: undefined };
         },
         fetchProperties: async (propertyIds) => {
             console.log(`propertyStore -> fetchProperties - propertyIds: ${propertyIds}`);
+            await initializedFlag;
 
             const { properties: storedProperties } = get();
-            
-            const nonStoredProperties = propertyIds.filter((propertyId) => storedProperties[propertyId] == undefined);
 
+            const nonStoredProperties = propertyIds.filter((propertyId) => storedProperties[propertyId] == undefined);
             if (nonStoredProperties.length == 0) {
                 return { data: undefined };
             }
 
             const { data: properties, error } = await backendApi.getProperties(propertyIds);
-
             if (error) {
                 return { error };
             }
@@ -208,42 +258,44 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             if (properties) {
                 storeProperties(properties);
             }
-
             return { data: undefined }
         },
-        searchProperties: async (filter) => {
-            const filterAsString = JSON.stringify(filter);
-            console.log(`propertyStore -> searchProperties - filter: ${filterAsString}`);
-
-            const { properties, searchResults: storedSearchResults } = get();
-
-            let searchResult = storedSearchResults[filterAsString];
-            if (!searchResult) {
-                const { error, data } = await backendApi.searchPropertyIds(filter);
-                if (error) return { error };
-                storeSearchResult(filterAsString, data);
-                searchResult = data;
-            }
-
-            const storedPropertyIds = new Set(Object.keys(properties).map(Number));
-            const nonStoredPropertyIds = searchResult.filter(
-                id => !storedPropertyIds.has(id)
+        searchProperties: async (filter, sortConfig, recordsPerPage, paginationCursor) => {
+            const searchIndex = objectsToString(filter, sortConfig);
+            console.log(`propertyStore -> searchProperties - 
+                searchIndex: ${searchIndex}
+                recordsPerPage: ${recordsPerPage}
+                paginationCursor: ${JSON.stringify(paginationCursor)}`
             );
+            await initializedFlag;
 
-            if (nonStoredPropertyIds.length > 0) {
-                const { error: getError, data: newProperties } = 
-                    await backendApi.getProperties(nonStoredPropertyIds);
-                if (getError) return { error: getError };
-                storeProperties(newProperties);
+            const { searchResults: storedSearchResults } = get();
+            if (storedSearchResults[searchIndex]) {
+                const paginationCursorIndex = storedSearchResults[searchIndex].findIndex(
+                    (propertyId) => propertyId == paginationCursor?.id
+                )
+
+                const resultsAlreadyStored = (paginationCursorIndex + recordsPerPage) < storedSearchResults[searchIndex].length
+                if (resultsAlreadyStored) {
+                    console.log(`propertyStore -> searchProperties - use already stored result`);
+                    return { data: undefined };
+                }
             }
 
+            const { error, data: propertyIds } = 
+                await backendApi.searchPropertyIds(filter, sortConfig, recordsPerPage, paginationCursor);
+            if (error) return { error };
+            if (!propertyIds) return { error: new Error(`searchProperties -> error: No data received`) };
+
+            storeSearchResult(searchIndex, paginationCursor, propertyIds);
             return { data: undefined };
         },
         createProperty: async (newPropertyData) => {
-            console.log(`propertyStore -> createProperty - propertyData: ${JSON.stringify(newPropertyData)}`)
+            console.log(`propertyStore -> createProperty - 
+                propertyData: ${JSON.stringify(newPropertyData)}`)
+            await initializedFlag;
 
             const { error } = await backendApi.createProperty(newPropertyData);
-
             if (error) {
                 return { error };
             }
@@ -251,10 +303,12 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return { data: undefined };
         },
         updateProperty: async (propertyId, updateData) => {
-            console.log(`propertyStore -> updateProperty - propertyId: ${propertyId} updateData: ${JSON.stringify(updateData)}`)
+            console.log(`propertyStore -> updateProperty - 
+                propertyId: ${propertyId} 
+                updateData: ${JSON.stringify(updateData)}`)
+            await initializedFlag;
 
             const { error } = await backendApi.updateProperty(propertyId, updateData);
-
             if (error) {
                 return { error };
             }
@@ -262,10 +316,11 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return { data: undefined };
         },
         deleteProperty: async (propertyId) => {
-            console.log(`propertyStore -> deleteProperty propertyId: ${propertyId}`);
-        
+            console.log(`propertyStore -> deleteProperty - 
+                propertyId: ${propertyId}`);
+            await initializedFlag;
+
             const { error } = await backendApi.deleteProperty(propertyId);
-        
             if (error) {
                 return { error };
             }
@@ -275,13 +330,13 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
     };
 })
 
-usePropertyStore.subscribe((state) => {
-    localStorage.setItem(PROPERTIES_LOCAL_STORAGE_KEY, JSON.stringify(state.properties));
+usePropertyStore.subscribe((store) => {
+    localStorage.setItem(PROPERTIES_LOCAL_STORAGE_KEY, JSON.stringify(store.properties));
 })
 
-export const fetchByIdSelector = (propertyId: Property["id"]) => {
-    return (store: PropertyStore) => store.properties[propertyId];
+export const selectPropertyById = (propertyId: Property["id"] | undefined) => {
+    return (store: PropertyStore): Property | undefined => propertyId ? store.properties[propertyId] : undefined;
 }
-export const searchResultByStringFilter = (filter: string) => {
-    return (store: PropertyStore) => store.searchResults[filter];
+export const selectSearchResultsBySearchIndex = (searchIndex: string)  => {
+    return (store: PropertyStore): Array<Property["id"]> | undefined => store.searchResults[searchIndex];
 };

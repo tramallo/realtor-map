@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import {
   Chip,
   CircularProgress,
@@ -9,40 +9,72 @@ import {
 import { useTranslation } from "react-i18next";
 
 import {
-  searchResultByStringFilter,
+  selectContractById,
   useContractStore,
 } from "../../stores/contractsStore";
 import {
   countDefinedAttributes,
+  createPaginationCursor,
+  objectsToString,
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { FilterContracts } from "./FilterContracts";
-import { ContractFilter } from "../../utils/data-filter-schema";
+import {
+  ContractFilter,
+  PaginationCursor,
+  SortConfig,
+} from "../../utils/data-filter-schema";
 import { Contract } from "../../utils/data-schema";
+import { SortData } from "../SortData";
 
 export interface SearchContractsProps {
-  onSearch: (result: Array<Contract["id"]>) => void;
+  onSearch: (searchIndex: string) => void;
   defaultFilter?: ContractFilter;
+  defaultSortConfig?: SortConfig<Contract>;
+  recordsPerPage?: number;
+  paginationId?: Contract["id"] | undefined;
 }
+const defaults = {
+  filter: { deletedEq: false } as ContractFilter,
+  sortConfig: [{ column: "id", direction: "asc" }] as SortConfig<Contract>,
+  recordsPerPage: 5,
+};
 
 export default function SearchContracts({
   onSearch,
-  defaultFilter = { deletedEq: false },
+  defaultFilter = defaults.filter,
+  defaultSortConfig = defaults.sortConfig,
+  recordsPerPage = defaults.recordsPerPage,
+  paginationId,
 }: SearchContractsProps) {
   const { t } = useTranslation();
   const searchContracts = useContractStore((store) => store.searchContracts);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
-  const [contractsFilter, setContractsFilter] = useState(defaultFilter);
 
   const [searchingContracts, setSearchingContracts] = useState(false);
   const [searchContractsResponse, setSearchContractsResponse] = useState(
     undefined as OperationResponse | undefined
   );
 
-  const filteredContractIds = useContractStore(
-    searchResultByStringFilter(JSON.stringify(contractsFilter))
+  const [searchFilter, setSearchFilter] = useState(defaultFilter);
+  const [sortConfig, setSortConfig] = useState(defaultSortConfig);
+
+  const paginationContract = useContractStore(selectContractById(paginationId));
+  const paginationCursor: PaginationCursor<Contract> | undefined = useMemo(
+    () =>
+      paginationContract
+        ? createPaginationCursor(paginationContract, sortConfig)
+        : undefined,
+    [paginationContract, sortConfig]
   );
+
+  console.log(`SearchContracts -> render -
+    defaultFilter: ${JSON.stringify(defaultFilter)}
+    defaultSortConfig: ${JSON.stringify(defaultSortConfig)}
+    recordsPerPage: ${recordsPerPage}
+    paginationCursor: ${JSON.stringify(paginationCursor)}
+    searchingContracts: ${searchingContracts}`);
 
   const toggleFiltersVisibility = useCallback(
     () => setFiltersVisible(!filtersVisible),
@@ -51,17 +83,30 @@ export default function SearchContracts({
 
   // searchContracts effect
   useEffect(() => {
+    const searchIndex = objectsToString(searchFilter, sortConfig);
+    console.log(
+      `SearchContracts -> searchContracts [effect] - 
+        searchIndex: ${searchIndex}
+        recordsPerPage: ${recordsPerPage}
+        paginationCursor: ${objectsToString(paginationCursor)}`
+    );
+
     setSearchContractsResponse(undefined);
     setSearchingContracts(true);
-    searchContracts(contractsFilter)
-      .then(setSearchContractsResponse)
+    searchContracts(searchFilter, sortConfig, recordsPerPage, paginationCursor)
+      .then((response) => {
+        setSearchContractsResponse(response);
+        return !response.error ? onSearch(searchIndex) : undefined;
+      })
       .finally(() => setSearchingContracts(false));
-  }, [searchContracts, contractsFilter]);
-
-  // callbackSearchResults effect
-  useEffect(() => {
-    onSearch(filteredContractIds ?? []);
-  }, [filteredContractIds, onSearch]);
+  }, [
+    searchFilter,
+    sortConfig,
+    recordsPerPage,
+    paginationCursor,
+    onSearch,
+    searchContracts,
+  ]);
 
   return (
     <Stack spacing={1}>
@@ -77,7 +122,7 @@ export default function SearchContracts({
                 : searchContractsResponse?.error
                 ? searchContractsResponse?.error.message
                 : `${t("fields.searchLabel.text")} (${countDefinedAttributes(
-                    contractsFilter
+                    searchFilter
                   )})`
             }
             disabled={searchingContracts}
@@ -93,10 +138,14 @@ export default function SearchContracts({
           />
         </Divider>
         <Collapse in={filtersVisible}>
-          <FilterContracts
-            filter={contractsFilter}
-            onChange={setContractsFilter}
-          />
+          <Stack spacing={1}>
+            <FilterContracts filter={searchFilter} onChange={setSearchFilter} />
+            <SortData
+              sortConfig={sortConfig}
+              onChange={setSortConfig}
+              sortColumnOptions={["id", "createdAt"]}
+            />
+          </Stack>
         </Collapse>
       </Stack>
     </Stack>

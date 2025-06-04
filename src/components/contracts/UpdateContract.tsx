@@ -9,7 +9,7 @@ import {
 } from "../../utils/data-schema";
 import {
   useContractStore,
-  fetchByIdSelector,
+  selectContractById,
 } from "../../stores/contractsStore";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
@@ -46,7 +46,7 @@ export default function UpdateContract({
 
   const [updatingContract, setUpdatingContract] = useState(false);
 
-  const cachedContract = useContractStore(fetchByIdSelector(contractId));
+  const cachedContract = useContractStore(selectContractById(contractId));
 
   const prefillData = useMemo(() => {
     const updateMetadata = {

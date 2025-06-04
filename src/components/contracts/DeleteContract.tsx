@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   useContractStore,
-  fetchByIdSelector,
+  selectContractById,
 } from "../../stores/contractsStore";
 import { Contract, UpdateContractDTO } from "../../utils/data-schema";
 import {
@@ -50,7 +50,7 @@ export default function DeleteContract({
   const [softDeletingContract, setSoftDeletingContract] = useState(false);
   const [restoringContract, setRestoringContract] = useState(false);
 
-  const cachedContract = useContractStore(fetchByIdSelector(contractId));
+  const cachedContract = useContractStore(selectContractById(contractId));
 
   const softDeleteContract = useCallback(async () => {
     console.log(`DeleteContract -> softDeleteContract ${contractId}`);

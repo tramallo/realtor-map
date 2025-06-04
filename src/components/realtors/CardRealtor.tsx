@@ -10,7 +10,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useTranslation } from "react-i18next";
 
 import { Realtor } from "../../utils/data-schema";
-import { fetchByIdSelector, useRealtorStore } from "../../stores/realtorsStore";
+import { selectRealtorById, useRealtorStore } from "../../stores/realtorsStore";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import ViewRealtor from "./ViewRealtor";
@@ -36,7 +36,7 @@ export function CardRealtor({
 
   const [viewRealtorModalOpen, setViewRealtorModalOpen] = useState(false);
 
-  const realtor = useRealtorStore(fetchByIdSelector(realtorId));
+  const realtor = useRealtorStore(selectRealtorById(realtorId));
 
   // fetchRealtor effect
   useEffect(() => {

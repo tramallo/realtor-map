@@ -6,7 +6,7 @@ import { Contract } from "../utils/data-schema";
 import ViewContract from "./contracts/ViewContract";
 import { OperationResponse } from "../utils/helperFunctions";
 import CustomModal from "./CustomModal";
-import { fetchByIdSelector, useContractStore } from "../stores/contractsStore";
+import { selectContractById, useContractStore } from "../stores/contractsStore";
 
 export interface ContractChipProps {
   contractId: Contract["id"];
@@ -27,7 +27,7 @@ export default function ContractChip({
 
   const [viewContractModalOpen, setViewContractModalOpen] = useState(false);
 
-  const cachedContract = useContractStore(fetchByIdSelector(contractId));
+  const cachedContract = useContractStore(selectContractById(contractId));
 
   // fetchContract effect
   useEffect(() => {

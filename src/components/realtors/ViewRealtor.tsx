@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
+import { useRealtorStore, selectRealtorById } from "../../stores/realtorsStore";
 import { Realtor } from "../../utils/data-schema";
 import DeleteRealtor from "./DeleteRealtor";
 import UpdateRealtor from "./UpdateRealtor";
@@ -33,7 +33,7 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
   const [deleteRealtorModalOpen, setDeleteRealtorModalOpen] = useState(false);
   const [updateRealtorModalOpen, setUpdateRealtorModalOpen] = useState(false);
 
-  const cachedRealtor = useRealtorStore(fetchByIdSelector(realtorId));
+  const cachedRealtor = useRealtorStore(selectRealtorById(realtorId));
 
   // fetchRealtor effect
   useEffect(() => {

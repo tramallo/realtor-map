@@ -6,7 +6,7 @@ import { Realtor } from "../utils/data-schema";
 import ViewRealtor from "./realtors/ViewRealtor";
 import { OperationResponse } from "../utils/helperFunctions";
 import CustomModal from "./CustomModal";
-import { useRealtorStore, fetchByIdSelector } from "../stores/realtorsStore";
+import { useRealtorStore, selectRealtorById } from "../stores/realtorsStore";
 
 export interface RealtorChipProps {
   realtorId: Realtor["id"];
@@ -24,7 +24,7 @@ export default function RealtorChip({ realtorId, onClose }: RealtorChipProps) {
 
   const [viewRealtorModalOpen, setViewRealtorModalOpen] = useState(false);
 
-  const cachedRealtor = useRealtorStore(fetchByIdSelector(realtorId));
+  const cachedRealtor = useRealtorStore(selectRealtorById(realtorId));
 
   //fetchRealtor effect
   useEffect(() => {

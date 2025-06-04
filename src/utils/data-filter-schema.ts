@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { dataIdSchema, propertyStates, propertyTypes, timestampSchema, userIdSchema } from "./data-schema";
+import { BaseData, dataIdSchema, propertyStates, propertyTypes, timestampSchema, userIdSchema } from "./data-schema";
 
 export const baseDataFilterSchema = z.object({
     idEq: dataIdSchema.array().optional(),
@@ -47,3 +47,21 @@ export type PropertyFilter = z.infer<typeof propertyFilterSchema>;
 export type ClientFilter = z.infer<typeof clientFilterSchema>;
 export type RealtorFilter = z.infer<typeof realtorFilterSchema>;
 export type ContractFilter = z.infer<typeof contractFilterSchema>;
+
+export const sortDirections = ["asc", "desc"] as const;
+export type SortDirection = typeof sortDirections[number];
+
+export type SortColumn<T extends BaseData> = keyof T & string
+
+export type SortConfigEntry<
+    T extends BaseData, 
+    Column extends SortColumn<T> = SortColumn<T>, 
+    Direction extends SortDirection = SortDirection
+> = { column: Column, direction: Direction };
+
+//sort by id is required for cursor pagination, as a tiebreaker for equal column cases
+export type SortConfig<T extends BaseData> = [...Array<SortConfigEntry<T>>, SortConfigEntry<T, "id">];
+//'id' is required, but for some reason the | operator is the one that works
+export type PaginationCursor<T extends BaseData> = Partial<T>;
+
+export const SORT_BY_ID_ASC: SortConfig<BaseData> = [{ column: "id", direction: "asc" }];

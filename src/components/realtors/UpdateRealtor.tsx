@@ -7,7 +7,7 @@ import {
   UpdateRealtorDTO,
   updateRealtorDTO,
 } from "../../utils/data-schema";
-import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
+import { useRealtorStore, selectRealtorById } from "../../stores/realtorsStore";
 import { MemoForm } from "../form/Form";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
@@ -40,7 +40,7 @@ export default function UpdateRealtor({
 
   const [updatingRealtor, setUpdatingRealtor] = useState(false);
 
-  const cachedRealtor = useRealtorStore(fetchByIdSelector(realtorId));
+  const cachedRealtor = useRealtorStore(selectRealtorById(realtorId));
 
   const prefillData = useMemo(() => {
     const updateMetadata = {

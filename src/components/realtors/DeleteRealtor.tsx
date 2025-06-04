@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
+import { useRealtorStore, selectRealtorById } from "../../stores/realtorsStore";
 import { Realtor, UpdateRealtorDTO } from "../../utils/data-schema";
 import {
   dateToTimestamp,
@@ -43,7 +43,7 @@ export default function DeleteRealtor({
   const [softDeletingRealtor, setSoftDeletingRealtor] = useState(false);
   const [restoringRealtor, setRestoringRealtor] = useState(false);
 
-  const cachedRealtor = useRealtorStore(fetchByIdSelector(realtorId));
+  const cachedRealtor = useRealtorStore(selectRealtorById(realtorId));
 
   const softDeleteRealtor = useCallback(async () => {
     console.log(`DeleteRealtor -> softDeleteRealtor ${realtorId}`);

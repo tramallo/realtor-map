@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import {
   Chip,
   CircularProgress,
@@ -9,40 +9,72 @@ import {
 import { useTranslation } from "react-i18next";
 
 import {
-  searchResultByStringFilter,
+  selectPropertyById,
   usePropertyStore,
 } from "../../stores/propertiesStore";
 import {
   countDefinedAttributes,
+  createPaginationCursor,
+  objectsToString,
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { FilterProperties } from "./FilterProperties";
-import { PropertyFilter } from "../../utils/data-filter-schema";
+import {
+  SortConfig,
+  PropertyFilter,
+  PaginationCursor,
+} from "../../utils/data-filter-schema";
 import { Property } from "../../utils/data-schema";
+import { SortData } from "../SortData";
 
 export interface SearchPropertiesProps {
-  onSearch: (result: Array<Property["id"]>) => void;
+  onSearch: (searchIndex: string) => void;
   defaultFilter?: PropertyFilter;
+  defaultSortConfig?: SortConfig<Property>;
+  recordsPerPage?: number;
+  paginationId?: Property["id"] | undefined;
 }
+const defaults = {
+  filter: { deletedEq: false } as PropertyFilter,
+  sortConfig: [{ column: "id", direction: "asc" }] as SortConfig<Property>,
+  recordsPerPage: 5,
+};
 
 export default function SearchProperties({
   onSearch,
-  defaultFilter = { deletedEq: false },
+  defaultFilter = defaults.filter,
+  defaultSortConfig = defaults.sortConfig,
+  recordsPerPage = defaults.recordsPerPage,
+  paginationId,
 }: SearchPropertiesProps) {
   const { t } = useTranslation();
   const searchProperties = usePropertyStore((store) => store.searchProperties);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
-  const [propertiesFilter, setPropertiesFilter] = useState(defaultFilter);
 
   const [searchingProperties, setSearchingProperties] = useState(false);
   const [searchPropertiesResponse, setSearchPropertiesResponse] = useState(
     undefined as OperationResponse | undefined
   );
 
-  const filteredPropertyIds = usePropertyStore(
-    searchResultByStringFilter(JSON.stringify(propertiesFilter))
+  const [searchFilter, setSearchFilter] = useState(defaultFilter);
+  const [sortConfig, setSortConfig] = useState(defaultSortConfig);
+
+  const paginationProperty = usePropertyStore(selectPropertyById(paginationId));
+  const paginationCursor: PaginationCursor<Property> | undefined = useMemo(
+    () =>
+      paginationProperty
+        ? createPaginationCursor(paginationProperty, sortConfig)
+        : undefined,
+    [paginationProperty, sortConfig]
   );
+
+  console.log(`SearchProperties -> render -
+    defaultFilter: ${JSON.stringify(defaultFilter)}
+    defaultSortConfig: ${JSON.stringify(defaultSortConfig)}
+    recordsPerPage: ${recordsPerPage}
+    paginationCursor: ${JSON.stringify(paginationCursor)}
+    searchingProperties: ${searchingProperties}`);
 
   const toggleFiltersVisibility = useCallback(
     () => setFiltersVisible(!filtersVisible),
@@ -51,17 +83,30 @@ export default function SearchProperties({
 
   // searchProperties effect
   useEffect(() => {
+    const searchIndex = objectsToString(searchFilter, sortConfig);
+    console.log(
+      `SearchProperties -> searchProperties [effect] - 
+        searchIndex: ${searchIndex}
+        recordsPerPage: ${recordsPerPage}
+        paginationCursor: ${objectsToString(paginationCursor)}`
+    );
+
     setSearchPropertiesResponse(undefined);
     setSearchingProperties(true);
-    searchProperties(propertiesFilter)
-      .then(setSearchPropertiesResponse)
+    searchProperties(searchFilter, sortConfig, recordsPerPage, paginationCursor)
+      .then((response) => {
+        setSearchPropertiesResponse(response);
+        return !response.error ? onSearch(searchIndex) : undefined;
+      })
       .finally(() => setSearchingProperties(false));
-  }, [searchProperties, propertiesFilter]);
-
-  // callbackSearchResults effect
-  useEffect(() => {
-    onSearch(filteredPropertyIds ?? []);
-  }, [filteredPropertyIds, onSearch]);
+  }, [
+    searchFilter,
+    sortConfig,
+    recordsPerPage,
+    paginationCursor,
+    onSearch,
+    searchProperties,
+  ]);
 
   return (
     <Stack spacing={1}>
@@ -77,7 +122,7 @@ export default function SearchProperties({
                 : searchPropertiesResponse?.error
                 ? searchPropertiesResponse?.error.message
                 : `${t("fields.searchLabel.text")} (${countDefinedAttributes(
-                    propertiesFilter
+                    searchFilter
                   )})`
             }
             disabled={searchingProperties}
@@ -93,10 +138,17 @@ export default function SearchProperties({
           />
         </Divider>
         <Collapse in={filtersVisible}>
-          <FilterProperties
-            filter={propertiesFilter}
-            onChange={setPropertiesFilter}
-          />
+          <Stack spacing={1}>
+            <FilterProperties
+              filter={searchFilter}
+              onChange={setSearchFilter}
+            />
+            <SortData
+              sortConfig={sortConfig}
+              onChange={setSortConfig}
+              sortColumnOptions={["id", "createdAt"]}
+            />
+          </Stack>
         </Collapse>
       </Stack>
     </Stack>

@@ -1,4 +1,11 @@
-import { ContractFilter, ClientFilter, PropertyFilter, RealtorFilter } from "./data-filter-schema";
+import { 
+    ContractFilter, 
+    ClientFilter, 
+    PropertyFilter, 
+    RealtorFilter, 
+    SortConfig,
+    PaginationCursor, 
+} from "./data-filter-schema";
 import { Contract, 
     CreateContractDTO, 
     CreateClientDTO, 
@@ -17,7 +24,12 @@ import { OperationResponse } from "./helperFunctions";
 export interface BackendApi {
     //properties
     getProperties: (propertyIds: Array<Property['id']>) => Promise<OperationResponse<Array<Property>>>;
-    searchPropertyIds: (filter: PropertyFilter) => Promise<OperationResponse<Array<Property['id']>>>;
+    searchPropertyIds: (
+        filter: PropertyFilter, 
+        order: SortConfig<Property>, 
+        recordsPerPage: number,
+        paginationCursor: PaginationCursor<Property> | undefined,
+    ) => Promise<OperationResponse<Array<Property['id']>>>;
     createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
     updateProperty: (propertyId: Property["id"], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
     deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;
@@ -30,7 +42,12 @@ export interface BackendApi {
     propertiesUnsubscribe: () => void;
     //realtors
     getRealtors: (realtorIds: Array<Realtor['id']>) => Promise<OperationResponse<Array<Realtor>>>;
-    searchRealtorIds: (filter: RealtorFilter) => Promise<OperationResponse<Array<Realtor['id']>>>;
+    searchRealtorIds: (
+        filter: RealtorFilter,
+        order: SortConfig<Realtor>, 
+        recordsPerPage: number,
+        paginationCursor: PaginationCursor<Realtor> | undefined,
+    ) => Promise<OperationResponse<Array<Realtor['id']>>>;
     createRealtor: (newRealtorData: CreateRealtorDTO) => Promise<OperationResponse>;
     updateRealtor: (realtorId: Realtor["id"], updateData: UpdateRealtorDTO) => Promise<OperationResponse>;
     deleteRealtor: (realtorId: Realtor['id']) => Promise<OperationResponse>;
@@ -43,7 +60,12 @@ export interface BackendApi {
     realtorsUnsubscribe: () => void;
     //clients
     getClients: (clientIds: Array<Client['id']>) => Promise<OperationResponse<Array<Client>>>;
-    searchClientIds: (filter: ClientFilter) => Promise<OperationResponse<Array<Client['id']>>>;
+    searchClientIds: (
+        filter: ClientFilter,
+        order: SortConfig<Client>, 
+        recordsPerPage: number,
+        paginationCursor: PaginationCursor<Client> | undefined,
+    ) => Promise<OperationResponse<Array<Client['id']>>>;
     createClient: (newClientData: CreateClientDTO) => Promise<OperationResponse>;
     updateClient: (clientId: Client["id"], updateData: UpdateClientDTO) => Promise<OperationResponse>;
     deleteClient: (clientId: Client['id']) => Promise<OperationResponse>;
@@ -56,7 +78,12 @@ export interface BackendApi {
     clientsUnsubscribe: () => void;
     // contracts
     getContracts: (contractIds: Array<Contract['id']>) => Promise<OperationResponse<Array<Contract>>>;
-    searchContractIds: (filter: ContractFilter) => Promise<OperationResponse<Array<Contract['id']>>>;
+    searchContractIds: (
+        filter: ContractFilter,
+        order: SortConfig<Contract>, 
+        recordsPerPage: number,
+        paginationCursor: PaginationCursor<Contract> | undefined,
+    ) => Promise<OperationResponse<Array<Contract['id']>>>;
     createContract: (newContractData: CreateContractDTO) => Promise<OperationResponse>;
     updateContract: (contractId: Contract["id"], updateData: UpdateContractDTO) => Promise<OperationResponse>;
     deleteContract: (contractId: Contract['id']) => Promise<OperationResponse>;

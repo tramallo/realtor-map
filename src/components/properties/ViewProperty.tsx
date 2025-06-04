@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   usePropertyStore,
-  fetchByIdSelector,
+  selectPropertyById,
 } from "../../stores/propertiesStore";
 import { Property } from "../../utils/data-schema";
 import UpdateProperty from "./UpdateProperty";
@@ -39,7 +39,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
   const [deletePropertyModalOpen, setDeletePropertyModalOpen] = useState(false);
   const [updatePropertyModalOpen, setUpdatePropertyModalOpen] = useState(false);
 
-  const cachedProperty = usePropertyStore(fetchByIdSelector(propertyId));
+  const cachedProperty = usePropertyStore(selectPropertyById(propertyId));
 
   //fetchProperty effect
   useEffect(() => {

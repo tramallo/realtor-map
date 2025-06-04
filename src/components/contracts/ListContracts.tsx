@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -7,21 +7,31 @@ import { CardContract } from "./CardContract";
 import ComponentsField from "../ComponentsField";
 import ContractChip from "../ContractChip";
 
-export type ListContractsProps = Omit<StackProps, "onSelect"> & {
-  contractIds: Array<Contract["id"]>;
+export type ListContractsProps = {
+  contractIds: Array<Contract["id"]> | undefined;
+  onReachScrollEnd?: () => void;
   selected?: Array<Contract["id"]>;
   onSelect?: (selected: Array<Contract["id"]>) => void;
   multiselect?: boolean;
+} & Omit<StackProps, "onSelect">;
+const defaults = {
+  selected: [],
 };
 
 export function ListContracts({
   contractIds,
-  selected = [],
+  onReachScrollEnd,
+  selected = defaults.selected,
   onSelect,
   multiselect,
   ...stackProps
 }: ListContractsProps) {
+  const bottomRef = useRef(null as HTMLLIElement | null);
+
   const { t } = useTranslation();
+
+  console.log(`ListContracts -> render - 
+    contractIds: ${contractIds}`);
 
   const toggleContractSelection = useCallback(
     (contractId: Contract["id"]) => {
@@ -44,6 +54,40 @@ export function ListContracts({
     [selected, multiselect, onSelect]
   );
 
+  // onReachScrollEnd effect
+  useEffect(() => {
+    const bottomItem = bottomRef.current;
+    if (!bottomItem || !onReachScrollEnd) {
+      return;
+    }
+    console.log(
+      `ListContracts -> onReachScrollEnd [effect] - register callback`
+    );
+
+    const onScrollEnd = () => {
+      console.log(
+        `ListContracts -> onReachScrollEnd [effect] - execute callback`
+      );
+      onReachScrollEnd();
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => (entries[0].isIntersecting ? onScrollEnd() : undefined),
+      {
+        root: null,
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(bottomItem);
+    return () => {
+      console.log(
+        `ListContracts -> onReachScrollEnd [effect] - unregister callback`
+      );
+      observer.unobserve(bottomItem);
+    };
+  }, [onReachScrollEnd]);
+
   return (
     <Stack
       spacing={1}
@@ -52,13 +96,11 @@ export function ListContracts({
       {...stackProps}
     >
       <Box overflow="auto">
-        <List>
-          {contractIds.map((contractId, index) => (
+        <List disablePadding>
+          {(contractIds ?? []).map((contractId, contractIndex) => (
             <ListItem
-              key={`list-contract-${index}`}
-              sx={{
-                "&:not(:last-child)": { marginBottom: 1 },
-              }}
+              key={contractIndex}
+              sx={{ marginBottom: 1 }}
               disablePadding
             >
               <CardContract
@@ -68,13 +110,15 @@ export function ListContracts({
               />
             </ListItem>
           ))}
+          <ListItem ref={bottomRef}></ListItem>
         </List>
       </Box>
       {onSelect && (
         <ComponentsField
           label={t("fields.selectedField.label")}
-          components={selected.map((selectedId) => (
+          components={selected.map((selectedId, selectedIndex) => (
             <ContractChip
+              key={selectedIndex}
               contractId={selectedId}
               onClose={() => toggleContractSelection(selectedId)}
             />

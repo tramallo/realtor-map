@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 
 import { Contract } from "../../utils/data-schema";
 import {
-  fetchByIdSelector,
+  selectContractById,
   useContractStore,
 } from "../../stores/contractsStore";
 import {
@@ -44,7 +44,7 @@ export function CardContract({
 
   const [viewContractModalOpen, setViewContractModalOpen] = useState(false);
 
-  const contract = useContractStore(fetchByIdSelector(contractId));
+  const contract = useContractStore(selectContractById(contractId));
 
   // fetchContract effect
   useEffect(() => {

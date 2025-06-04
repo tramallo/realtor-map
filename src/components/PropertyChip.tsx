@@ -6,7 +6,10 @@ import { Property } from "../utils/data-schema";
 import ViewProperty from "./properties/ViewProperty";
 import { OperationResponse } from "../utils/helperFunctions";
 import CustomModal from "./CustomModal";
-import { fetchByIdSelector, usePropertyStore } from "../stores/propertiesStore";
+import {
+  selectPropertyById,
+  usePropertyStore,
+} from "../stores/propertiesStore";
 
 export interface PropertyChipProps {
   propertyId: Property["id"];
@@ -27,7 +30,7 @@ export default function PropertyChip({
 
   const [viewPropertyModalOpen, setViewPropertyModalOpen] = useState(false);
 
-  const cachedProperty = usePropertyStore(fetchByIdSelector(propertyId));
+  const cachedProperty = usePropertyStore(selectPropertyById(propertyId));
 
   // fetchProperty effect
   useEffect(() => {

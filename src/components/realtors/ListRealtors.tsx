@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Box, List, ListItem, Stack, StackProps } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -8,20 +8,30 @@ import ComponentsField from "../ComponentsField";
 import RealtorChip from "../RealtorChip";
 
 export type ListRealtorsProps = Omit<StackProps, "onSelect"> & {
-  realtorIds: Array<Realtor["id"]>;
+  realtorIds: Array<Realtor["id"]> | undefined;
+  onReachScrollEnd?: () => void;
   selected?: Array<Realtor["id"]>;
   onSelect?: (selected: Array<Realtor["id"]>) => void;
   multiselect?: boolean;
 };
+const defaults = {
+  selected: [],
+};
 
 export function ListRealtors({
   realtorIds,
-  selected = [],
+  onReachScrollEnd,
+  selected = defaults.selected,
   onSelect,
   multiselect,
   ...stackProps
 }: ListRealtorsProps) {
+  const bottomRef = useRef(null as HTMLLIElement | null);
+
   const { t } = useTranslation();
+
+  console.log(`ListRealtors -> render - 
+    realtorIds: ${realtorIds}`);
 
   const toggleRealtorSelection = useCallback(
     (realtorId: Realtor["id"]) => {
@@ -44,6 +54,40 @@ export function ListRealtors({
     [selected, multiselect, onSelect]
   );
 
+  // onReachScrollEnd effect
+  useEffect(() => {
+    const bottomItem = bottomRef.current;
+    if (!bottomItem || !onReachScrollEnd) {
+      return;
+    }
+    console.log(
+      `ListRealtors -> onReachScrollEnd [effect] - register callback`
+    );
+
+    const onScrollEnd = () => {
+      console.log(
+        `ListRealtors -> onReachScrollEnd [effect] - execute callback`
+      );
+      onReachScrollEnd();
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => (entries[0].isIntersecting ? onScrollEnd() : undefined),
+      {
+        root: null,
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(bottomItem);
+    return () => {
+      console.log(
+        `ListRealtors -> onReachScrollEnd [effect] - unregister callback`
+      );
+      observer.unobserve(bottomItem);
+    };
+  }, [onReachScrollEnd]);
+
   return (
     <Stack
       spacing={1}
@@ -52,13 +96,11 @@ export function ListRealtors({
       {...stackProps}
     >
       <Box overflow="auto">
-        <List>
-          {realtorIds.map((realtorId, index) => (
+        <List disablePadding>
+          {(realtorIds ?? []).map((realtorId, realtorIndex) => (
             <ListItem
-              key={`list-realtor-${index}`}
-              sx={{
-                "&:not(:last-child)": { marginBottom: 1 },
-              }}
+              key={realtorIndex}
+              sx={{ marginBottom: 1 }}
               disablePadding
             >
               <CardRealtor
@@ -68,14 +110,15 @@ export function ListRealtors({
               />
             </ListItem>
           ))}
+          <ListItem ref={bottomRef}></ListItem>
         </List>
       </Box>
       {onSelect && (
         <ComponentsField
           label={t("fields.selectedField.label")}
-          components={selected.map((selectedId) => (
+          components={selected.map((selectedId, selectedIndex) => (
             <RealtorChip
-              key={selectedId}
+              key={selectedIndex}
               realtorId={selectedId}
               onClose={() => toggleRealtorSelection(selectedId)}
             />

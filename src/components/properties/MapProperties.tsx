@@ -18,9 +18,9 @@ import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
 import ViewProperty from "./ViewProperty";
 
-export type MapProperties = BoxProps & {
-  propertyIds: Array<Property["id"]>;
-};
+export type MapProperties = {
+  propertyIds: Array<Property["id"]> | undefined;
+} & BoxProps;
 
 export default function MapProperties({
   propertyIds,
@@ -39,8 +39,15 @@ export default function MapProperties({
     undefined as Property["id"] | undefined
   );
 
+  console.log(`MapProperties -> render - 
+    propertyIds: ${propertyIds}`);
+
   //fetchProperties effect
   useEffect(() => {
+    if (!propertyIds) {
+      return;
+    }
+
     setFetchPropertiesResponse(undefined);
     setFetchingProperties(true);
     fetchProperties(propertyIds)
@@ -51,7 +58,7 @@ export default function MapProperties({
   return (
     <Box {...boxProps} position="relative">
       <MemoMap mapTilesService={osmMapTilesService}>
-        {propertyIds.map((propertyId, index) => {
+        {(propertyIds ?? []).map((propertyId, index) => {
           if (cachedProperties[propertyId]) {
             return (
               <Marker

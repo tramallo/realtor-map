@@ -7,14 +7,28 @@ import {
   SelectProps,
 } from "@mui/material";
 
-export type CustomSelectFieldProps = SelectProps & {
-  options: Array<{ label: string; value: string }>;
+export type SelectFieldOption<T extends string> = {
+  label: string;
+  value: T;
 };
 
-export function CustomSelectField({
+export type CustomSelectFieldProps<OValue extends string> = Omit<
+  SelectProps,
+  "onChange" | "value"
+> & {
+  value: OValue | undefined;
+  onChange: (newValue: OValue) => void;
+  options: Array<SelectFieldOption<OValue>>;
+  emptyOptionLabel?: string;
+};
+
+export function CustomSelectField<TValue extends string = string>({
+  value,
+  onChange,
   options,
+  emptyOptionLabel,
   ...selectProps
-}: CustomSelectFieldProps) {
+}: CustomSelectFieldProps<TValue>) {
   const labelId = useId();
 
   return (
@@ -23,9 +37,14 @@ export function CustomSelectField({
       <Select
         labelId={labelId}
         variant="outlined"
-        {...selectProps}
+        value={value ?? ""}
+        onChange={(event) =>
+          onChange((event.target.value as TValue) ?? undefined)
+        }
         sx={(theme) => ({ backgroundColor: theme.palette.grey[200] })}
+        {...selectProps}
       >
+        {emptyOptionLabel && <MenuItem value="">{emptyOptionLabel}</MenuItem>}
         {options.map(({ label, value }, index) => (
           <MenuItem key={`select-${label}-${index}`} value={value}>
             {label}

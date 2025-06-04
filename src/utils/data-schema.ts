@@ -5,6 +5,7 @@ import { z } from "zod";
 // helpers
 export const propertyTypes = ['house', 'apartment'] as const;
 export const propertyStates = ['rented', 'available', 'reserved'] as const
+
 export const dataIdSchema = z.number().int().positive().finite();
 export const userIdSchema = z.string().uuid();
 export const timestampSchema = z.number().int().positive().finite();
@@ -20,8 +21,8 @@ export const baseDataSchema = z.object({
     updatedAt: timestampSchema.optional(),
     deleted: z.boolean().optional(),
 })
-export const PropertyTypesSchema = z.enum(propertyTypes);
-export const PropertyStatesSchema = z.enum(propertyStates);
+export const propertyTypesSchema = z.enum(propertyTypes);
+export const propertyStatesSchema = z.enum(propertyStates);
 
 // entities
 export const clientSchema = baseDataSchema.extend({
@@ -35,8 +36,8 @@ export const realtorSchema = baseDataSchema.extend({
 export const propertySchema = baseDataSchema.extend({
     address: z.string(),
     coordinates: coordinatesSchema,
-    type: z.enum(propertyTypes),
-    state: z.enum(propertyStates).optional(),
+    type: propertyTypesSchema,
+    state: propertyStatesSchema.optional(),
     owner: dataIdSchema.optional(),
     exclusiveRealtor: dataIdSchema.optional(),
     relatedRealtorIds: dataIdSchema.array().optional(),
@@ -92,8 +93,8 @@ export const updateContractDTO = contractSchema.omit({
     updatedAt: true,
 }).partial()
 
-export type PropertyType = z.infer<typeof PropertyTypesSchema>;
-export type PropertyState = z.infer<typeof PropertyStatesSchema>;
+export type PropertyType = z.infer<typeof propertyTypesSchema>;
+export type PropertyState = z.infer<typeof propertyStatesSchema>;
 export type Coordinates = z.infer<typeof coordinatesSchema>;
 
 export type BaseData = z.infer<typeof baseDataSchema>;
