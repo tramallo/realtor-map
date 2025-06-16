@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Chip, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import { useTranslation } from "react-i18next";
@@ -11,19 +11,26 @@ import CustomModal from "../components/CustomModal";
 import CreateProperty from "../components/properties/CreateProperty";
 import { Property } from "../utils/data-schema";
 import {
-  selectSearchResultsBySearchIndex,
+  selectSearchResultBySearchReference,
   usePropertyStore,
 } from "../stores/propertiesStore";
+import { SearchIndex } from "../utils/helperFunctions";
 
+type PropertiesView = "list" | "map";
 const MAP_VIEW_RECORDS_PER_PAGE = 100000;
 
 export function PropertiesLayout() {
   const { t } = useTranslation();
+  const fetchSearchPropertiesCount = usePropertyStore(
+    (store) => store.fetchSearchPropertiesCount
+  );
 
-  const [view, setView] = useState("list" as "list" | "map");
+  const [view, setView] = useState("list" as PropertiesView);
   const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
 
-  const [searchIndex, setSearchIndex] = useState("");
+  const [searchReference, setSearchReference] = useState(
+    undefined as SearchIndex | undefined
+  );
   const [listRecordsPerPage] = useState(3);
   const [listPaginationId, setListPaginationId] = useState(
     undefined as Property["id"] | undefined
@@ -32,31 +39,44 @@ export function PropertiesLayout() {
   const [mapPaginationId] = useState(undefined as Property["id"] | undefined);
 
   const searchResult = usePropertyStore(
-    selectSearchResultsBySearchIndex(searchIndex)
+    selectSearchResultBySearchReference(searchReference)
   );
+
   const lastPropertyId = useMemo(
-    () => (searchResult ?? []).at(-1),
-    [searchResult]
+    () => (searchResult?.dataIds ?? []).at(-1),
+    [searchResult?.dataIds]
   );
+
+  console.log(`PropertiesLayout -> render -
+    searchReference: ${searchReference}
+    lastPropertyId: ${lastPropertyId}
+    listPaginationId: ${listPaginationId}`);
 
   const loadMoreProperties = useCallback(() => {
     if (!lastPropertyId) {
       return;
     }
+    console.log(`PropertiesLayout -> loadMoreProperties`);
 
     setListPaginationId(lastPropertyId);
   }, [lastPropertyId]);
 
-  const onPropertiesSearch = useCallback(
-    (newSearchIndex: string) => {
-      setSearchIndex(newSearchIndex);
+  const loadSearchPropertiesCount = useCallback(() => {
+    if (
+      !searchReference ||
+      !searchResult ||
+      searchResult.totalRows != undefined
+    ) {
+      return;
+    }
+    console.log(`PropertiesLayout -> loadSearchPropertiesCount`);
 
-      if (view == "list") {
-        setListPaginationId(undefined);
-      }
-    },
-    [view]
-  );
+    fetchSearchPropertiesCount(searchReference);
+  }, [searchResult, searchReference, fetchSearchPropertiesCount]);
+
+  const onPropertiesSearch = useCallback((newSearchReference: string) => {
+    setSearchReference(newSearchReference);
+  }, []);
 
   return (
     <Stack
@@ -90,16 +110,25 @@ export function PropertiesLayout() {
         </Stack>
         <Box overflow="auto" height="100%">
           {view == "map" ? (
-            <MapProperties propertyIds={searchResult} height="100%" />
+            <MapProperties propertyIds={searchResult?.dataIds} height="100%" />
           ) : (
             <ListProperties
-              propertyIds={searchResult}
+              propertyIds={searchResult?.dataIds}
               onReachScrollEnd={loadMoreProperties}
             />
           )}
         </Box>
       </Stack>
       <Stack spacing={1} minHeight="auto">
+        <Chip
+          label={`Showing ${searchResult?.dataIds.length ?? 0}/${
+            searchResult?.totalRows ?? "??"
+          } items`}
+          variant="filled"
+          color="info"
+          size="small"
+          onClick={loadSearchPropertiesCount}
+        />
         <SearchProperties
           onSearch={onPropertiesSearch}
           recordsPerPage={

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { CreateContractDTO, Contract, UpdateContractDTO } from "../utils/data-schema";
-import { getLocalStorageData, objectsToString, OperationResponse, stringToObjects } from "../utils/helperFunctions";
+import { getLocalStorageData, createSearchIndex, OperationResponse, parseSearchIndex } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { ContractFilter, PaginationCursor, SortConfig } from "../utils/data-filter-schema";
 import { contractCompliesFilter } from "../utils/filter-evaluators";
@@ -108,7 +108,7 @@ export const useContractStore = create<ContractStore>((set, get) => {
         }
         const storedSearchResultsCopy = { ...storedSearchResults };
 
-        const [, sortConfig] = stringToObjects<[ContractFilter, SortConfig<Contract>]>(searchIndex);
+        const [, sortConfig] = parseSearchIndex<[ContractFilter, SortConfig<Contract>]>(searchIndex);
             
         const currentResults = storedSearchResultsCopy[searchIndex];
         if (currentResults.length == 0) {
@@ -139,7 +139,7 @@ export const useContractStore = create<ContractStore>((set, get) => {
 
         const { searchResults } = get();
         Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[ContractFilter]>(searchIndex);
+            const [filter] = parseSearchIndex<[ContractFilter]>(searchIndex);
     
             if (contractCompliesFilter(newContract, filter)) {
                 const prevResults = searchResults[searchIndex];
@@ -154,7 +154,7 @@ export const useContractStore = create<ContractStore>((set, get) => {
 
         const { searchResults } = get();
         Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[ContractFilter]>(searchIndex);
+            const [filter] = parseSearchIndex<[ContractFilter]>(searchIndex);
                     
             if (searchResults[searchIndex]!.includes(updatedContract.id)) {
                 if (!contractCompliesFilter(updatedContract, filter)) {
@@ -261,7 +261,7 @@ export const useContractStore = create<ContractStore>((set, get) => {
           return { data: undefined };
         },
         searchContracts: async (filter, sortConfig, recordsPerPage, paginationCursor) => {
-            const searchIndex = objectsToString(filter, sortConfig);
+            const searchIndex = createSearchIndex(filter, sortConfig);
             console.log(`contractStore -> searchContracts - 
                 searchIndex: ${searchIndex}
                 recordsPerPage: ${recordsPerPage}

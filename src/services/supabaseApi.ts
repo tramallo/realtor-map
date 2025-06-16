@@ -53,7 +53,6 @@ export const getSession = async (): Promise<OperationResponse<Session>> => {
 
   return { data: data.session };
 };
-
 export const onAuthStateChange = (
   callback: (event: AuthChangeEvent, session: Session | null) => void
 ): OperationResponse<Subscription> => {
@@ -62,7 +61,6 @@ export const onAuthStateChange = (
   const { data } = supabase.auth.onAuthStateChange(callback);
   return { data: data.subscription };
 };
-
 export const signInWithPassword = async (
   email: string,
   password: string
@@ -80,7 +78,6 @@ export const signInWithPassword = async (
 
   return { data: data.session };
 };
-
 export const logout = async (): Promise<OperationResponse> => {
   console.log(`supabase -> logout`);
 
@@ -300,6 +297,26 @@ const buildSearchContractIdsQuery = (
 
 // property
 let propertyChannel = undefined as RealtimeChannel | undefined;
+const fetchPropertiesSearchCount = async (filter: PropertyFilter): Promise<OperationResponse<number>> => {
+  console.log(`supabase -> fetchPropertiesSearchCount -
+    filter: ${JSON.stringify(filter)}`);
+  
+  const { count, error } = await supabase.from("property").select("id", { count: "exact", head: true });
+  if (error) {
+    const e = new Error(`fetchPropertiesSearchCount -> error: ${error.message}`);
+    console.log(e);
+    return { error: e };
+  }
+  if (!count) {
+    const e = new Error(`fetchPropertiesSearchCount -> error: count number undefined`);
+    console.log(e);
+    return { error: e };
+  }
+
+  console.log(`fetchPropertiesSearchCount ->
+    return: ${count}`);
+  return { data: count };
+}
 const searchPropertyIds = async (
   filter: PropertyFilter,
   sortConfig: SortConfig<Property>,
@@ -1058,6 +1075,7 @@ const contractsUnsubscribe = async (): Promise<OperationResponse> => {
 export const supabaseApi: BackendApi = {
   //client
   searchClientIds,
+  fetchPropertiesSearchCount,
   getClients,
   createClient,
   updateClient,

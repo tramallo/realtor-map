@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { CreateRealtorDTO, Realtor, UpdateRealtorDTO } from "../utils/data-schema";
-import { getLocalStorageData, objectsToString, OperationResponse, stringToObjects } from "../utils/helperFunctions";
+import { getLocalStorageData, createSearchIndex, OperationResponse, parseSearchIndex } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { PaginationCursor, RealtorFilter, SortConfig } from "../utils/data-filter-schema";
 import { realtorCompliesFilter } from "../utils/filter-evaluators";
@@ -113,7 +113,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
             return;
         }
 
-        const [, sortConfig] = stringToObjects<[RealtorFilter, SortConfig<Realtor>]>(searchIndex);
+        const [, sortConfig] = parseSearchIndex<[RealtorFilter, SortConfig<Realtor>]>(searchIndex);
 
         const unsortedRealtors = unsortedRealtorIds.map(resultId => {
             if (!storedRealtors[resultId]) {
@@ -139,7 +139,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
 
         const { searchResults } = get();
         Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[RealtorFilter]>(searchIndex);
+            const [filter] = parseSearchIndex<[RealtorFilter]>(searchIndex);
     
             if (realtorCompliesFilter(newRealtor, filter)) {
                 const prevResults = searchResults[searchIndex];
@@ -154,7 +154,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
 
         const { searchResults } = get();
         Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[RealtorFilter]>(searchIndex);
+            const [filter] = parseSearchIndex<[RealtorFilter]>(searchIndex);
                     
             if (searchResults[searchIndex]!.includes(updatedRealtor.id)) {
                 if (!realtorCompliesFilter(updatedRealtor, filter)) {
@@ -261,7 +261,7 @@ export const useRealtorStore = create<RealtorStore>((set, get) => {
           return { data: undefined };
         },
         searchRealtors: async (filter, sortConfig, recordsPerPage, paginationCursor) => {
-            const searchIndex = objectsToString(filter, sortConfig);
+            const searchIndex = createSearchIndex(filter, sortConfig);
             console.log(`realtorStore -> searchRealtors - 
                 searchIndex: ${searchIndex}
                 recordsPerPage: ${recordsPerPage}

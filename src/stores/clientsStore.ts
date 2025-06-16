@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { CreateClientDTO, Client, UpdateClientDTO } from "../utils/data-schema";
-import { getLocalStorageData, objectsToString, OperationResponse, stringToObjects } from "../utils/helperFunctions";
+import { getLocalStorageData, createSearchIndex, OperationResponse, parseSearchIndex } from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { ClientFilter, PaginationCursor, SortConfig } from "../utils/data-filter-schema";
 import { clientCompliesFilter } from "../utils/filter-evaluators";
@@ -108,7 +108,7 @@ export const useClientStore = create<ClientStore>((set, get) => {
         }
         const storedSearchResultsCopy = { ...storedSearchResults };
 
-        const [, sortConfig] = stringToObjects<[ClientFilter, SortConfig<Client>]>(searchIndex);
+        const [, sortConfig] = parseSearchIndex<[ClientFilter, SortConfig<Client>]>(searchIndex);
             
         const unsortedClientIds = storedSearchResultsCopy[searchIndex];
         if (unsortedClientIds.length == 0) {
@@ -139,7 +139,7 @@ export const useClientStore = create<ClientStore>((set, get) => {
 
         const { searchResults } = get();
         Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[ClientFilter]>(searchIndex);
+            const [filter] = parseSearchIndex<[ClientFilter]>(searchIndex);
     
             if (clientCompliesFilter(newClient, filter)) {
                 const prevResults = searchResults[searchIndex];
@@ -154,7 +154,7 @@ export const useClientStore = create<ClientStore>((set, get) => {
 
         const { searchResults } = get();
         Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[ClientFilter]>(searchIndex);
+            const [filter] = parseSearchIndex<[ClientFilter]>(searchIndex);
                     
             if (searchResults[searchIndex]!.includes(updatedClient.id)) {
                 if (!clientCompliesFilter(updatedClient, filter)) {
@@ -261,7 +261,7 @@ export const useClientStore = create<ClientStore>((set, get) => {
           return { data: undefined };
         },
         searchClients: async (filter, sortConfig, recordsPerPage, paginationCursor) => {
-            const searchIndex = objectsToString(filter, sortConfig);
+            const searchIndex = createSearchIndex(filter, sortConfig);
             console.log(`clientsStore -> searchClients - 
                 searchIndex: ${searchIndex}
                 recordsPerPage: ${recordsPerPage}

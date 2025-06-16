@@ -30,6 +30,7 @@ export interface BackendApi {
         recordsPerPage: number,
         paginationCursor: PaginationCursor<Property> | undefined,
     ) => Promise<OperationResponse<Array<Property['id']>>>;
+    fetchPropertiesSearchCount: (filter: PropertyFilter) => Promise<OperationResponse<number>>;
     createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
     updateProperty: (propertyId: Property["id"], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
     deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;

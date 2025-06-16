@@ -12,7 +12,7 @@ import { selectRealtorById, useRealtorStore } from "../../stores/realtorsStore";
 import {
   countDefinedAttributes,
   createPaginationCursor,
-  objectsToString,
+  createSearchIndex,
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { FilterRealtors } from "./FilterRealtors";
@@ -80,12 +80,12 @@ export default function SearchRealtors({
 
   // searchRealtors effect
   useEffect(() => {
-    const searchIndex = objectsToString(searchFilter, sortConfig);
+    const searchIndex = createSearchIndex(searchFilter, sortConfig);
     console.log(
       `SearchProperties -> searchProperties [effect] - 
         searchIndex: ${searchIndex}
         recordsPerPage: ${recordsPerPage}
-        paginationCursor: ${objectsToString(paginationCursor)}`
+        paginationCursor: ${createSearchIndex(paginationCursor)}`
     );
 
     setSearchRealtorsResponse(undefined);

@@ -43,13 +43,13 @@ export const timestampToDDMMYYString = (timestamp: number): string | undefined =
   return format(asDate, "dd/MM/yy");
 }
 
-export const objectsToString = <Objects extends Array<unknown>>(...objects: Objects): string => {
+export const createSearchIndex = <Objects extends Array<unknown>>(...objects: Objects): SearchIndex => {
   const objStrings = objects.map(object => JSON.stringify(object));
   //return empty string "" for undefined inputs
   return objStrings.join("::");
 }
-export const stringToObjects = <Objects extends Array<unknown>>(objectsString: string): Objects => {
-  const objStrings = objectsString.split("::");
+export const parseSearchIndex = <Objects extends Array<unknown>>(searchIndex: SearchIndex): Objects => {
+  const objStrings = searchIndex.split("::");
   //return undefined for empty strings ""
   return objStrings.map(objString => objString ? JSON.parse(objString) : undefined) as Objects;
 }
@@ -67,20 +67,30 @@ export const createPaginationCursor = <T extends BaseData>(record: T, sortConfig
 }
 
 export const getLocalStorageData = <T extends object | string | number>(storageKey: string): OperationResponse<T | undefined> => {
-    const rawLocalStorageData = localStorage.getItem(storageKey);
+  const rawLocalStorageData = localStorage.getItem(storageKey);
 
-    if (!rawLocalStorageData) {
-        return { data: undefined };
-    }
+  if (!rawLocalStorageData) {
+    return { data: undefined };
+  }
 
-    try {
-        const parsedLocalStorageData = JSON.parse(rawLocalStorageData);
-        return { data: parsedLocalStorageData as T };
-    } catch (error) {
-        return { error: error as Error };
-    }
+  try {
+    const parsedLocalStorageData = JSON.parse(rawLocalStorageData);
+    return { data: parsedLocalStorageData as T };
+  } catch (error) {
+    return { error: error as Error };
+  }
 }
 
 export const countDefinedAttributes = <T extends Record<string, unknown>>(object: T) => {
   return Object.keys(object).filter(key => object[key] !== undefined).length;
 }
+
+export type DataStorage<Data extends BaseData = BaseData> = Record<Data["id"], Data | undefined>;
+
+export type SearchIndex = string;
+export type SearchDataResult<Data extends BaseData = BaseData> = {
+  dataIds: Array<Data["id"]>,
+  totalRows?: number,
+  loading?: boolean
+}
+export type SearchDataResults<Data extends BaseData = BaseData> = Map<SearchIndex, SearchDataResult<Data>>

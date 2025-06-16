@@ -15,7 +15,7 @@ import {
 import {
   countDefinedAttributes,
   createPaginationCursor,
-  objectsToString,
+  createSearchIndex,
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { FilterContracts } from "./FilterContracts";
@@ -83,12 +83,12 @@ export default function SearchContracts({
 
   // searchContracts effect
   useEffect(() => {
-    const searchIndex = objectsToString(searchFilter, sortConfig);
+    const searchIndex = createSearchIndex(searchFilter, sortConfig);
     console.log(
       `SearchContracts -> searchContracts [effect] - 
         searchIndex: ${searchIndex}
         recordsPerPage: ${recordsPerPage}
-        paginationCursor: ${objectsToString(paginationCursor)}`
+        paginationCursor: ${createSearchIndex(paginationCursor)}`
     );
 
     setSearchContractsResponse(undefined);

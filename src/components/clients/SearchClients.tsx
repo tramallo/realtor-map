@@ -12,7 +12,7 @@ import { selectClientById, useClientStore } from "../../stores/clientsStore";
 import {
   countDefinedAttributes,
   createPaginationCursor,
-  objectsToString,
+  createSearchIndex,
   OperationResponse,
 } from "../../utils/helperFunctions";
 import { FilterClients } from "./FilterClients";
@@ -80,12 +80,12 @@ export default function SearchClients({
 
   // searchClients effect
   useEffect(() => {
-    const searchIndex = objectsToString(searchFilter, sortConfig);
+    const searchIndex = createSearchIndex(searchFilter, sortConfig);
     console.log(
       `SearchClients -> searchClients [effect] - 
         searchIndex: ${searchIndex}
         recordsPerPage: ${recordsPerPage}
-        paginationCursor: ${objectsToString(paginationCursor)}`
+        paginationCursor: ${createSearchIndex(paginationCursor)}`
     );
 
     setSearchClientsResponse(undefined);

@@ -15,8 +15,9 @@ import {
 import {
   countDefinedAttributes,
   createPaginationCursor,
-  objectsToString,
+  createSearchIndex,
   OperationResponse,
+  SearchIndex,
 } from "../../utils/helperFunctions";
 import { FilterProperties } from "./FilterProperties";
 import {
@@ -28,7 +29,7 @@ import { Property } from "../../utils/data-schema";
 import { SortData } from "../SortData";
 
 export interface SearchPropertiesProps {
-  onSearch: (searchIndex: string) => void;
+  onSearch: (searchIndex: SearchIndex) => void;
   defaultFilter?: PropertyFilter;
   defaultSortConfig?: SortConfig<Property>;
   recordsPerPage?: number;
@@ -49,12 +50,13 @@ export default function SearchProperties({
 }: SearchPropertiesProps) {
   const { t } = useTranslation();
   const searchProperties = usePropertyStore((store) => store.searchProperties);
+  const fetchProperty = usePropertyStore((store) => store.fetchProperty);
 
   const [filtersVisible, setFiltersVisible] = useState(false);
 
   const [searchingProperties, setSearchingProperties] = useState(false);
   const [searchPropertiesResponse, setSearchPropertiesResponse] = useState(
-    undefined as OperationResponse | undefined
+    undefined as OperationResponse<SearchIndex> | undefined
   );
 
   const [searchFilter, setSearchFilter] = useState(defaultFilter);
@@ -70,6 +72,7 @@ export default function SearchProperties({
   );
 
   console.log(`SearchProperties -> render -
+    filtersVisible: ${filtersVisible}
     defaultFilter: ${JSON.stringify(defaultFilter)}
     defaultSortConfig: ${JSON.stringify(defaultSortConfig)}
     recordsPerPage: ${recordsPerPage}
@@ -81,14 +84,26 @@ export default function SearchProperties({
     [filtersVisible]
   );
 
-  // searchProperties effect
+  // fetchPaginationProperty effect
   useEffect(() => {
-    const searchIndex = objectsToString(searchFilter, sortConfig);
+    if (paginationProperty || !paginationId) {
+      return;
+    }
+
     console.log(
-      `SearchProperties -> searchProperties [effect] - 
-        searchIndex: ${searchIndex}
+      `SearchProperties -> fetchPaginationProperty [effect] - propertyId: ${paginationId}`
+    );
+    fetchProperty(paginationId);
+  }, [paginationId, paginationProperty, fetchProperty]);
+
+  // search effect
+  useEffect(() => {
+    console.log(
+      `SearchProperties -> search [effect] - 
+        filter: ${JSON.stringify(searchFilter)}
+        sortConfig: ${JSON.stringify(sortConfig)}
         recordsPerPage: ${recordsPerPage}
-        paginationCursor: ${objectsToString(paginationCursor)}`
+        paginationCursor: ${createSearchIndex(paginationCursor)}`
     );
 
     setSearchPropertiesResponse(undefined);
@@ -96,7 +111,7 @@ export default function SearchProperties({
     searchProperties(searchFilter, sortConfig, recordsPerPage, paginationCursor)
       .then((response) => {
         setSearchPropertiesResponse(response);
-        return !response.error ? onSearch(searchIndex) : undefined;
+        return !response.error ? onSearch(response.data) : undefined;
       })
       .finally(() => setSearchingProperties(false));
   }, [

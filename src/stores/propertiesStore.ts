@@ -1,19 +1,26 @@
 import { create } from "zustand";
+import { orderBy } from "lodash";
 
 import { CreatePropertyDTO, Property, UpdatePropertyDTO } from "../utils/data-schema";
-import { getLocalStorageData, objectsToString, OperationResponse, stringToObjects } from "../utils/helperFunctions";
+import { 
+    DataStorage, 
+    getLocalStorageData, 
+    createSearchIndex, 
+    OperationResponse, 
+    SearchDataResult, 
+    SearchDataResults, 
+    SearchIndex,
+    parseSearchIndex, 
+} from "../utils/helperFunctions";
 import { supabaseApi as backendApi } from "../services/supabaseApi";
 import { SortConfig, PaginationCursor, PropertyFilter } from "../utils/data-filter-schema";
 import { propertyCompliesFilter } from "../utils/filter-evaluators";
-import { orderBy } from "lodash";
 
 const PROPERTIES_LOCAL_STORAGE_KEY = "properties";
-export type PropertiesStorage = Record<Property["id"], Property | undefined>;
-export type SearchPropertiesResults = Record<string, Array<Property["id"]>>;
 
 export interface PropertyStore {
-    properties: PropertiesStorage;
-    searchResults: SearchPropertiesResults;
+    properties: DataStorage<Property>;
+    searchResults: SearchDataResults<Property>;
     fetchProperty: (propertyId: Property["id"]) => Promise<OperationResponse>;
     fetchProperties: (propertyIds: Array<Property["id"]>) => Promise<OperationResponse>;
     searchProperties: (
@@ -21,7 +28,8 @@ export interface PropertyStore {
         sortConfig: SortConfig<Property>, 
         recordsPerPage: number,
         paginationCursor?: PaginationCursor<Property>,
-    ) => Promise<OperationResponse>;
+    ) => Promise<OperationResponse<SearchIndex>>;
+    fetchSearchPropertiesCount: (searchReference: string) => Promise<OperationResponse>;
     createProperty: (newPropertyData: CreatePropertyDTO) => Promise<OperationResponse>;
     updateProperty: (propertyId: Property['id'], updateData: UpdatePropertyDTO) => Promise<OperationResponse>;
     deleteProperty: (propertyId: Property['id']) => Promise<OperationResponse>;
@@ -56,135 +64,145 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
         set({ properties: storedPropertiesCopy });
     };
 
-    const storeSearchResult = (
-        searchIndex: string, 
-        paginationCursor: PaginationCursor<Property> | undefined, 
-        newSearchResult: Array<Property["id"]>
+    const addPropertyIdsToSearchResult = (
+        searchIndex: SearchIndex, 
+        propertyIds: Array<Property["id"]>,
+        paginationCursor?: PaginationCursor<Property>, 
     ) => {
         const { searchResults: storedSearchResults } = get();
-        const storedSearchResultsCopy = { ...storedSearchResults };
-
-        if (!storedSearchResultsCopy[searchIndex]) {
-            storedSearchResultsCopy[searchIndex] = newSearchResult;
+        const storedSearchResultsCopy = new Map(storedSearchResults)
+        
+        const storedSearchResult = storedSearchResultsCopy.get(searchIndex);
+        if (!storedSearchResult) {
+            storedSearchResultsCopy.set(searchIndex, { dataIds: propertyIds, loading: false });
             set({ searchResults: storedSearchResultsCopy });
             return;
         }
 
-        const paginationCursorIndex = storedSearchResultsCopy[searchIndex].findIndex(
+        const storedSearchResultCopy = { ...storedSearchResult };
+        const paginationCursorIndex = storedSearchResultCopy.dataIds.findIndex(
             (propertyId) => propertyId == paginationCursor?.id
         );
 
-        storedSearchResultsCopy[searchIndex] = [ 
-            ...storedSearchResultsCopy[searchIndex].slice(0, paginationCursorIndex + 1), 
-            ...newSearchResult 
+        const notAlreadyPresentIds = propertyIds.filter(propertyId => !storedSearchResultCopy.dataIds.includes(propertyId));
+        if (notAlreadyPresentIds.length == 0) {
+            return;
+        }
+
+        storedSearchResultCopy.dataIds = [ 
+            ...storedSearchResultCopy.dataIds.slice(0, paginationCursorIndex + 1), 
+            ...notAlreadyPresentIds 
         ];
 
+        storedSearchResultsCopy.set(searchIndex, storedSearchResultCopy);
         set({ searchResults: storedSearchResultsCopy });
     };
-    /* const removeSearchResult = (searchIndex: string) => {
-        const { searchResults } = get();
-        if (!searchResults[searchIndex]) return;
-
-        const searchResultsCopy = { ...searchResults };
-        delete searchResultsCopy[searchIndex];
-
-        set({ searchResults: searchResultsCopy });
-    }; */
-    const removePropertyFromSearchResult = (searchIndex: string, propertyId: Property["id"]) => {
+    const removePropertiesFromSearchResult = (searchIndex: SearchIndex, propertyIds: Array<Property["id"]>) => {
         const { searchResults: storedSearchResults } = get();
-        const storedSearchResultsCopy = { ...storedSearchResults };
+        const storedSearchResultsCopy = new Map(storedSearchResults)
 
-        if (!storedSearchResultsCopy[searchIndex]) {
+        const storedSearchResult = storedSearchResultsCopy.get(searchIndex);
+        if (!storedSearchResult) {
             return;
         }
 
-        storedSearchResultsCopy[searchIndex].filter(searchResultId => searchResultId != propertyId);
+        storedSearchResult.dataIds = 
+            storedSearchResult.dataIds.filter(searchResultId => !propertyIds.includes(searchResultId));
+        set({ searchResults: storedSearchResultsCopy });
+    };
+    const setSearchResultTotalRows = (searchIndex: SearchIndex, totalRows: number | undefined) => {
+        const { searchResults: storedSearchResults } = get();
+        const storedSearchResultsCopy = new Map(storedSearchResults);
+
+        const storedSearchResult = storedSearchResultsCopy.get(searchIndex);
+        if (!storedSearchResult) {
+            return;
+        }
+
+        storedSearchResultsCopy.set(searchIndex, { ...storedSearchResult, totalRows: totalRows })
         set({ searchResults: storedSearchResultsCopy });
     }
-    const sortSearchResults = (searchIndex: string) => {
+    const sortSearchResult = (searchIndex: SearchIndex) => {
         const { properties: storedProperties, searchResults: storedSearchResults } = get();
-        if (!storedSearchResults[searchIndex]) {
+        const storedSearchResultsCopy = new Map(storedSearchResults);
+
+        const storedSearchResult = storedSearchResultsCopy.get(searchIndex);
+        if (!storedSearchResult) {
             return;
         }
-        const storedSearchResultsCopy = { ...storedSearchResults };
-
-        const [, sortConfig] = stringToObjects<[PropertyFilter, SortConfig<Property>]>(searchIndex);
-        
-        const currentResults = storedSearchResultsCopy[searchIndex];
-        if (currentResults.length == 0) {
+        if (storedSearchResult.dataIds.length == 0) {
             return;
         }
 
-        const properties = currentResults.map(resultId => {
+        const properties = storedSearchResult.dataIds.map(resultId => {
             if (!storedProperties[resultId]) {
                 console.warn(`propertyStore -> sortSearchResults -
                     warn: property (id: ${resultId}) is not present, cannot be sorted. will be set at final`)
             }
             return storedProperties[resultId];
         }).filter(property => property != undefined)
-        const nonPresentPropertyIds = currentResults.filter(resultId => storedProperties[resultId] == undefined);
+        const nonPresentPropertyIds = storedSearchResult.dataIds.filter(resultId => storedProperties[resultId] == undefined);
 
+        const [, sortConfig] = parseSearchIndex(searchIndex) as [PropertyFilter, SortConfig<Property>];
         const sortColumns = sortConfig.map(sortEntry => sortEntry.column);
         const sortDirections = sortConfig.map(sortEntry => sortEntry.direction);
         const sortedProperties = orderBy(properties, sortColumns, sortDirections);
-        const sortedResults = sortedProperties.map(property => property.id);
+        const sortedIds = sortedProperties.map(property => property.id);
 
-        storedSearchResultsCopy[searchIndex] = [...sortedResults, ...nonPresentPropertyIds];
+        storedSearchResult.dataIds = [...sortedIds, ...nonPresentPropertyIds];
         set({ searchResults: storedSearchResultsCopy });
-    }
+    };
 
     const newPropertyHandler = (newProperty: Property) => {
         console.log(`event -> [new-property] ${newProperty.address} `);
         storeProperties([newProperty]);
 
         const { searchResults } = get();
-        Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[PropertyFilter]>(searchIndex);
+        searchResults.forEach((_searchResult, searchIndex) => {
+            const [filter] = parseSearchIndex(searchIndex) as [PropertyFilter];
 
             if (propertyCompliesFilter(newProperty, filter)) {
-                const prevResults = searchResults[searchIndex];
-                storeSearchResult(searchIndex, undefined, [...prevResults, newProperty.id]);
-                sortSearchResults(searchIndex);
+                addPropertyIdsToSearchResult(searchIndex, [newProperty.id]);
+                sortSearchResult(searchIndex);
             }
-        });
+        })
     };
     const updatedPropertyHandler = (updatedProperty: Property) => {
         console.log(`event -> [updated-property] ${updatedProperty.address} `);
         storeProperties([updatedProperty]);
 
         const { searchResults } = get();
-        Object.keys(searchResults).forEach((searchIndex) => {
-            const [filter] = stringToObjects<[PropertyFilter]>(searchIndex);
-            
-            if (searchResults[searchIndex]!.includes(updatedProperty.id)) {
+        searchResults.forEach((searchResult, searchIndex) => {
+            const [filter] = parseSearchIndex(searchIndex) as [PropertyFilter];
+
+            if (searchResult.dataIds.includes(updatedProperty.id)) {
                 if (!propertyCompliesFilter(updatedProperty, filter)) {
-                    removePropertyFromSearchResult(searchIndex, updatedProperty.id)
+                    removePropertiesFromSearchResult(searchIndex, [updatedProperty.id]);
                 }
             } else {
                 if (propertyCompliesFilter(updatedProperty, filter)) {
-                    const prevResults = searchResults[searchIndex];
-                    storeSearchResult(searchIndex, undefined, [...prevResults, updatedProperty.id]);
+                    addPropertyIdsToSearchResult(searchIndex, [updatedProperty.id]);
                 }
             }
-        });
+        })
     };
     const deletedPropertyHandler = (deletedProperty: Property) => {
         console.log(`event -> [deleted-property] ${deletedProperty.address}`);
         removeProperties([deletedProperty.id]);
 
         const { searchResults } = get();
-        Object.keys(searchResults).forEach((searchIndex) => {
-            if (searchResults[searchIndex]!.includes(deletedProperty.id)) {
-                removePropertyFromSearchResult(searchIndex, deletedProperty.id);
+        searchResults.forEach((searchResult, searchIndex) => {
+            if (searchResult.dataIds.includes(deletedProperty.id)) {
+                removePropertiesFromSearchResult(searchIndex, [deletedProperty.id]);
             }
-        });
+        })
     };
     backendApi.propertiesSubscribe(newPropertyHandler, updatedPropertyHandler, deletedPropertyHandler);
 
     const syncLocalStorageState = async () => {
         console.log(`propertiesStorage -> syncLocalStorageState`);
     
-        const { error, data: localStorageProperties} = getLocalStorageData<PropertiesStorage>(PROPERTIES_LOCAL_STORAGE_KEY);
+        const { error, data: localStorageProperties} = getLocalStorageData<DataStorage<Property>>(PROPERTIES_LOCAL_STORAGE_KEY);
         if (error) {
             console.log('syncLocalStorageState -> error: ', error);
             localStorage.removeItem(PROPERTIES_LOCAL_STORAGE_KEY);
@@ -206,7 +224,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return;
         }
     
-        const validProperties: PropertiesStorage = {};
+        const validProperties: DataStorage<Property> = {};
         validIds.forEach((validId) => {
             validProperties[validId] = localStorageProperties[validId];
         })
@@ -218,7 +236,7 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
 
     return {
         properties: {},
-        searchResults: {},
+        searchResults: new Map(),
         fetchProperty: async (propertyId: Property["id"]) => {
             console.log(`propertyStore -> fetchProperty - 
                 propertyId: ${propertyId}`)
@@ -261,7 +279,8 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             return { data: undefined }
         },
         searchProperties: async (filter, sortConfig, recordsPerPage, paginationCursor) => {
-            const searchIndex = objectsToString(filter, sortConfig);
+            const searchIndex: SearchIndex = createSearchIndex(filter, sortConfig);
+            const searchReference = `${searchIndex}<>${JSON.stringify(paginationCursor)}`;
             console.log(`propertyStore -> searchProperties - 
                 searchIndex: ${searchIndex}
                 recordsPerPage: ${recordsPerPage}
@@ -270,15 +289,17 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             await initializedFlag;
 
             const { searchResults: storedSearchResults } = get();
-            if (storedSearchResults[searchIndex]) {
-                const paginationCursorIndex = storedSearchResults[searchIndex].findIndex(
+            const storedSearchResult = storedSearchResults.get(searchIndex);
+            if (storedSearchResult) {
+                const paginationCursorIndex = storedSearchResult.dataIds.findIndex(
                     (propertyId) => propertyId == paginationCursor?.id
                 )
 
-                const resultsAlreadyStored = (paginationCursorIndex + recordsPerPage) < storedSearchResults[searchIndex].length
+                const resultsAlreadyStored = 
+                    (paginationCursorIndex + recordsPerPage) < storedSearchResult.dataIds.length
                 if (resultsAlreadyStored) {
                     console.log(`propertyStore -> searchProperties - use already stored result`);
-                    return { data: undefined };
+                    return { data: searchReference };
                 }
             }
 
@@ -287,7 +308,24 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
             if (error) return { error };
             if (!propertyIds) return { error: new Error(`searchProperties -> error: No data received`) };
 
-            storeSearchResult(searchIndex, paginationCursor, propertyIds);
+            addPropertyIdsToSearchResult(searchIndex, propertyIds, paginationCursor);
+            return { data: searchReference };
+        },
+        fetchSearchPropertiesCount: async (searchReference) => {
+            console.log(`propertyStore -> fetchSearchPropertiesCount - searchReference: ${searchReference}`);
+            await initializedFlag;
+
+            const [searchIndex] = searchReference.split("<>");
+            const [filter] = parseSearchIndex(searchIndex) as [PropertyFilter];
+            const { error, data } = await backendApi.fetchPropertiesSearchCount(filter);
+            if (error) {
+                return { error };
+            }
+            if (!data) {
+                return { error: new Error(`fetchSearchPropertiesCount -> error: No data received `) };
+            }
+
+            setSearchResultTotalRows(searchIndex, data);
             return { data: undefined };
         },
         createProperty: async (newPropertyData) => {
@@ -332,11 +370,15 @@ export const usePropertyStore = create<PropertyStore>((set, get) => {
 
 usePropertyStore.subscribe((store) => {
     localStorage.setItem(PROPERTIES_LOCAL_STORAGE_KEY, JSON.stringify(store.properties));
-})
+});
 
 export const selectPropertyById = (propertyId: Property["id"] | undefined) => {
     return (store: PropertyStore): Property | undefined => propertyId ? store.properties[propertyId] : undefined;
-}
-export const selectSearchResultsBySearchIndex = (searchIndex: string)  => {
-    return (store: PropertyStore): Array<Property["id"]> | undefined => store.searchResults[searchIndex];
+};
+export const selectSearchResultBySearchReference = (searchReference: string | undefined)  => {
+    return (store: PropertyStore): SearchDataResult<Property> | undefined => {
+        const [searchIndex] = (searchReference ?? "").split("<>");
+
+        return store.searchResults.get(searchIndex);
+    }
 };
