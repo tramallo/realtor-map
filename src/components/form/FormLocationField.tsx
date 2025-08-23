@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { Location } from "../../utils/services-interface";
 import { useCallback, useState } from "react";
 import AddressSearch from "../AddressSearch";
-import { googleGeocodingService } from "../../services/googleApi";
-import { osmMapTilesService } from "../../services/nominatimOSMApi";
+//import { googleGeocodingService } from "../../services/googleApi";
+import { osmMapTilesService, nominatimGeocodingService } from "../../services/nominatimOSMApi";
 import CustomModal from "../CustomModal";
 import { FormTextField } from "./FormTextField";
 
@@ -72,7 +72,7 @@ export default function FormLocationField({
         onClose={() => setSelectLocationModalOpen(false)}
       >
         <AddressSearch
-          geocodingService={googleGeocodingService}
+          geocodingService={nominatimGeocodingService}
           mapTilesService={osmMapTilesService}
           onLocationSelect={onLocationSelect}
         />
