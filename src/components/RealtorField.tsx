@@ -1,16 +1,17 @@
 import { useCallback, useState } from "react";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-import { RealtorData } from "../utils/domainSchemas";
+import { Realtor } from "../utils/data-schema";
 import ComponentsField from "./ComponentsField";
 import RealtorChip from "./RealtorChip";
 import CustomModal from "./CustomModal";
-import ListRealtors from "./realtors/ListRealtors";
+import { SelectRealtor } from "./realtors/SelectRealtor";
 
 export interface RealtorFieldProps {
   label?: string;
-  selected: Array<RealtorData["id"]>;
-  onSelect: (newValue: Array<RealtorData["id"]>) => void;
+  selected: Array<Realtor["id"]>;
+  onSelect: (newValue: Array<Realtor["id"]>) => void;
   multiple?: boolean;
   errorMessage?: string;
   readOnly?: boolean;
@@ -24,21 +25,21 @@ export default function RealtorField({
   errorMessage,
   readOnly,
 }: RealtorFieldProps) {
+  const { t } = useTranslation();
+
   const [selectRealtorModalOpen, setSelectRealtorModalOpen] = useState(false);
 
   const removeSelected = useCallback(
-    (realtorId: RealtorData["id"]) => {
+    (realtorId: Realtor["id"]) => {
       onSelect(
-        selected.filter(
-          (selectedId: RealtorData["id"]) => selectedId != realtorId
-        )
+        selected.filter((selectedId: Realtor["id"]) => selectedId != realtorId)
       );
     },
     [selected, onSelect]
   );
 
   const onRealtorSelect = useCallback(
-    (newValue: Array<RealtorData["id"]>) => {
+    (newValue: Array<Realtor["id"]>) => {
       onSelect(newValue);
       setSelectRealtorModalOpen(false);
     },
@@ -46,7 +47,7 @@ export default function RealtorField({
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box>
       <ComponentsField
         label={label}
         readOnly={readOnly}
@@ -54,25 +55,23 @@ export default function RealtorField({
         onActionButtonClick={
           !readOnly ? () => setSelectRealtorModalOpen(true) : undefined
         }
-        components={selected.map(
-          (realtorId: RealtorData["id"], index: number) => (
-            <RealtorChip
-              key={`chip-${realtorId}-${index}`}
-              realtorId={realtorId}
-              onClose={readOnly ? undefined : () => removeSelected(realtorId)}
-            />
-          )
-        )}
+        components={selected.map((realtorId: Realtor["id"], index: number) => (
+          <RealtorChip
+            key={`chip-${realtorId}-${index}`}
+            realtorId={realtorId}
+            onClose={readOnly ? undefined : () => removeSelected(realtorId)}
+          />
+        ))}
       />
       <CustomModal
-        title="Select realtor(s)"
+        title={t("titles.selectRealtor")}
         open={selectRealtorModalOpen}
         onClose={() => setSelectRealtorModalOpen(false)}
       >
-        <ListRealtors
+        <SelectRealtor
           defaultSelected={selected}
           onSelect={onRealtorSelect}
-          multiple={multiple}
+          multiselect={multiple}
         />
       </CustomModal>
     </Box>

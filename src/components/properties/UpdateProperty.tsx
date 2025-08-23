@@ -1,33 +1,34 @@
-import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
-  PropertyData,
+  Property,
   propertyStates,
   propertyTypes,
-  UpdatePropertyData,
-  updatePropertySchema,
-} from "../../utils/domainSchemas";
+  UpdatePropertyDTO,
+  updatePropertyDTO,
+} from "../../utils/data-schema";
 import {
   usePropertyStore,
   fetchByIdSelector,
 } from "../../stores/propertiesStore";
-import FormDateField from "../form/FormDateField";
 import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
 import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
-import FormLocationField from "../form/FormLocationField";
+import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
+import FormLocationField from "../form/FormLocationField";
+import { FormTextField } from "../form/FormTextField";
 
 export interface UpdatePropertyProps {
-  propertyId: PropertyData["id"];
+  propertyId: Property["id"];
   onUpdate?: () => void;
 }
 
@@ -35,6 +36,8 @@ export default function UpdateProperty({
   propertyId,
   onUpdate,
 }: UpdatePropertyProps) {
+  const { t } = useTranslation();
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
   const updateProperty = usePropertyStore((store) => store.updateProperty);
@@ -50,18 +53,17 @@ export default function UpdateProperty({
 
   const prefillData = useMemo(() => {
     const updateMetadata = {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
-    } as UpdatePropertyData;
+    } as UpdatePropertyDTO;
 
     return cachedProperty
       ? { ...cachedProperty, ...updateMetadata }
       : updateMetadata;
-  }, [cachedProperty]);
+  }, [cachedProperty, userSession]);
 
   const submitUpdate = useCallback(
-    async (updatePropertyData: UpdatePropertyData) => {
+    async (updatePropertyData: UpdatePropertyDTO) => {
       console.log(
         `UpdateProperty -> submitUpdate propertyId: ${cachedProperty?.id}`
       );
@@ -74,22 +76,20 @@ export default function UpdateProperty({
       setUpdatingProperty(false);
 
       if (updateResponse.error) {
-        notifyUser("Error. Property not updated.");
+        notifyUser(t("errorMessages.propertyNotUpdated"));
         return;
       }
 
-      notifyUser("Property updated.");
+      notifyUser(t("notifications.propertyUpdated"));
       if (onUpdate) {
         onUpdate();
       }
     },
-    [propertyId, cachedProperty, updateProperty, notifyUser, onUpdate]
+    [propertyId, cachedProperty, updateProperty, notifyUser, onUpdate, t]
   );
 
   //fetchProperty effect
   useEffect(() => {
-    console.log(`UpdateProperty -> effect [fetchProperty]`);
-
     setFetchPropertyResponse(undefined);
     setFetchingProperty(true);
     fetchProperty(propertyId)
@@ -98,8 +98,8 @@ export default function UpdateProperty({
   }, [propertyId, fetchProperty]);
 
   return (
-    <MemoForm schema={updatePropertySchema} prefillData={prefillData}>
-      <Stack spacing={2}>
+    <MemoForm schema={updatePropertyDTO} prefillData={prefillData}>
+      <Stack spacing={2} padding={1}>
         {fetchingProperty && (
           <Typography align="center">
             <CircularProgress />
@@ -113,26 +113,19 @@ export default function UpdateProperty({
           >
             {fetchPropertyResponse?.error
               ? fetchPropertyResponse.error.message
-              : `Property (id: ${propertyId}) not found`}
+              : t("errorMessages.propertyNotFound", { propertyId: propertyId })}
           </Typography>
         )}
         {!fetchingProperty && cachedProperty && (
           <>
-            {cachedProperty.deleted && (
-              <Chip
-                label="This property is deleted"
-                color="error"
-                variant="filled"
-              />
-            )}
             <FormLocationField
-              label="Address"
+              label={t("entities.property.address")}
               addressFieldName="address"
               coordinatesFieldName="coordinates"
             />
             <FormSelectField
               fieldName="type"
-              label="Type"
+              label={t("entities.property.type")}
               options={propertyTypes.map((propertyType) => ({
                 label: propertyType,
                 value: propertyType,
@@ -140,33 +133,27 @@ export default function UpdateProperty({
             />
             <FormSelectField
               fieldName="state"
-              label="State"
+              label={t("entities.property.state")}
               options={propertyStates.map((propertyState) => ({
                 label: propertyState,
                 value: propertyState,
               }))}
             />
-            <FormPersonField fieldName="ownerId" label="Owner" />
+            <FormPersonField fieldName="owner" label="Owner" />
             <FormTextField
               fieldName="description"
-              label="Description"
+              label={t("entities.property.description")}
               multiline
             />
             <FormRealtorField
-              fieldName="exclusiveRealtorId"
-              label="Exclusive realtor"
+              fieldName="exclusiveRealtor"
+              label={t("entities.property.exclusiveRealtor")}
             />
             <FormRealtorField
               fieldName="relatedRealtorIds"
-              label="Associated realtors"
+              label={t("entities.property.relatedRealtorIds")}
               multiple
             />
-            <FormPersonField
-              fieldName="updatedBy"
-              label="Updated by"
-              readOnly
-            />
-            <FormDateField fieldName="updatedAt" label="Updated at" readOnly />
           </>
         )}
 
@@ -178,7 +165,7 @@ export default function UpdateProperty({
         >
           <MemoSubmitButton
             onSubmit={submitUpdate}
-            label="Confirm update"
+            label={t("buttons.confirmButton.label")}
             color="warning"
             loading={updatingProperty}
           />

@@ -7,12 +7,13 @@ import {
   useState,
 } from "react";
 import { Session } from "@supabase/supabase-js";
+
 import {
   getSession,
   logout,
   onAuthStateChange,
   signInWithPassword,
-} from "../utils/supabaseApi";
+} from "../services/supabaseApi";
 import { OperationResponse } from "../utils/helperFunctions";
 
 type AuthContext = {
@@ -21,7 +22,8 @@ type AuthContext = {
   endSession: () => Promise<OperationResponse>;
 };
 
-const authContext = createContext<AuthContext | undefined>({
+// eslint-disable-next-line react-refresh/only-export-components
+export const authContext = createContext<AuthContext | undefined>({
   userSession: undefined,
   startSession: async () => ({ error: new Error("not implemented") }),
   endSession: async () => ({ error: new Error("not implemented") }),
@@ -83,6 +85,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuthContext() {
   const context = useContext(authContext);
   if (context === undefined) {

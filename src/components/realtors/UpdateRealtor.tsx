@@ -1,25 +1,25 @@
-import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
-  RealtorData,
-  UpdateRealtorData,
-  updateRealtorSchema,
-} from "../../utils/domainSchemas";
+  Realtor,
+  UpdateRealtorDTO,
+  updateRealtorDTO,
+} from "../../utils/data-schema";
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
-import FormDateField from "../form/FormDateField";
-import FormPersonField from "../form/FormPersonField";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import {
   dateToTimestamp,
   OperationResponse,
 } from "../../utils/helperFunctions";
+import { useAuthContext } from "../AuthContext";
 import { useAppContext } from "../AppContext";
+import { FormTextField } from "../form/FormTextField";
 
 export interface UpdateRealtorProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
   onUpdate?: () => void;
 }
 
@@ -27,6 +27,8 @@ export default function UpdateRealtor({
   realtorId,
   onUpdate,
 }: UpdateRealtorProps) {
+  const { t } = useTranslation();
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
   const updateRealtor = useRealtorStore((store) => store.updateRealtor);
@@ -42,18 +44,17 @@ export default function UpdateRealtor({
 
   const prefillData = useMemo(() => {
     const updateMetadata = {
-      //TODO: use logged in user id
-      updatedBy: 3,
+      updatedBy: userSession?.user.id,
       updatedAt: dateToTimestamp(new Date()),
-    } as UpdateRealtorData;
+    } as UpdateRealtorDTO;
 
     return cachedRealtor
       ? { ...cachedRealtor, ...updateMetadata }
       : updateMetadata;
-  }, [cachedRealtor]);
+  }, [cachedRealtor, userSession]);
 
   const submitUpdate = useCallback(
-    async (updateRealtorData: UpdateRealtorData) => {
+    async (updateRealtorData: UpdateRealtorDTO) => {
       console.log(
         `UpdateRealtor -> submitUpdate realtorId: ${cachedRealtor?.id}`
       );
@@ -63,22 +64,20 @@ export default function UpdateRealtor({
       setUpdatingRealtor(false);
 
       if (updateResponse.error) {
-        notifyUser("Error. Realtor not updated.");
+        notifyUser(t("errorMessages.realtorNotUpdated"));
         return;
       }
 
-      notifyUser("Realtor updated");
+      notifyUser(t("notifications.realtorUpdated"));
       if (onUpdate) {
         onUpdate();
       }
     },
-    [realtorId, cachedRealtor, updateRealtor, notifyUser, onUpdate]
+    [realtorId, cachedRealtor, updateRealtor, notifyUser, onUpdate, t]
   );
 
   // fetchRealtor effect
   useEffect(() => {
-    console.log(`UpdateRealtor -> effect [fetchRealtor]`);
-
     setFetchRealtorResponse(undefined);
     setFetchingRealtor(true);
     fetchRealtor(realtorId)
@@ -87,8 +86,8 @@ export default function UpdateRealtor({
   }, [realtorId, fetchRealtor]);
 
   return (
-    <MemoForm schema={updateRealtorSchema} prefillData={prefillData}>
-      <Stack spacing={2}>
+    <MemoForm schema={updateRealtorDTO} prefillData={prefillData}>
+      <Stack spacing={2} padding={1}>
         {fetchingRealtor && (
           <Typography align="center">
             <CircularProgress />
@@ -102,25 +101,22 @@ export default function UpdateRealtor({
           >
             {fetchRealtorResponse?.error
               ? fetchRealtorResponse.error.message
-              : `Realtor (id: ${realtorId}) not found`}
+              : t("errorMessages.realtorNotFound", { realtorId: realtorId })}
           </Typography>
         )}
         {!fetchingRealtor && cachedRealtor && (
           <>
             {cachedRealtor.deleted && (
               <Chip
-                label="This realtor is deleted"
+                label={t("entities.base.deleted")}
                 color="error"
-                variant="filled"
+                variant="outlined"
               />
             )}
-            <FormTextField fieldName="name" label="Name" />
-            <FormPersonField
-              fieldName="updatedBy"
-              label="Updated by"
-              readOnly
+            <FormTextField
+              fieldName="name"
+              label={t("entities.realtor.name")}
             />
-            <FormDateField fieldName="updatedAt" label="Updated at" readOnly />
           </>
         )}
 
@@ -132,7 +128,7 @@ export default function UpdateRealtor({
         >
           <MemoSubmitButton
             onSubmit={submitUpdate}
-            label="Confirm update"
+            label={t("buttons.confirmButton.label")}
             color="warning"
             loading={updatingRealtor}
           />

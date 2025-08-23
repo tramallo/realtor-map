@@ -1,5 +1,11 @@
-import { ReactNode, useState } from "react";
-import { Box, Button, Stack } from "@mui/material";
+import React, { ReactElement, useState } from "react";
+import { Box, Button, Divider, Stack, useMediaQuery } from "@mui/material";
+
+export interface NavigationAction {
+  label: string;
+  icon?: ReactElement;
+  callback: () => void;
+}
 
 export interface NavigationSlide {
   label: string;
@@ -8,10 +14,12 @@ export interface NavigationSlide {
 
 export interface NavigationProps {
   slides: NavigationSlide[];
-  children?: ReactNode;
+  actions?: Array<NavigationAction>;
 }
 
-export default function Navigation({ slides, children }: NavigationProps) {
+export default function Navigation({ slides, actions }: NavigationProps) {
+  const sizeMdOrGreater = useMediaQuery((theme) => theme.breakpoints.up("md"));
+
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   return (
@@ -25,6 +33,7 @@ export default function Navigation({ slides, children }: NavigationProps) {
         sm: "column",
         md: "row-reverse",
       }}
+      sx={(theme) => ({ backgroundColor: theme.palette.grey[500] })}
     >
       <Box
         //content box
@@ -44,28 +53,44 @@ export default function Navigation({ slides, children }: NavigationProps) {
       >
         <Stack
           direction={{ xs: "row", md: "column" }}
+          padding={1}
+          spacing={1}
           boxSizing="border-box"
           width="100%"
           height="100%"
-          sx={{
-            borderTop: {
-              xs: "2px solid black",
-              md: "0",
-            },
-            borderRight: { md: "2px solid black" },
-          }}
+          justifyContent="center"
         >
           {slides.map((slide, index) => (
             <Button
-              key={`nav-button-${slide.label}-${index}`}
-              onClick={() => setActiveSlideIndex(index)}
+              key={`nav-button-${index}`}
               variant="contained"
-              sx={{ flex: 1, borderRadius: 0 }}
+              onClick={() => setActiveSlideIndex(index)}
+              color={activeSlideIndex == index ? "secondary" : undefined}
+              sx={{ flex: 1 }}
             >
               {slide.label}
             </Button>
           ))}
-          {children}
+          {actions && (
+            <>
+              <Divider
+                flexItem
+                orientation={sizeMdOrGreater ? "horizontal" : "vertical"}
+                sx={{ mx: 0.5, my: 1 }}
+              />
+              {actions.map(({ label, icon, callback }, index) => (
+                <Button
+                  key={`action-button-${index}`}
+                  variant="contained"
+                  onClick={callback}
+                  color="info"
+                  sx={{ flex: 1 }}
+                >
+                  {icon ?? label}
+                </Button>
+              ))}
+            </>
+          )}
         </Stack>
       </Box>
     </Box>

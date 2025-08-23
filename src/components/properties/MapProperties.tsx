@@ -1,165 +1,112 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 import {
   Box,
+  BoxProps,
   Button,
   CircularProgress,
-  Collapse,
-  Stack,
   Typography,
 } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { useTranslation } from "react-i18next";
 
-import { PropertyData, PropertyFilterData } from "../../utils/domainSchemas";
-import { propertyCompliesFilter } from "../../utils/filter-evaluators";
-import CreateProperty from "./CreateProperty";
-import ViewProperty from "./ViewProperty";
+import { Property } from "../../utils/data-schema";
 import { MemoMap } from "../Map";
-import { osmMapTilesService } from "../../utils/nominatimOSMApi";
-import { getIconForProperty } from "../../utils/mapMarkerIcons";
-import { MemoFilterProperties } from "./FilterProperties";
-import {
-  countDefinedAttributes,
-  OperationResponse,
-} from "../../utils/helperFunctions";
-import { MemoMapComponent } from "../MapComponent";
-import CustomModal from "../CustomModal";
+import { osmMapTilesService } from "../../services/nominatimOSMApi";
 import { usePropertyStore } from "../../stores/propertiesStore";
+import { getIconForProperty } from "../../utils/mapMarkerIcons";
+import { OperationResponse } from "../../utils/helperFunctions";
+import CustomModal from "../CustomModal";
+import ViewProperty from "./ViewProperty";
 
-export default function MapProperties() {
-  const searchProperties = usePropertyStore((store) => store.searchProperties);
+export type MapProperties = BoxProps & {
+  propertyIds: Array<Property["id"]>;
+};
 
-  const [searchingProperties, setSearchingProperties] = useState(false);
-  const [searchPropertiesResponse, setSearchPropertiesResponse] = useState(
+export default function MapProperties({
+  propertyIds,
+  ...boxProps
+}: MapProperties) {
+  const { t } = useTranslation();
+  const cachedProperties = usePropertyStore((store) => store.properties);
+  const fetchProperties = usePropertyStore((store) => store.fetchProperties);
+
+  const [fetchingProperties, setFetchingProperties] = useState(false);
+  const [fetchPropertiesResponse, setFetchPropertiesResponse] = useState(
     undefined as OperationResponse | undefined
   );
 
-  const [showFiltersPane, setShowFiltersPane] = useState(false);
-  const [propertiesFilter, setPropertiesFilter] = useState({
-    deleted: false,
-  } as PropertyFilterData);
-
-  const [createPropertyModalOpen, setCreatePropertyModalOpen] = useState(false);
-  const [viewPropertyId, setViewPropertyId] = useState(
-    undefined as PropertyData["id"] | undefined
+  const [viewPropertyModalId, setViewPropertyModalId] = useState(
+    undefined as Property["id"] | undefined
   );
 
-  const propertiesCache = usePropertyStore((store) => store.properties);
-  const filteredProperties = useMemo(
-    () =>
-      Object.values(propertiesCache).filter((property) =>
-        propertyCompliesFilter(property, propertiesFilter)
-      ),
-    [propertiesFilter, propertiesCache]
-  );
-
-  //searchProperties effect
+  //fetchProperties effect
   useEffect(() => {
-    console.log(`PropertiesMap -> effect [searchProperties]`);
-
-    setSearchPropertiesResponse(undefined);
-    setSearchingProperties(true);
-    searchProperties(propertiesFilter)
-      .then(setSearchPropertiesResponse)
-      .finally(() => setSearchingProperties(false));
-  }, [propertiesFilter, searchProperties]);
+    setFetchPropertiesResponse(undefined);
+    setFetchingProperties(true);
+    fetchProperties(propertyIds)
+      .then(setFetchPropertiesResponse)
+      .finally(() => setFetchingProperties(false));
+  }, [propertyIds, fetchProperties]);
 
   return (
-    <Box
-      padding={1}
-      boxSizing="border-box"
-      width="100%"
-      height="100%"
-      position="relative"
-    >
+    <Box {...boxProps} position="relative">
       <MemoMap mapTilesService={osmMapTilesService}>
-        <MemoMapComponent position="topright" customMargin="4px">
-          <Button
-            variant="contained"
-            onClick={() => setCreatePropertyModalOpen(true)}
-          >
-            New property
-          </Button>
-        </MemoMapComponent>
-        <MemoMapComponent position="bottomleft">
-          <Stack alignItems="center">
-            <Button
-              variant="contained"
-              onClick={() => setShowFiltersPane(!showFiltersPane)}
-            >{`Filters (${countDefinedAttributes(propertiesFilter)})`}</Button>
-            <Collapse
-              in={showFiltersPane}
-              sx={(theme) => ({
-                backgroundColor: theme.palette.background.default,
-              })}
-            >
-              <Box padding={1}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <MemoFilterProperties
-                    filter={propertiesFilter}
-                    onChange={setPropertiesFilter}
-                  />
-                </LocalizationProvider>
-              </Box>
-            </Collapse>
-          </Stack>
-        </MemoMapComponent>
-        {filteredProperties.map((property, index) => (
-          <Marker
-            key={`Properties-Map-Marker-${index}`}
-            position={property.coordinates}
-            icon={getIconForProperty(property)}
-          >
-            <Popup>
-              <Typography>{property.address}</Typography>
-              <Button
-                variant="contained"
-                onClick={() => setViewPropertyId(property.id)}
-                fullWidth
+        {propertyIds.map((propertyId, index) => {
+          if (cachedProperties[propertyId]) {
+            return (
+              <Marker
+                key={`property-marker-${index}`}
+                position={cachedProperties[propertyId].coordinates}
+                icon={getIconForProperty(cachedProperties[propertyId])}
               >
-                View
-              </Button>
-            </Popup>
-          </Marker>
-        ))}
+                <Popup>
+                  <Typography>
+                    {cachedProperties[propertyId].address}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => setViewPropertyModalId(propertyId)}
+                    fullWidth
+                  >
+                    {t("buttons.viewButton.label")}
+                  </Button>
+                </Popup>
+              </Marker>
+            );
+          }
+        })}
       </MemoMap>
-      {(searchingProperties || searchPropertiesResponse?.error) && (
-        <Stack
+      {(fetchingProperties || fetchPropertiesResponse?.error) && (
+        <Box
           position="absolute"
-          boxSizing="border-box"
-          padding={1}
           left={0}
           top={0}
+          boxSizing="border-box"
           width="100%"
           height="100%"
-          zIndex={1000}
-          bgcolor="rgba(100, 100, 100, .8)"
+          display="flex"
+          flexDirection="column"
           alignItems="center"
           justifyContent="center"
+          zIndex={999}
+          sx={{ backgroundColor: `rgba(0, 0, 0, .7)` }}
+          borderRadius={2}
         >
-          {searchPropertiesResponse?.error ? (
-            <Typography variant="h6" color="error">
-              {searchPropertiesResponse?.error.message}
-            </Typography>
+          {fetchingProperties ? (
+            <CircularProgress size="10em" />
           ) : (
-            <CircularProgress size="20svw" />
+            <Typography color="error" variant="h6">
+              {fetchPropertiesResponse?.error?.message}
+            </Typography>
           )}
-        </Stack>
+        </Box>
       )}
       <CustomModal
-        title="Create property"
-        open={createPropertyModalOpen}
-        onClose={() => setCreatePropertyModalOpen(false)}
+        title={t("titles.viewProperty")}
+        open={viewPropertyModalId != undefined}
+        onClose={() => setViewPropertyModalId(undefined)}
       >
-        <CreateProperty />
-      </CustomModal>
-      <CustomModal
-        title={`View property: ${viewPropertyId}`}
-        open={viewPropertyId != undefined}
-        onClose={() => setViewPropertyId(undefined)}
-      >
-        <ViewProperty propertyId={viewPropertyId ?? 0} />
+        <ViewProperty propertyId={viewPropertyModalId!} />
       </CustomModal>
     </Box>
   );

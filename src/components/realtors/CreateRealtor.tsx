@@ -1,22 +1,18 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-import {
-  CreateRealtorData,
-  createRealtorSchema,
-  CreateRealtorSchema,
-} from "../../utils/domainSchemas";
+import { CreateRealtorDTO, createRealtorDTO } from "../../utils/data-schema";
 import { dateToTimestamp } from "../../utils/helperFunctions";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
-import FormPersonField from "../form/FormPersonField";
-import FormDateField from "../form/FormDateField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import { useRealtorStore } from "../../stores/realtorsStore";
-import { useAppContext } from "../AppContext";
+import { FormTextField } from "../form/FormTextField";
 
 export interface CreateRealtorProps {
-  prefillRealtor?: Partial<CreateRealtorData>;
+  prefillRealtor?: Partial<CreateRealtorDTO>;
   onCreate?: () => void;
 }
 
@@ -24,49 +20,49 @@ export default function CreateRealtor({
   prefillRealtor,
   onCreate,
 }: CreateRealtorProps) {
+  const { t } = useTranslation();
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createRealtor = useRealtorStore((store) => store.createRealtor);
 
   const [creatingRealtor, setCreatingRealtor] = useState(false);
 
   const prefillData = useMemo(
-    () => ({
-      //TODO: use logged in user id
-      ...prefillRealtor,
-      createdBy: 3,
-      createdAt: dateToTimestamp(new Date()),
-    }),
-    [prefillRealtor]
+    () =>
+      ({
+        ...prefillRealtor,
+        createdBy: userSession?.user.id,
+        createdAt: dateToTimestamp(new Date()),
+      } as CreateRealtorDTO),
+    [prefillRealtor, userSession]
   );
 
   const onSubmit = useCallback(
-    async (newRealtorData: CreateRealtorData) => {
+    async (newRealtorData: CreateRealtorDTO) => {
       setCreatingRealtor(true);
       const createResponse = await createRealtor(newRealtorData);
       setCreatingRealtor(false);
 
       if (createResponse.error) {
-        notifyUser("Error. Realtor not created.");
+        notifyUser(t("errorMessages.realtorNotCreated"));
         return;
       }
 
-      notifyUser("Realtor created");
+      notifyUser(t("notifications.realtorCreated"));
       if (onCreate) {
         onCreate();
       }
     },
-    [createRealtor, notifyUser, onCreate]
+    [createRealtor, notifyUser, onCreate, t]
   );
 
   return (
-    <MemoForm<CreateRealtorSchema>
-      schema={createRealtorSchema}
+    <MemoForm<typeof createRealtorDTO>
+      schema={createRealtorDTO}
       prefillData={prefillData}
     >
-      <Stack direction="column" spacing={1} padding={1}>
+      <Stack direction="column" spacing={2} padding={1}>
         <FormTextField fieldName="name" label="Name" />
-        <FormPersonField fieldName="createdBy" label="Created by" readOnly />
-        <FormDateField fieldName="createdAt" label="Created at" readOnly />
 
         <Stack
           direction="row"
@@ -76,7 +72,7 @@ export default function CreateRealtor({
         >
           <MemoSubmitButton
             onSubmit={onSubmit}
-            label="Create"
+            label={t("buttons.confirmButton.label")}
             color="success"
             loading={creatingRealtor}
             disabled={creatingRealtor}

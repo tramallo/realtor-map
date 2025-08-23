@@ -8,8 +8,8 @@ import {
 import { AttributionControl, MapContainer, TileLayer } from "react-leaflet";
 import { CircularProgress, Stack, Typography } from "@mui/material";
 
-import { MapTilesService } from "../utils/mapServicesSchemas";
 import { OperationResponse } from "../utils/helperFunctions";
+import { MapTilesService } from "../utils/services-interface";
 
 export interface MapProps {
   mapTilesService: MapTilesService;

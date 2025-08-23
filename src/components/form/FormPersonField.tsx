@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from "react-hook-form";
 
-import PersonField from "../PersonField";
+import ClientField from "../ClientField";
 
 export interface FormPersonFieldProps {
   fieldName: string;
@@ -22,7 +22,7 @@ export default function FormPersonField({
       name={fieldName}
       control={control}
       render={({ field: { value, onChange }, fieldState: { error } }) => (
-        <PersonField
+        <ClientField
           label={label}
           selected={value ? (multiple ? value : [value]) : []}
           onSelect={(newSelected) =>

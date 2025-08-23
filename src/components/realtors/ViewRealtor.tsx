@@ -4,22 +4,25 @@ import {
   Chip,
   CircularProgress,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { useRealtorStore, fetchByIdSelector } from "../../stores/realtorsStore";
-import { RealtorData } from "../../utils/domainSchemas";
+import { Realtor } from "../../utils/data-schema";
 import DeleteRealtor from "./DeleteRealtor";
 import UpdateRealtor from "./UpdateRealtor";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
+import { CustomTextField } from "../CustomTextField";
+import DateField from "../DateField";
 
 export interface ViewRealtorProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
 }
 
 export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
+  const { t } = useTranslation();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
 
   const [fetchingRealtor, setFetchingRealtor] = useState(false);
@@ -34,8 +37,6 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
 
   // fetchRealtor effect
   useEffect(() => {
-    console.log(`ViewRealtor -> effect [fetchRealtor]`);
-
     setFetchRealtorResponse(undefined);
     setFetchingRealtor(true);
     fetchRealtor(realtorId)
@@ -44,7 +45,7 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
   }, [realtorId, fetchRealtor]);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} padding={1}>
       {fetchingRealtor && (
         <Typography align="center">
           <CircularProgress />
@@ -58,21 +59,50 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
         >
           {fetchRealtorResponse?.error
             ? fetchRealtorResponse.error.message
-            : `Realtor (id: ${realtorId}) not found`}
+            : t("errorMessages.realtorNotFound", { realtorId: realtorId })}
         </Typography>
       )}
       {!fetchingRealtor && cachedRealtor && (
         <>
           {cachedRealtor.deleted && (
-            <Chip label="Deleted realtor" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           {cachedRealtor.name && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedRealtor.name ?? ""}
-              label="Name"
-              fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              label={t("entities.realtor.name")}
+            />
+          )}
+          {cachedRealtor.createdBy && (
+            <CustomTextField
+              label={t("entities.base.createdBy")}
+              value={cachedRealtor.createdBy}
+              disabled
+            />
+          )}
+          {cachedRealtor.createdAt && (
+            <DateField
+              label={t("entities.base.createdAt")}
+              value={cachedRealtor.createdAt}
+              disabled
+            />
+          )}
+          {cachedRealtor.updatedBy && (
+            <CustomTextField
+              label={t("entities.base.updatedBy")}
+              value={cachedRealtor.updatedBy}
+              disabled
+            />
+          )}
+          {cachedRealtor.updatedAt && (
+            <DateField
+              label={t("entities.base.updatedAt")}
+              value={cachedRealtor.updatedAt}
+              disabled
             />
           )}
 
@@ -87,7 +117,9 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
               color={cachedRealtor.deleted ? "success" : "error"}
               onClick={() => setDeleteRealtorModalOpen(true)}
             >
-              {cachedRealtor.deleted ? "Restore" : "Delete"}
+              {cachedRealtor.deleted
+                ? t("buttons.restoreButton.label")
+                : t("buttons.deleteButton.label")}
             </Button>
             {!cachedRealtor.deleted && (
               <Button
@@ -95,12 +127,12 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
                 color="warning"
                 onClick={() => setUpdateRealtorModalOpen(true)}
               >
-                Update
+                {t("buttons.updateButton.label")}
               </Button>
             )}
           </Stack>
           <CustomModal
-            title={`Delete Realtor: ${realtorId}`}
+            title={t("titles.deleteRealtor")}
             open={deleteRealtorModalOpen}
             onClose={() => setDeleteRealtorModalOpen(false)}
           >
@@ -111,7 +143,7 @@ export default function ViewRealtor({ realtorId }: ViewRealtorProps) {
             />
           </CustomModal>
           <CustomModal
-            title={`Update Realtor: ${realtorId}`}
+            title={t("titles.updateRealtor")}
             open={updateRealtorModalOpen}
             onClose={() => setUpdateRealtorModalOpen(false)}
           >

@@ -14,9 +14,10 @@ import {
   Location,
   GeocodingService,
   MapTilesService,
-} from "../utils/mapServicesSchemas";
-import { DebouncedTextField } from "./DebouncedTextField";
+} from "../utils/services-interface";
+import { CustomTextField } from "./CustomTextField";
 import { OperationResponse } from "../utils/helperFunctions";
+import { useTranslation } from "react-i18next";
 
 export interface AddressSearchProps {
   geocodingService: GeocodingService;
@@ -29,6 +30,8 @@ export default function AddressSearch({
   geocodingService,
   onLocationSelect,
 }: AddressSearchProps) {
+  const { t } = useTranslation();
+
   const [searchValue, setSearchValue] = useState("");
   const [searchingAddress, setSearchingAddress] = useState(false);
   const [searchAddressResponse, setSearchAddressResponse] = useState(
@@ -53,10 +56,11 @@ export default function AddressSearch({
   }, [searchValue, geocodingService]);
 
   return (
-    <Stack spacing={1}>
-      <DebouncedTextField
-        label="Search address"
+    <Stack spacing={1} padding={1}>
+      <CustomTextField
+        label={t("fields.addressField.label")}
         value={searchValue}
+        delay={500}
         onChange={setSearchValue}
       />
       <Box boxSizing="border-box" height="70svh" position="relative">
@@ -77,7 +81,7 @@ export default function AddressSearch({
                       onClick={() => onLocationSelect(location)}
                       fullWidth
                     >
-                      Select
+                      {t("buttons.selectButton.label")}
                     </Button>
                   )}
                 </Popup>

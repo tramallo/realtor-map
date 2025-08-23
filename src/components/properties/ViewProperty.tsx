@@ -2,33 +2,33 @@ import { useEffect, useState } from "react";
 import {
   Button,
   Stack,
-  TextField,
   Chip,
   CircularProgress,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   usePropertyStore,
   fetchByIdSelector,
 } from "../../stores/propertiesStore";
-import { PropertyData } from "../../utils/domainSchemas";
+import { Property } from "../../utils/data-schema";
 import UpdateProperty from "./UpdateProperty";
 import RealtorChip from "../RealtorChip";
-import PersonChip from "../PersonChip";
+import ClientChip from "../ClientChip";
 import ComponentsField from "../ComponentsField";
 import DeleteProperty from "./DeleteProperty";
 import DateField from "../DateField";
 import { OperationResponse } from "../../utils/helperFunctions";
 import CustomModal from "../CustomModal";
+import { CustomTextField } from "../CustomTextField";
 
 export interface ViewPropertyProps {
-  propertyId: PropertyData["id"];
+  propertyId: Property["id"];
 }
 
 export default function ViewProperty({ propertyId }: ViewPropertyProps) {
-  console.log(`ViewProperty -> render`);
-
+  const { t } = useTranslation();
   const fetchProperty = usePropertyStore((store) => store.fetchProperty);
 
   const [fetchingProperty, setFetchingProperty] = useState(false);
@@ -43,8 +43,6 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
 
   //fetchProperty effect
   useEffect(() => {
-    console.log(`ViewProperty -> effect [fetchProperty]`);
-
     setFetchPropertyResponse(undefined);
     setFetchingProperty(true);
     fetchProperty(propertyId)
@@ -53,7 +51,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
   }, [propertyId, fetchProperty]);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} padding={1}>
       {fetchingProperty && (
         <Typography align="center">
           <CircularProgress />
@@ -67,54 +65,49 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
         >
           {fetchPropertyResponse?.error
             ? fetchPropertyResponse.error.message
-            : `Property (id: ${propertyId}) not found`}
+            : t("errorMessages.propertyNotFound", { propertyId: propertyId })}
         </Typography>
       )}
       {!fetchingProperty && cachedProperty && (
         <>
           {cachedProperty.deleted && (
-            <Chip label="Deleted property" color="error" variant="outlined" />
+            <Chip
+              label={t("entities.base.deleted")}
+              color="error"
+              variant="outlined"
+            />
           )}
           {cachedProperty.address && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedProperty.address ?? ""}
-              label="Address"
-              fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              label={t("entities.property.address")}
             />
           )}
           {cachedProperty.type && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedProperty.type ?? ""}
-              label="Type"
-              fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              label={t("entities.property.type")}
             />
           )}
           {cachedProperty.state && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedProperty.state ?? ""}
-              label="State"
-              fullWidth
-              slotProps={{ input: { readOnly: true } }}
+              label={t("entities.property.state")}
             />
           )}
-          {cachedProperty.ownerId && (
+          {cachedProperty.owner && (
             <ComponentsField
-              label="Owner"
+              label={t("entities.property.owner")}
               components={
-                cachedProperty.ownerId
-                  ? [<PersonChip personId={cachedProperty.ownerId} />]
+                cachedProperty.owner
+                  ? [<ClientChip clientId={cachedProperty.owner} />]
                   : []
               }
             />
           )}
           {cachedProperty.relatedRealtorIds && (
             <ComponentsField
-              label="Realtors"
+              label={t("entities.property.relatedRealtorIds")}
               components={(cachedProperty.relatedRealtorIds ?? []).map(
                 (realtorId, index) => (
                   <RealtorChip
@@ -125,14 +118,14 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               )}
             />
           )}
-          {cachedProperty.exclusiveRealtorId && (
+          {cachedProperty.exclusiveRealtor && (
             <ComponentsField
-              label="Exclusive realtor"
+              label={t("entities.property.exclusiveRealtor")}
               components={
-                cachedProperty.exclusiveRealtorId
+                cachedProperty.exclusiveRealtor
                   ? [
                       <RealtorChip
-                        realtorId={cachedProperty.exclusiveRealtorId}
+                        realtorId={cachedProperty.exclusiveRealtor}
                       />,
                     ]
                   : []
@@ -140,39 +133,38 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
             />
           )}
           {cachedProperty.description && (
-            <TextField
-              variant="outlined"
+            <CustomTextField
               value={cachedProperty.description ?? ""}
-              label="Description"
-              fullWidth
+              label={t("entities.property.description")}
               multiline
-              slotProps={{ input: { readOnly: true } }}
             />
           )}
           {cachedProperty.createdBy && (
-            <ComponentsField
-              label="Created by"
-              components={[<PersonChip personId={cachedProperty.createdBy} />]}
+            <CustomTextField
+              label={t("entities.base.createdBy")}
+              value={cachedProperty.createdBy}
+              disabled
             />
           )}
           {cachedProperty.createdAt && (
             <DateField
-              label="Created at"
+              label={t("entities.base.createdAt")}
               value={cachedProperty.createdAt}
-              readOnly
+              disabled
             />
           )}
           {cachedProperty.updatedBy && (
-            <ComponentsField
-              label="Updated by"
-              components={[<PersonChip personId={cachedProperty.updatedBy} />]}
+            <CustomTextField
+              label={t("entities.base.updatedBy")}
+              value={cachedProperty.updatedBy}
+              disabled
             />
           )}
           {cachedProperty.updatedAt && (
             <DateField
-              label="Updated at"
+              label={t("entities.base.updatedAt")}
               value={cachedProperty.updatedAt}
-              readOnly
+              disabled
             />
           )}
           <Stack
@@ -186,7 +178,9 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
               color={cachedProperty.deleted ? "success" : "error"}
               onClick={() => setDeletePropertyModalOpen(true)}
             >
-              {cachedProperty.deleted ? "Restore" : "Delete"}
+              {cachedProperty.deleted
+                ? t("buttons.restoreButton.label")
+                : t("buttons.deleteButton.label")}
             </Button>
             {!cachedProperty.deleted && (
               <Button
@@ -194,12 +188,12 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
                 color="warning"
                 onClick={() => setUpdatePropertyModalOpen(true)}
               >
-                Update
+                {t("buttons.updateButton.label")}
               </Button>
             )}
           </Stack>
           <CustomModal
-            title={`Delete property: ${propertyId}`}
+            title={t("titles.deleteProperty")}
             open={deletePropertyModalOpen}
             onClose={() => setDeletePropertyModalOpen(false)}
           >
@@ -210,7 +204,7 @@ export default function ViewProperty({ propertyId }: ViewPropertyProps) {
             />
           </CustomModal>
           <CustomModal
-            title={`Update property: ${propertyId}`}
+            title={t("titles.updateProperty")}
             open={updatePropertyModalOpen}
             onClose={() => setUpdatePropertyModalOpen(false)}
           >

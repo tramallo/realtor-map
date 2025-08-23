@@ -1,16 +1,16 @@
 import { expect, it, describe } from "vitest";
 
-import { dataCompliesFilter, personCompliesFilter, propertyCompliesFilter, realtorCompliesFilter } from "./filter-evaluators";
+import { dataCompliesFilter, clientCompliesFilter, propertyCompliesFilter, realtorCompliesFilter } from "./filter-evaluators";
 import { 
     BaseData, 
     BaseFilterData, 
-    PersonData, 
+    Client, 
     PersonFilterData, 
-    PropertyData, 
+    Property, 
     PropertyFilterData, 
-    RealtorData,
+    Realtor,
     RealtorFilterData, 
-} from "./domainSchemas";
+} from "./data-schema";
 import { dateToTimestamp } from "./helperFunctions";
 
 describe("filter-evaluators", () => {
@@ -271,7 +271,7 @@ describe("filter-evaluators", () => {
     })
 
     describe("propertyCompliesFilter", () => {
-        const property1: PropertyData = {
+        const property1: Property = {
             id: 1,
             createdBy: 1,
             createdAt: dateToTimestamp(new Date("1999-05-15"))!,
@@ -303,7 +303,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'address' value is undefined", () => {
                 const filter: PropertyFilterData = { address: "Liber Seregni 2401" };
-                const result = propertyCompliesFilter({} as PropertyData, filter);
+                const result = propertyCompliesFilter({} as Property, filter);
 
                 expect(result).toBe(false);
             })
@@ -326,7 +326,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'type' value is undefined", () => {
                 const filter: PropertyFilterData = { type: "apartment" };
-                const result = propertyCompliesFilter({} as PropertyData, filter);
+                const result = propertyCompliesFilter({} as Property, filter);
 
                 expect(result).toBe(false);
             })
@@ -349,7 +349,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'state' value is undefined", () => {
                 const filter: PropertyFilterData = { state: "rented" };
-                const result = propertyCompliesFilter({} as PropertyData, filter);
+                const result = propertyCompliesFilter({} as Property, filter);
 
                 expect(result).toBe(false);
             })
@@ -372,7 +372,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'ownerId' value is undefined", () => {
                 const filter: PropertyFilterData = { ownerId: 2 };
-                const result = propertyCompliesFilter({} as PropertyData, filter);
+                const result = propertyCompliesFilter({} as Property, filter);
 
                 expect(result).toBe(false);
             })
@@ -395,7 +395,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'exclusiveRealtorId' value is undefined", () => {
                 const filter: PropertyFilterData = { exclusiveRealtorId: 1 };
-                const result = propertyCompliesFilter({} as PropertyData, filter);
+                const result = propertyCompliesFilter({} as Property, filter);
 
                 expect(result).toBe(false);
             })
@@ -428,7 +428,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'relatedRealtorIds' is undefined", () => {
                 const filter: PropertyFilterData = { relatedRealtorIds: [2, 3] };
-                const result = propertyCompliesFilter({} as PropertyData, filter);
+                const result = propertyCompliesFilter({} as Property, filter);
 
                 expect(result).toBe(false);
             })
@@ -436,7 +436,7 @@ describe("filter-evaluators", () => {
     })
 
     describe("realtorCompliesFilter", () => {
-        const realtor1: RealtorData = {
+        const realtor1: Realtor = {
             id: 1,
             createdAt: dateToTimestamp(new Date("1999-05-15"))!,
             createdBy: 1,
@@ -461,7 +461,7 @@ describe("filter-evaluators", () => {
 
             it("returns false when 'name' is undefined", () => {
                 const filter: RealtorFilterData = { name: "Gabana" };
-                const result = realtorCompliesFilter({} as RealtorData, filter);
+                const result = realtorCompliesFilter({} as Realtor, filter);
 
                 expect(result).toBe(false);
             })
@@ -469,7 +469,7 @@ describe("filter-evaluators", () => {
     })
 
     describe("personCompliesFilter", () => {
-        const person1: PersonData = {
+        const person1: Client = {
             id: 1,
             createdBy: 1,
             createdAt: dateToTimestamp(new Date("1999-05-15"))!,
@@ -482,21 +482,21 @@ describe("filter-evaluators", () => {
         describe("filter by name", () => {
             it("returns false when 'name' doesnt match filter", () => {
                 const filter: PersonFilterData = { name: "non.existent.name" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(false);
             })
 
             it("returns true when 'name' match filter", () => {
                 const filter: PersonFilterData = { name: "Timothy" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(true);
             })
 
             it("returns false when 'name' is undefined", () => {
                 const filter: PersonFilterData = { name: "Timothy" };
-                const result = personCompliesFilter({} as PersonData, filter);
+                const result = clientCompliesFilter({} as Client, filter);
 
                 expect(result).toBe(false);
             })
@@ -505,21 +505,21 @@ describe("filter-evaluators", () => {
         describe("filter by email", () => {
             it("returns false when 'email' value doesnt match filter", () => {
                 const filter: PersonFilterData = { email: "non.existent.email" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(false);
             })
 
             it("returns true when 'email' value match filter", () => {
                 const filter: PersonFilterData = { email: "timo@mail.com" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(true);
             })
 
             it("returns false when 'email' is undefined", () => {
                 const filter: PersonFilterData = { email: "timo@mail.com" };
-                const result = personCompliesFilter({} as PersonData, filter);
+                const result = clientCompliesFilter({} as Client, filter);
 
                 expect(result).toBe(false);
             })
@@ -528,21 +528,21 @@ describe("filter-evaluators", () => {
         describe("filter by mobile", () => {
             it("returns false when 'mobile' doesnt match filter", () => {
                 const filter: PersonFilterData = { mobile: "non.existent.mobile" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(false);
             })
 
             it("returns true when 'mobile' value match filter", () => {
                 const filter: PersonFilterData = { mobile: "091234567" };
-                const result = personCompliesFilter(person1, filter);
+                const result = clientCompliesFilter(person1, filter);
 
                 expect(result).toBe(true);
             })
 
             it("returns false when 'mobile' is undefined", () => {
                 const filter: PersonFilterData = { mobile: "091234567" };
-                const result = personCompliesFilter({} as PersonData, filter);
+                const result = clientCompliesFilter({} as Client, filter);
 
                 expect(result).toBe(false);
             })

@@ -30,13 +30,23 @@ export default function DateField({
       slotProps={{
         field: {
           clearable: !readOnly && !disabled ? true : false,
-          readOnly: readOnly,
+          readOnly: true,
         },
         textField: {
           variant: "outlined",
           fullWidth: true,
           error: !!errorMessage,
           helperText: errorMessage,
+          sx: (theme) => ({
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: theme.palette.grey[200],
+            },
+            "& .MuiInputLabel-root": {
+              backgroundColor: theme.palette.grey[200],
+              borderRadius: 3,
+              paddingInline: 1,
+            },
+          }),
         },
         openPickerButton: { disabled: readOnly },
       }}

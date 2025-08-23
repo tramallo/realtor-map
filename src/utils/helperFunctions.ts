@@ -1,4 +1,4 @@
-import { isValid } from "date-fns";
+import { format, isValid } from "date-fns";
 
 interface SuccessResponse<T> {
   data: T;
@@ -17,7 +17,6 @@ export const dateToTimestamp = (date: Date | null | undefined): number | undefin
 
   return Math.floor(date.getTime() / 1000);
 }
-
 export const timestampToDate = (timestamp: number | undefined): Date | null => {
   if (!timestamp) {
     return null;
@@ -31,6 +30,14 @@ export const timestampToDate = (timestamp: number | undefined): Date | null => {
   }
 
   return date;
+}
+export const timestampToDDMMYYString = (timestamp: number): string | undefined => {
+  const asDate = timestampToDate(timestamp);
+  if (!asDate) {
+    return undefined;
+  }
+
+  return format(asDate, "dd/MM/yy");
 }
 
 export const countDefinedAttributes = <T extends Record<string, unknown>>(object: T) => {

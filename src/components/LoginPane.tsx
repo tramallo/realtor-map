@@ -1,15 +1,12 @@
 import { useCallback, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
+import { CustomTextField } from "./CustomTextField";
 import { useAuthContext } from "./AuthContext";
 
 export function LoginPane() {
+  const { t } = useTranslation();
   const { startSession } = useAuthContext();
 
   const [email, setEmail] = useState("");
@@ -33,18 +30,18 @@ export function LoginPane() {
   }, [email, password, startSession]);
 
   return (
-    <Stack spacing={2}>
-      <TextField
-        label="Email"
+    <Stack spacing={2} padding={1}>
+      <CustomTextField
+        label={t("fields.emailField.label")}
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={setEmail}
         disabled={startingSession}
       />
-      <TextField
-        label="Password"
+      <CustomTextField
+        label={t("fields.passwordField.label")}
         type="password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={setPassword}
         disabled={startingSession}
       />
       {signInError && (
@@ -56,7 +53,11 @@ export function LoginPane() {
           onClick={handleLogin}
           disabled={startingSession}
         >
-          {startingSession ? <CircularProgress size="1.4em" /> : "Login"}
+          {startingSession ? (
+            <CircularProgress size="1.4em" />
+          ) : (
+            t("buttons.loginButton.label")
+          )}
         </Button>
       </Stack>
     </Stack>

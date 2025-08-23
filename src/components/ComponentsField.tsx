@@ -11,7 +11,7 @@ export interface ComponentsFieldProps {
 }
 
 export default function ComponentsField({
-  components: chips,
+  components,
   label,
   onActionButtonClick,
   errorMessage,
@@ -30,9 +30,19 @@ export default function ComponentsField({
         htmlInput: {
           sx: { width: 0, paddingInline: 0 },
         },
-        inputLabel: { shrink: !!chips.length },
+        inputLabel: {
+          shrink: !!components.length,
+          sx: (theme) => ({
+            backgroundColor: theme.palette.grey[200],
+            borderRadius: 3,
+            paddingInline: 1,
+          }),
+        },
         input: {
-          sx: onActionButtonClick ? { paddingRight: 0 } : undefined,
+          sx: (theme) =>
+            onActionButtonClick
+              ? { paddingRight: 0, backgroundColor: theme.palette.grey[200] }
+              : { backgroundColor: theme.palette.grey[200] },
           startAdornment: (
             <InputAdornment
               position="start"
@@ -44,7 +54,7 @@ export default function ComponentsField({
                 overflow: "hidden",
               })}
             >
-              {...chips}
+              {...components}
             </InputAdornment>
           ),
           endAdornment: onActionButtonClick ? (

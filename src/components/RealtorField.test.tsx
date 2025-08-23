@@ -6,7 +6,7 @@ import RealtorField from "./RealtorField";
 import ComponentsField from "./ComponentsField";
 import RealtorChip from "./RealtorChip";
 import CustomModal from "./CustomModal";
-import ListRealtors from "./realtors/ListRealtors";
+import SearchRealtors from "./realtors/SearchRealtors";
 
 // mock dependencies
 vi.mock("./ComponentsField", () => ({
@@ -41,7 +41,7 @@ vi.mock("./CustomModal", () => ({
 }));
 
 vi.mock("./realtors/ListRealtors", () => ({
-  default: vi.fn((props: ComponentProps<typeof ListRealtors>) => (
+  default: vi.fn((props: ComponentProps<typeof SearchRealtors>) => (
     <div data-testid="list-realtors">
       {props.onSelect && (
         <button
@@ -110,7 +110,7 @@ describe("RealtorField", () => {
       );
       fireEvent.click(openRealtorListButton);
 
-      expect(ListRealtors).toHaveBeenCalledWith(
+      expect(SearchRealtors).toHaveBeenCalledWith(
         expect.objectContaining({ multiple: multipleTest }),
         expect.anything()
       );
@@ -200,7 +200,7 @@ describe("RealtorField", () => {
     );
     fireEvent.click(openRealtorListButton);
 
-    expect(ListRealtors).toHaveBeenCalledWith(
+    expect(SearchRealtors).toHaveBeenCalledWith(
       expect.objectContaining({ defaultSelected: selectedRealtorIds }),
       expect.anything()
     );

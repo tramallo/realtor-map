@@ -1,13 +1,14 @@
 import { useFormContext } from "react-hook-form";
 import { Button, FormGroup, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-import FormTextField from "./FormTextField";
-import { Location } from "../../utils/mapServicesSchemas";
+import { Location } from "../../utils/services-interface";
 import { useCallback, useState } from "react";
 import AddressSearch from "../AddressSearch";
-import { googleGeocodingService } from "../../utils/googleApi";
-import { osmMapTilesService } from "../../utils/nominatimOSMApi";
+//import { googleGeocodingService } from "../../services/googleApi";
+import { osmMapTilesService, nominatimGeocodingService } from "../../services/nominatimOSMApi";
 import CustomModal from "../CustomModal";
+import { FormTextField } from "./FormTextField";
 
 export interface FormLocationFieldProps {
   addressFieldName: string;
@@ -24,6 +25,7 @@ export default function FormLocationField({
   defaultValue,
   readOnly,
 }: FormLocationFieldProps) {
+  const { t } = useTranslation();
   const { setValue } = useFormContext();
 
   const [selectLocationModalOpen, setSelectLocationModalOpen] = useState(false);
@@ -52,7 +54,7 @@ export default function FormLocationField({
           fieldName={addressFieldName}
           label={label}
           defaultValue={defaultValue?.address}
-          readOnly
+          disabled={readOnly}
           fullWidth={false}
           sx={{ flex: 1 }}
         />
@@ -61,16 +63,16 @@ export default function FormLocationField({
           onClick={() => setSelectLocationModalOpen(true)}
           disabled={readOnly}
         >
-          Select
+          {t("buttons.selectButton.label")}
         </Button>
       </FormGroup>
       <CustomModal
-        title="Select location"
+        title={t("titles.selectLocation")}
         open={selectLocationModalOpen}
         onClose={() => setSelectLocationModalOpen(false)}
       >
         <AddressSearch
-          geocodingService={googleGeocodingService}
+          geocodingService={nominatimGeocodingService}
           mapTilesService={osmMapTilesService}
           onLocationSelect={onLocationSelect}
         />

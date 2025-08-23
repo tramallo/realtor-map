@@ -1,18 +1,20 @@
-import { Chip, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Chip, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-import { RealtorData } from "../utils/domainSchemas";
+import { Realtor } from "../utils/data-schema";
 import ViewRealtor from "./realtors/ViewRealtor";
 import { OperationResponse } from "../utils/helperFunctions";
 import CustomModal from "./CustomModal";
 import { useRealtorStore, fetchByIdSelector } from "../stores/realtorsStore";
 
 export interface RealtorChipProps {
-  realtorId: RealtorData["id"];
+  realtorId: Realtor["id"];
   onClose?: () => void;
 }
 
 export default function RealtorChip({ realtorId, onClose }: RealtorChipProps) {
+  const { t } = useTranslation();
   const fetchRealtor = useRealtorStore((store) => store.fetchRealtor);
 
   const [fetchingRealtor, setFetchingRealtor] = useState(false);
@@ -46,7 +48,7 @@ export default function RealtorChip({ realtorId, onClose }: RealtorChipProps) {
             ? "Error"
             : cachedRealtor
             ? cachedRealtor.name
-            : "Not found"
+            : t("errorMessages.realtorNotFound")
         }
         color={
           !fetchRealtorResponse
@@ -64,7 +66,7 @@ export default function RealtorChip({ realtorId, onClose }: RealtorChipProps) {
         size="small"
       />
       <CustomModal
-        title={`View realtor: ${realtorId}`}
+        title={t("titles.viewRealtor")}
         open={viewRealtorModalOpen}
         onClose={() => setViewRealtorModalOpen(false)}
       >

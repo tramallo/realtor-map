@@ -1,27 +1,27 @@
 import { useCallback, useMemo, useState } from "react";
 import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
-  CreatePropertyData,
-  CreatePropertySchema,
-  createPropertySchema,
+  CreatePropertyDTO,
+  createPropertyDTO,
   propertyStates,
   propertyTypes,
-} from "../../utils/domainSchemas";
-import FormDateField from "../form/FormDateField";
+} from "../../utils/data-schema";
 import FormSelectField from "../form/FormSelectField";
 import FormPersonField from "../form/FormPersonField";
 import FormRealtorField from "../form/FormRealtorField";
 import { MemoForm } from "../form/Form";
-import FormTextField from "../form/FormTextField";
 import { MemoSubmitButton } from "../form/SubmitButton";
 import { dateToTimestamp } from "../../utils/helperFunctions";
+import { useAuthContext } from "../AuthContext";
+import { useAppContext } from "../AppContext";
 import FormLocationField from "../form/FormLocationField";
 import { usePropertyStore } from "../../stores/propertiesStore";
-import { useAppContext } from "../AppContext";
+import { FormTextField } from "../form/FormTextField";
 
 export interface CreatePropertyProps {
-  prefillProperty?: Partial<CreatePropertyData>;
+  prefillProperty?: Partial<CreatePropertyDTO>;
   onCreate?: () => void;
 }
 
@@ -29,25 +29,25 @@ export default function CreateProperty({
   prefillProperty,
   onCreate,
 }: CreatePropertyProps) {
-  console.log(`CreateProperty -> render`);
-
+  const { t } = useTranslation();
+  const { userSession } = useAuthContext();
   const { notifyUser } = useAppContext();
   const createProperty = usePropertyStore((store) => store.createProperty);
 
   const [creatingProperty, setCreatingProperty] = useState(false);
 
   const prefillData = useMemo(
-    () => ({
-      //TODO: use logged in user id
-      ...prefillProperty,
-      createdBy: 3,
-      createdAt: dateToTimestamp(new Date()),
-    }),
-    [prefillProperty]
+    () =>
+      ({
+        ...prefillProperty,
+        createdBy: userSession?.user.id,
+        createdAt: dateToTimestamp(new Date()),
+      } as CreatePropertyDTO),
+    [prefillProperty, userSession]
   );
 
   const submitProperty = useCallback(
-    async (newPropertyData: CreatePropertyData) => {
+    async (newPropertyData: CreatePropertyDTO) => {
       console.log(
         `CreateProperty -> submitProperty ${newPropertyData.address}`
       );
@@ -57,74 +57,72 @@ export default function CreateProperty({
       setCreatingProperty(false);
 
       if (createResponse.error) {
-        notifyUser("Error. Property not created.");
+        notifyUser(t("errorMessages.propertyNotCreated"));
         return;
       }
 
-      notifyUser("Property created.");
+      notifyUser(t("notifications.propertyCreated"));
       if (onCreate) {
         onCreate();
       }
     },
-    [createProperty, notifyUser, onCreate]
+    [createProperty, notifyUser, onCreate, t]
   );
 
   return (
-    <MemoForm<CreatePropertySchema>
-      schema={createPropertySchema}
+    <MemoForm<typeof createPropertyDTO>
+      schema={createPropertyDTO}
       prefillData={prefillData}
     >
-      <Stack direction="column" spacing={2}>
+      <Stack spacing={2} padding={1}>
         <FormLocationField
           addressFieldName="address"
           coordinatesFieldName="coordinates"
-          label="Address"
+          label={t("entities.property.address")}
           readOnly={creatingProperty}
         />
         <FormSelectField
           fieldName="type"
-          label="Type"
+          label={t("entities.property.type")}
           readOnly={creatingProperty}
           options={propertyTypes.map((propertyType) => ({
             label: propertyType,
             value: propertyType,
           }))}
-          emptyOptionLabel="select a type"
+          emptyOptionLabel="_"
         />
         <FormSelectField
           fieldName="state"
-          label="State"
+          label={t("entities.property.state")}
           readOnly={creatingProperty}
           options={propertyStates.map((propertyState) => ({
             label: propertyState,
             value: propertyState,
           }))}
-          emptyOptionLabel="select a state"
+          emptyOptionLabel="_"
         />
         <FormPersonField
-          fieldName="ownerId"
-          label="Owner"
+          fieldName="owner"
+          label={t("entities.property.owner")}
           readOnly={creatingProperty}
         />
         <FormTextField
           fieldName="description"
-          label="Description"
-          readOnly={creatingProperty}
+          label={t("entities.property.description")}
+          disabled={creatingProperty}
           multiline
         />
         <FormRealtorField
-          fieldName="exclusiveRealtorId"
-          label="Exclusive realtor"
+          fieldName="exclusiveRealtor"
+          label={t("entities.property.exclusiveRealtor")}
           readOnly={creatingProperty}
         />
         <FormRealtorField
           fieldName="relatedRealtorIds"
-          label="Associated realtors"
+          label={t("entities.property.relatedRealtorIds")}
           readOnly={creatingProperty}
           multiple
         />
-        <FormPersonField fieldName="createdBy" label="Created by" readOnly />
-        <FormDateField fieldName="createdAt" label="Created at" readOnly />
 
         <Stack
           direction="row"
@@ -134,7 +132,7 @@ export default function CreateProperty({
         >
           <MemoSubmitButton
             onSubmit={submitProperty}
-            label="Create"
+            label={t("buttons.confirmButton.label")}
             color="success"
             loading={creatingProperty}
           />

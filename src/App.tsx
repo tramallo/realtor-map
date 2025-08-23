@@ -1,31 +1,51 @@
-import { memo } from "react";
+import { memo, useMemo, useState } from "react";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { useTranslation } from "react-i18next";
 
-import MapProperties from "./components/properties/MapProperties";
 import Navigation, { NavigationSlide } from "./components/Navigation";
-import ListPersons from "./components/persons/ListPersons";
-import ListRealtors from "./components/realtors/ListRealtors";
-import ListProperties from "./components/properties/ListProperties";
-import Test from "./layouts/Test";
-import { Button } from "@mui/material";
-import { useAuthContext } from "./components/AuthContext";
+import { PropertiesLayout } from "./layouts/PropertiesLayout";
+import { ContractsLayout } from "./layouts/ContractsLayout";
+import { RealtorsLayout } from "./layouts/RealtorsLayout";
+import { ClientsLayout } from "./layouts/ClientsLayout";
+import CustomModal from "./components/CustomModal";
+import { UserMenu } from "./layouts/UserMenu";
 
 export function App() {
-  const { endSession } = useAuthContext();
+  const { t } = useTranslation();
 
-  const slides: NavigationSlide[] = [
-    { label: "Map", component: <MapProperties /> },
-    { label: "Properties", component: <ListProperties /> },
-    { label: "Persons", component: <ListPersons /> },
-    { label: "Realtors", component: <ListRealtors /> },
-    //{ label: "test", component: <Test /> },
-  ];
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const slides: NavigationSlide[] = useMemo(
+    () => [
+      { label: t("layouts.properties.label"), component: <PropertiesLayout /> },
+      { label: t("layouts.clients.label"), component: <ClientsLayout /> },
+      { label: t("layouts.realtors.label"), component: <RealtorsLayout /> },
+      { label: t("layouts.contracts.label"), component: <ContractsLayout /> },
+    ],
+    [t]
+  );
 
   return (
-    <Navigation slides={slides}>
-      <Button variant="contained" onClick={endSession} sx={{ flex: 1 }}>
-        Logout
-      </Button>
-    </Navigation>
+    <>
+      <Navigation
+        slides={slides}
+        actions={[
+          {
+            label: "menu",
+            icon: <SettingsIcon />,
+            callback: () => setUserMenuOpen(true),
+          },
+        ]}
+      />
+      <CustomModal
+        title="User menu"
+        open={userMenuOpen}
+        onClose={() => setUserMenuOpen(false)}
+        slideDirection="left"
+      >
+        <UserMenu />
+      </CustomModal>
+    </>
   );
 }
 
