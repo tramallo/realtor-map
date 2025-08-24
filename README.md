@@ -18,13 +18,11 @@ git clone https://github.com/tramallo/maps-test.git
 ```bash
 npm install
 ```
-- Create **.env** file on the root of the poject and add the required key
+- Create **.env** file on the root of the poject and add the required values
 ```bash
-echo VITE_GOOGLE_MAPS_API_KEY=your-api-key > .env
+VITE_SUPABASE_PROJECT_URL=your_project_url
+VITE_SUPABASE_ANON_KEY=your_publishable_anon_key
 ```
-> [!IMPORTANT]  
-> You need a google cloud project and Maps Platform service with Geocoding API enabled, which is the one used by this app.  
-> See more about this on [Maps-Geocoding-API].
 - Run the project
 ```bash
 npm run dev
