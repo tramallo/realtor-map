@@ -10,7 +10,7 @@ export function AppSettingsPane() {
     <Stack>
       <CustomSelectField
         label={t("fields.languageField.label")}
-        value={i18n.language}
+        value={i18n.language.split('-')[0]}
         onChange={(e) => i18n.changeLanguage(e.target.value as string)}
         options={supportedLanguages.map((supportedLang) => ({
           label: supportedLang,
