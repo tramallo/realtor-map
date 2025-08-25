@@ -51,7 +51,7 @@ export function RealtorsLayout() {
           open={createRealtorModalOpen}
           onClose={() => setCreateRealtorModalOpen(false)}
         >
-          <CreateRealtor />
+          <CreateRealtor onCreate={() => setCreateRealtorModalOpen(false)} />
         </CustomModal>
       </Stack>
     </Stack>
