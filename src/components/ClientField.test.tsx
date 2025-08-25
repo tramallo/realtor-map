@@ -7,6 +7,7 @@ import ComponentsField from "./ComponentsField";
 import ClientChip from "./ClientChip";
 import CustomModal from "./CustomModal";
 import SearchClients from "./clients/SearchClients";
+import { SelectClient } from "./clients/SelectClient";
 
 // mock dependencies
 vi.mock("./ComponentsField", () => ({
@@ -14,20 +15,20 @@ vi.mock("./ComponentsField", () => ({
     <div>
       {props.onActionButtonClick && (
         <button
-          data-testid="open-list-persons-modal-button"
+          data-testid="open-select-client-button"
           onClick={props.onActionButtonClick}
         />
       )}
-      {props.components}
+      {...props.components}
     </div>
   )),
 }));
 
-vi.mock("./PersonChip", () => ({
+vi.mock("./ClientChip", () => ({
   default: vi.fn((props: ComponentProps<typeof ClientChip>) => (
-    <div data-testid={`person-chip-${props.clientId}`}>
+    <div data-testid={`client-chip-${props.clientId}`}>
       <button
-        data-testid={`person-chip-close-${props.clientId}`}
+        data-testid={`client-chip-close-${props.clientId}`}
         onClick={props.onClose}
       />
     </div>
@@ -40,20 +41,18 @@ vi.mock("./CustomModal", () => ({
   )),
 }));
 
-vi.mock("./persons/ListPersons", () => ({
-  default: vi.fn((props: ComponentProps<typeof SearchClients>) => (
-    <div data-testid="list-persons">
-      {props.onSelect && (
-        <button
-          data-testid="list-persons-select-button"
-          onClick={() => props.onSelect!(props.defaultSelected ?? [])}
+vi.mock("./clients/SelectClient", () => ({
+  SelectClient: vi.fn((props: ComponentProps<typeof SelectClient>) => (
+    <div data-testid="select-client">
+      <button
+          data-testid="select-client-button"
+          onClick={() => props.onSelect(props.defaultSelected ?? [])}
         />
-      )}
     </div>
   )),
 }));
 
-describe("PersonField", () => {
+describe("ClientField", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -95,7 +94,7 @@ describe("PersonField", () => {
   );
 
   it.each([true, false, undefined])(
-    "passes 'multiple' prop down to ListPersons multiple",
+    "passes 'multiple' prop down to SelectClient",
     (multipleTest) => {
       const testProps = {
         multiple: multipleTest,
@@ -105,13 +104,11 @@ describe("PersonField", () => {
 
       render(<ClientField {...testProps} />);
 
-      const openListButton = screen.getByTestId(
-        "open-list-persons-modal-button"
-      );
+      const openListButton = screen.getByTestId("open-select-client-button");
       fireEvent.click(openListButton);
 
-      expect(SearchClients).toHaveBeenCalledWith(
-        expect.objectContaining({ multiple: multipleTest }),
+      expect(SelectClient).toHaveBeenCalledWith(
+        expect.objectContaining({ multiselect: multipleTest }),
         expect.anything()
       );
     }
@@ -136,7 +133,7 @@ describe("PersonField", () => {
       }
     );
 
-    it("doesn't add 'onActionButtonClick' to ComponentsField nor 'onClose' to PersonChip when readOnly is true", () => {
+    it("doesn't add 'onActionButtonClick' to ComponentsField nor 'onClose' to ClientChip when readOnly is true", () => {
       const testProps = {
         selected: [1],
         onSelect: vi.fn(),
@@ -156,7 +153,7 @@ describe("PersonField", () => {
     });
   });
 
-  it("open-list-persons-modal-button is hidden when 'readOnly' is true", () => {
+  it("open-select-client-modal-button is hidden when 'readOnly' is true", () => {
     const testProps = {
       selected: [1],
       onSelect: vi.fn(),
@@ -165,10 +162,10 @@ describe("PersonField", () => {
 
     render(<ClientField {...testProps} />);
 
-    expect(screen.queryByTestId("open-list-persons-modal-button")).toBeNull();
+    expect(screen.queryByTestId("open-select-client-button")).toBeNull();
   });
 
-  it("opens person list when clicking ComponentsField action button", () => {
+  it("opens ClientSelect modal when clicking ComponentsField action button", () => {
     const testProps = {
       selected: [1],
       onSelect: vi.fn(),
@@ -176,15 +173,15 @@ describe("PersonField", () => {
 
     render(<ClientField {...testProps} />);
 
-    expect(screen.queryByTestId("list-persons")).toBeNull();
+    expect(screen.queryByTestId("select-client")).toBeNull();
 
-    const openButton = screen.getByTestId("open-list-persons-modal-button");
+    const openButton = screen.getByTestId("open-select-client-button");
     fireEvent.click(openButton);
 
-    expect(screen.getByTestId("list-persons")).toBeInTheDocument();
+    expect(screen.getByTestId("select-client")).toBeInTheDocument();
   });
 
-  it("persons-list receives selected persons as defaultSelected when opened", () => {
+  it("select-client receives default selected clients", () => {
     const selectedIds = [1, 2];
     const testProps = {
       selected: selectedIds,
@@ -193,16 +190,16 @@ describe("PersonField", () => {
 
     render(<ClientField {...testProps} />);
 
-    const openButton = screen.getByTestId("open-list-persons-modal-button");
+    const openButton = screen.getByTestId("open-select-client-button");
     fireEvent.click(openButton);
 
-    expect(SearchClients).toHaveBeenCalledWith(
+    expect(SelectClient).toHaveBeenCalledWith(
       expect.objectContaining({ defaultSelected: selectedIds }),
       expect.anything()
     );
   });
 
-  it("triggers onSelect callback when list-persons triggers its onSelect", () => {
+  it("triggers onSelect callback when select-client triggers its onSelect", () => {
     const selectedIds = [1, 2, 4];
     const onSelectMock = vi.fn();
     const testProps = {
@@ -212,15 +209,15 @@ describe("PersonField", () => {
 
     render(<ClientField {...testProps} />);
 
-    const openButton = screen.getByTestId("open-list-persons-modal-button");
+    const openButton = screen.getByTestId("open-select-client-button");
     fireEvent.click(openButton);
-    const selectButton = screen.getByTestId("list-persons-select-button");
+    const selectButton = screen.getByTestId("select-client-button");
     fireEvent.click(selectButton);
 
     expect(onSelectMock).toHaveBeenCalledWith(selectedIds);
   });
 
-  it("triggers onSelect without removed person when closing a chip", () => {
+  it("triggers onSelect without removed client when closing a chip", () => {
     const selectedIds = [1, 2, 4];
     const onSelectMock = vi.fn();
     const testProps = {
@@ -230,13 +227,13 @@ describe("PersonField", () => {
 
     render(<ClientField {...testProps} />);
 
-    const closeButton = screen.getByTestId("person-chip-close-4");
+    const closeButton = screen.getByTestId("client-chip-close-4");
     fireEvent.click(closeButton);
 
     expect(onSelectMock).toHaveBeenCalledWith([1, 2]);
   });
 
-  it("passes person-chips for each selected person to components-field", () => {
+  it("passes client-chips for each selected client to components-field", () => {
     const selectedIds = [1, 2, 4];
     const testProps = {
       selected: selectedIds,

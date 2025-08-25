@@ -7,6 +7,7 @@ import ComponentsField from "./ComponentsField";
 import RealtorChip from "./RealtorChip";
 import CustomModal from "./CustomModal";
 import SearchRealtors from "./realtors/SearchRealtors";
+import { SelectRealtor } from "./realtors/SelectRealtor";
 
 // mock dependencies
 vi.mock("./ComponentsField", () => ({
@@ -14,7 +15,7 @@ vi.mock("./ComponentsField", () => ({
     <div>
       {props.onActionButtonClick && (
         <button
-          data-testid="open-list-realtors-modal-button"
+          data-testid="open-select-realtor-button"
           onClick={props.onActionButtonClick}
         />
       )}
@@ -40,15 +41,13 @@ vi.mock("./CustomModal", () => ({
   )),
 }));
 
-vi.mock("./realtors/ListRealtors", () => ({
-  default: vi.fn((props: ComponentProps<typeof SearchRealtors>) => (
-    <div data-testid="list-realtors">
-      {props.onSelect && (
-        <button
-          data-testid="list-realtors-select-button"
-          onClick={() => props.onSelect!(props.defaultSelected ?? [])}
-        />
-      )}
+vi.mock("./realtors/SelectRealtor", () => ({
+  SelectRealtor: vi.fn((props: ComponentProps<typeof SelectRealtor>) => (
+    <div data-testid="select-realtor">
+      <button
+        data-testid="select-realtor-button"
+        onClick={() => props.onSelect(props.defaultSelected ?? [])}
+      />
     </div>
   )),
 }));
@@ -95,7 +94,7 @@ describe("RealtorField", () => {
   );
 
   it.each([true, false, undefined])(
-    "passes 'multiple' prop down to ListRealtors multiple",
+    "passes 'multiple' prop down to SelectRealtor",
     (multipleTest) => {
       const testProps = {
         multiple: multipleTest,
@@ -105,13 +104,11 @@ describe("RealtorField", () => {
 
       render(<RealtorField {...testProps} />);
 
-      const openRealtorListButton = screen.getByTestId(
-        "open-list-realtors-modal-button"
-      );
+      const openRealtorListButton = screen.getByTestId("open-select-realtor-button");
       fireEvent.click(openRealtorListButton);
 
-      expect(SearchRealtors).toHaveBeenCalledWith(
-        expect.objectContaining({ multiple: multipleTest }),
+      expect(SelectRealtor).toHaveBeenCalledWith(
+        expect.objectContaining({ multiselect: multipleTest }),
         expect.anything()
       );
     }
@@ -168,7 +165,7 @@ describe("RealtorField", () => {
     expect(screen.queryByTestId("open-list-realtors-modal-button")).toBeNull();
   });
 
-  it("open realtor list when click ComponentsField action button", () => {
+  it("open select realtor modal when click ComponentsField action button", () => {
     const testProps = {
       selected: [1],
       onSelect: vi.fn(),
@@ -176,37 +173,15 @@ describe("RealtorField", () => {
 
     render(<RealtorField {...testProps} />);
 
-    expect(screen.queryByTestId("list-realtors")).toBeNull();
+    expect(screen.queryByTestId("select-realtor")).toBeNull();
 
-    const openRealtorListButton = screen.getByTestId(
-      "open-list-realtors-modal-button"
-    );
-    fireEvent.click(openRealtorListButton);
+    const openSelectRealtorButton = screen.getByTestId("open-select-realtor-button");
+    fireEvent.click(openSelectRealtorButton);
 
-    expect(screen.queryByTestId("list-realtors")).toBeInTheDocument();
+    expect(screen.queryByTestId("select-realtor")).toBeInTheDocument();
   });
 
-  it("realtors-list receives selected realtors as defaultSelected when opened", () => {
-    const selectedRealtorIds = [1, 2];
-    const testProps = {
-      selected: selectedRealtorIds,
-      onSelect: vi.fn(),
-    };
-
-    render(<RealtorField {...testProps} />);
-
-    const openRealtorListButton = screen.getByTestId(
-      "open-list-realtors-modal-button"
-    );
-    fireEvent.click(openRealtorListButton);
-
-    expect(SearchRealtors).toHaveBeenCalledWith(
-      expect.objectContaining({ defaultSelected: selectedRealtorIds }),
-      expect.anything()
-    );
-  });
-
-  it("triggers onSelect callback when list-realtors triggers its onSelect callback", () => {
+  it("triggers onSelect callback when select-realtor triggers its onSelect callback", () => {
     const selectedRealtorIds = [1, 2, 4];
     const onSelectCallback = vi.fn();
     const testProps = {
@@ -216,14 +191,11 @@ describe("RealtorField", () => {
 
     render(<RealtorField {...testProps} />);
 
-    const openRealtorListButton = screen.getByTestId(
-      "open-list-realtors-modal-button"
-    );
-    fireEvent.click(openRealtorListButton);
-    const listRealtorsSelectButton = screen.getByTestId(
-      "list-realtors-select-button"
-    );
-    fireEvent.click(listRealtorsSelectButton);
+    const openSelectRealtorPaneButton = screen.getByTestId('open-select-realtor-button');
+    fireEvent.click(openSelectRealtorPaneButton);
+
+    const selectRealtorSelectButton = screen.getByTestId("select-realtor-button");
+    fireEvent.click(selectRealtorSelectButton);
 
     expect(onSelectCallback).toBeCalledWith(selectedRealtorIds);
   });
