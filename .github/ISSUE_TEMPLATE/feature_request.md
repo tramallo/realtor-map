@@ -2,7 +2,7 @@
 name: Improvement
 about: Improvement
 title: ''
-labels: ''
+labels: improvement
 assignees: ''
 
 ---
