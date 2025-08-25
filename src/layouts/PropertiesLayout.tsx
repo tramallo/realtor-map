@@ -80,7 +80,7 @@ export function PropertiesLayout() {
           open={createPropertyModalOpen}
           onClose={() => setCreatePropertyModalOpen(false)}
         >
-          <CreateProperty />
+          <CreateProperty onCreate={() => setCreatePropertyModalOpen(false)} />
         </CustomModal>
       </Stack>
     </Stack>
