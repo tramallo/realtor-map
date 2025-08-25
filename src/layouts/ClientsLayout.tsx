@@ -49,7 +49,7 @@ export function ClientsLayout() {
           open={createClientModalOpen}
           onClose={() => setCreateClientModalOpen(false)}
         >
-          <CreateClient />
+          <CreateClient onCreate={() => setCreateClientModalOpen(false)} />
         </CustomModal>
       </Stack>
     </Stack>
