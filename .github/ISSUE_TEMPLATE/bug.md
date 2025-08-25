@@ -1,14 +1,11 @@
 ---
-name: Bug report
-about: Bug report
-title: "[BUG] "
+name: Bug
+about: Bug
+title: ''
 labels: bug
 assignees: ''
 
 ---
-
-**Description:**
-A clear and concise description of what the bug is.
 
 **Steps to reproduce:**
 - Click button 'Create'
@@ -16,10 +13,10 @@ A clear and concise description of what the bug is.
 - Select a status
 
 **Expected behavior:**
-A clear and concise description of what you expected to happen.
+Describe what you expected to happen.
 
 **Current behavior:**
-A clear and concise description of the unexpected behavior
+Describe the unexpected behavior
 
 **Environment details:**
 Your device/app details (Device, OS, Browser, Version)

@@ -1,17 +1,17 @@
 ---
-name: Feature request
-about: Feature request
+name: Improvement
+about: Improvement
 title: ''
-labels: enhancement
+labels: ''
 assignees: ''
 
 ---
 
-***Problem it solves:*
-Describe the problem this feature solves
+***Feature:*
+Describe where/how is located the feature this improvement modifies
 
 **Description:**
-Describe the feature and how it solves the problem
+Describe the changes and the new workflow
 
 **Additional notes:**
 Add considerations and related notes
