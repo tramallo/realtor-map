@@ -79,7 +79,7 @@ export function ContractsLayout() {
           open={createContractModalOpen}
           onClose={() => setCreateContractModalOpen(false)}
         >
-          <CreateContract />
+          <CreateContract onCreate={() => setCreateContractModalOpen(false)} />
         </CustomModal>
       </Stack>
     </Stack>
