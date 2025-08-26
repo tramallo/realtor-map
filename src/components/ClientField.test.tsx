@@ -6,7 +6,6 @@ import ClientField from "./ClientField";
 import ComponentsField from "./ComponentsField";
 import ClientChip from "./ClientChip";
 import CustomModal from "./CustomModal";
-import SearchClients from "./clients/SearchClients";
 import { SelectClient } from "./clients/SelectClient";
 
 // mock dependencies

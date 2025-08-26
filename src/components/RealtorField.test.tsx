@@ -6,7 +6,6 @@ import RealtorField from "./RealtorField";
 import ComponentsField from "./ComponentsField";
 import RealtorChip from "./RealtorChip";
 import CustomModal from "./CustomModal";
-import SearchRealtors from "./realtors/SearchRealtors";
 import { SelectRealtor } from "./realtors/SelectRealtor";
 
 // mock dependencies
