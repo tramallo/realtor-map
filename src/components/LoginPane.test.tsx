@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Button, Stack } from "@mui/material";
 
 import { LoginPane } from "./LoginPane";
+import { CustomTextField } from "./CustomTextField";
 
 // mock dependencies
 vi.mock("@mui/material", () => ({
@@ -24,6 +25,18 @@ vi.mock("@mui/material", () => ({
   Typography: vi.fn((props) => <p data-testid="typography" {...props} />),
 }));
 
+vi.mock("./CustomTextField", () => ({
+  CustomTextField: vi.fn((props: ComponentProps<typeof CustomTextField>) => (
+    <input 
+      type="text" 
+      data-testid={`customTextField-${props.label}`} 
+      disabled={props.disabled} 
+      value={props.value || ''}
+      onChange={(e) => props.onChange?.(e.target.value)}
+    />
+  ))
+}));
+
 const authContextMock = {
   startSession: vi.fn(),
 };
@@ -39,25 +52,25 @@ describe("LoginPane", () => {
   it("renders email and password fields and login button", () => {
     render(<LoginPane />);
 
-    expect(screen.getByTestId("textfield-Email")).toBeInTheDocument();
-    expect(screen.getByTestId("textfield-Password")).toBeInTheDocument();
+    expect(screen.getByTestId("customTextField-Email")).toBeInTheDocument();
+    expect(screen.getByTestId("customTextField-Password")).toBeInTheDocument();
     expect(screen.getByTestId("login-button")).toBeInTheDocument();
   });
 
   it("updates email and password state when input values change", () => {
     render(<LoginPane />);
 
-    fireEvent.change(screen.getByTestId("textfield-Email"), {
+    fireEvent.change(screen.getByTestId("customTextField-Email"), {
       target: { value: "test@example.com" },
     });
-    fireEvent.change(screen.getByTestId("textfield-Password"), {
+    fireEvent.change(screen.getByTestId("customTextField-Password"), {
       target: { value: "password123" },
     });
 
-    expect(screen.getByTestId("textfield-Email")).toHaveValue(
+    expect(screen.getByTestId("customTextField-Email")).toHaveValue(
       "test@example.com"
     );
-    expect(screen.getByTestId("textfield-Password")).toHaveValue("password123");
+    expect(screen.getByTestId("customTextField-Password")).toHaveValue("password123");
   });
 
   it("disables form elements during login attempt", async () => {
@@ -71,8 +84,8 @@ describe("LoginPane", () => {
     render(<LoginPane />);
 
     fireEvent.click(screen.getByTestId("login-button"));
-    expect(screen.getByTestId("textfield-Email")).toBeDisabled();
-    expect(screen.getByTestId("textfield-Password")).toBeDisabled();
+    expect(screen.getByTestId("customTextField-Email")).toBeDisabled();
+    expect(screen.getByTestId("customTextField-Password")).toBeDisabled();
     expect(screen.getByTestId("login-button")).toBeDisabled();
     await waitFor(() => {
       expect(screen.getByTestId("login-button")).not.toBeDisabled();
@@ -113,10 +126,10 @@ describe("LoginPane", () => {
 
     render(<LoginPane />);
 
-    fireEvent.change(screen.getByTestId("textfield-Email"), {
+    fireEvent.change(screen.getByTestId("customTextField-Email"), {
       target: { value: "user@example.com" },
     });
-    fireEvent.change(screen.getByTestId("textfield-Password"), {
+    fireEvent.change(screen.getByTestId("customTextField-Password"), {
       target: { value: "securepass" },
     });
     fireEvent.click(screen.getByTestId("login-button"));
