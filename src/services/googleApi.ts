@@ -61,7 +61,7 @@ const searchAddress = async (searchValue: string): Promise<OperationResponse<Loc
       throw new Error(`Reponse non-2XX - ${JSON.stringify(response)}`);
     }
 
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get("content-type") ?? '';
     if (!contentType || !contentType.includes("application/json")) {
       throw new Error(
         `Content type not supported - ${JSON.stringify(response)}`
