@@ -137,7 +137,7 @@ describe("RealtorChip", () => {
     await waitFor(() => {
       expect(Chip).toHaveBeenCalledWith(
         expect.objectContaining({
-          label: "Not found",
+          label: "Realtor (1) not found",
         }),
         expect.anything()
       );

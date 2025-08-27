@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button, Stack } from "@mui/material";
 
 import { Client } from "../../utils/data-schema";
-import { ListPersons } from "./ListClients";
+import { ListClients } from "./ListClients";
 import SearchClients from "./SearchClients";
 
 export interface SelectClientProps {
@@ -30,7 +30,7 @@ export function SelectClient({
       justifyContent="space-between"
       height="100%"
     >
-      <ListPersons
+      <ListClients
         clientIds={searchResult}
         selected={selected}
         onSelect={setSelected}

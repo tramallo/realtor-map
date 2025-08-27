@@ -48,7 +48,7 @@ export default function RealtorChip({ realtorId, onClose }: RealtorChipProps) {
             ? "Error"
             : cachedRealtor
             ? cachedRealtor.name
-            : t("errorMessages.realtorNotFound")
+            : t("errorMessages.realtorNotFound", { realtorId: realtorId })
         }
         color={
           !fetchRealtorResponse

@@ -1,12 +1,13 @@
 import { ComponentProps } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, Mocked } from "vitest";
 import { Chip, CircularProgress } from "@mui/material";
 
 import ClientChip from "./ClientChip";
 import { Client } from "../utils/data-schema";
 import CustomModal from "./CustomModal";
 import ViewClient from "./clients/ViewClient";
+import { ClientStore } from "../stores/clientsStore";
 
 // mock dependencies
 vi.mock("@mui/material", () => ({
@@ -20,21 +21,26 @@ vi.mock("@mui/material", () => ({
   CircularProgress: vi.fn(() => <div data-testid="circular-progress" />),
 }));
 
-let personsMock = {} as Record<Client["id"], Client>;
-const fetchPersonMock = vi.fn();
-vi.mock("../stores/personsStore", async (requireActual) => {
-  const actual = await requireActual<typeof import("../stores/clientsStore")>();
+const clientStoreMock: Mocked<ClientStore> = {
+  clients: {},
+  searchResults: {},
+  searchClients: vi.fn(),
+  createClient: vi.fn(),
+  fetchClient: vi.fn(),
+  fetchClients: vi.fn(),
+  deleteClient: vi.fn(),
+  updateClient: vi.fn(),
+}
+vi.mock('../stores/clientsStore', async (importOriginal) => {
+  const originalClientStore = await importOriginal<ClientStore>();
 
   return {
-    ...actual,
-    usePersonStore: (selectorFunction: (args: unknown) => unknown) => {
-      return selectorFunction({
-        persons: personsMock,
-        fetchPerson: fetchPersonMock,
-      });
-    },
-  };
-});
+    ...originalClientStore,
+    useClientStore: vi.fn((selector?: (state: ClientStore) => any) => {
+      return selector ? selector(clientStoreMock) : clientStoreMock
+    })
+  }
+})
 
 vi.mock("./CustomModal", () => ({
   default: vi.fn((props: ComponentProps<typeof CustomModal>) => (
@@ -52,26 +58,27 @@ vi.mock("./CustomModal", () => ({
   )),
 }));
 
-vi.mock("./persons/ViewPerson", () => ({
+vi.mock("./clients/ViewClient", () => ({
   default: vi.fn((props: ComponentProps<typeof ViewClient>) => (
-    <div data-testid={`view-person-${props.clientId}`} />
+    <div data-testid={`view-client-${props.clientId}`} />
   )),
 }));
 
-describe("PersonChip", () => {
+describe("ClientChip", () => {
   beforeEach(() => {
-    personsMock = {};
+    clientStoreMock.clients = {};
+    clientStoreMock.searchResults = {};
     vi.clearAllMocks();
   });
 
   it("renders without crashing", () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
     render(<ClientChip clientId={1} />);
     expect(screen.getByTestId("mui-chip")).toBeInTheDocument();
   });
 
   it("displays loading spinner when fetching person data", () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} />);
 
@@ -89,26 +96,23 @@ describe("PersonChip", () => {
     );
   });
 
-  it("shows person name when fetch succeeds", async () => {
-    const personId = 1;
-    const personName = "John Doe";
-    personsMock[personId] = { id: personId, name: personName } as Client;
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+  it("shows client name when fetch succeeds", async () => {
+    const client1 = { id: 1, name: "John Doe" } as Client;
+    clientStoreMock.clients[client1.id] = client1;
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined } as any)
 
-    render(<ClientChip clientId={personId} />);
+    render(<ClientChip clientId={client1.id} />);
 
     await waitFor(() => {
       expect(Chip).toHaveBeenCalledWith(
-        expect.objectContaining({ label: personName }),
+        expect.objectContaining({ label: client1.name }),
         expect.anything()
       );
     });
   });
 
   it("displays error message when fetch fails", async () => {
-    fetchPersonMock.mockResolvedValueOnce({
-      error: new Error("error message"),
-    });
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ error: new Error("error message") });
 
     render(<ClientChip clientId={1} />);
 
@@ -122,41 +126,41 @@ describe("PersonChip", () => {
     });
   });
 
-  it("shows 'Not found' when person is not in cache", async () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+  it("shows 'Client (id) not found' when client is not in cache", async () => {
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} />);
 
     await waitFor(() => {
       expect(Chip).toHaveBeenCalledWith(
         expect.objectContaining({
-          label: "Not found",
+          label: "Client (1) not found",
         }),
         expect.anything()
       );
     });
   });
 
-  it("opens view person modal when chip is clicked", async () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+  it("opens ViewClient modal when chip is clicked", async () => {
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} />);
 
     fireEvent.click(screen.getByTestId("mui-chip"));
     await waitFor(() => {
       expect(screen.getByTestId("custom-modal")).toBeInTheDocument();
-      expect(screen.getByTestId("view-person-1")).toBeInTheDocument();
+      expect(screen.getByTestId("view-client-1")).toBeInTheDocument();
     });
   });
 
-  it("closes modal when CustomModal onClose is triggered", async () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+  it("closes modal when CustomModal close is triggered", async () => {
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} />);
 
     fireEvent.click(screen.getByTestId("mui-chip"));
     await waitFor(() => {
-      expect(screen.queryByTestId("view-person-1")).toBeInTheDocument();
+      expect(screen.queryByTestId("view-client-1")).toBeInTheDocument();
       expect(
         screen.queryByTestId("custom-modal-close-button")
       ).toBeInTheDocument();
@@ -164,21 +168,23 @@ describe("PersonChip", () => {
     fireEvent.click(screen.getByTestId("custom-modal-close-button"));
 
     await waitFor(() => {
-      expect(screen.queryByTestId("view-person-1")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("view-client-1")).not.toBeInTheDocument();
     });
   });
 
-  it("displays ViewPerson component in modal with correct personId", async () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+  it("displays ViewClient component in modal with correct personId", async () => {
+    const client1 = { id: 1, name: "John Doe" } as Client;
+    clientStoreMock.clients[client1.id] = client1;
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined } as any)
 
     render(<ClientChip clientId={1} />);
 
     fireEvent.click(screen.getByTestId("mui-chip"));
     await waitFor(() => {
-      expect(screen.queryByTestId("view-person-1")).toBeInTheDocument();
+      expect(screen.queryByTestId("view-client-1")).toBeInTheDocument();
       expect(ViewClient).toHaveBeenCalledWith(
         expect.objectContaining({
-          personId: 1,
+          clientId: 1,
         }),
         expect.anything()
       );
@@ -186,8 +192,8 @@ describe("PersonChip", () => {
   });
 
   it("calls onClose callback when mui Chip delete button is clicked", async () => {
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
     const onCloseMock = vi.fn();
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} onClose={onCloseMock} />);
 
@@ -204,7 +210,7 @@ describe("PersonChip", () => {
   });
 
   it("hides delete button when onClose prop is not provided", () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} />);
 
@@ -218,12 +224,7 @@ describe("PersonChip", () => {
   });
 
   it("disables onClose functionality during data loading", async () => {
-    fetchPersonMock.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve({ data: undefined }), 300);
-        })
-    );
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     render(<ClientChip clientId={1} onClose={vi.fn()} />);
 
@@ -240,13 +241,13 @@ describe("PersonChip", () => {
   });
 
   it("triggers data refetch when personId prop changes", async () => {
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
-    fetchPersonMock.mockResolvedValueOnce({ data: undefined });
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
+    clientStoreMock.fetchClient.mockResolvedValueOnce({ data: undefined });
 
     const { rerender } = render(<ClientChip clientId={1} />);
 
-    await waitFor(() => expect(fetchPersonMock).toHaveBeenCalledWith(1));
+    await waitFor(() => expect(clientStoreMock.fetchClient).toHaveBeenCalledWith(1));
     rerender(<ClientChip clientId={2} />);
-    await waitFor(() => expect(fetchPersonMock).toHaveBeenCalledWith(2));
+    await waitFor(() => expect(clientStoreMock.fetchClient).toHaveBeenCalledWith(2));
   });
 });

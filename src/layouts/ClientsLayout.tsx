@@ -3,7 +3,7 @@ import { Box, Button, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { Client } from "../utils/data-schema";
-import { ListPersons } from "../components/clients/ListClients";
+import { ListClients } from "../components/clients/ListClients";
 import SearchClients from "../components/clients/SearchClients";
 import CustomModal from "../components/CustomModal";
 import CreateClient from "../components/clients/CreateClient";
@@ -25,7 +25,7 @@ export function ClientsLayout() {
     >
       <Stack spacing={1} minHeight={0}>
         <Box overflow="auto">
-          <ListPersons clientIds={searchResults} />
+          <ListClients clientIds={searchResults} />
         </Box>
       </Stack>
       <Stack spacing={1} minHeight={"auto"}>

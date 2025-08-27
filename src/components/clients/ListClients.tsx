@@ -14,7 +14,7 @@ export type ListClientsProps = Omit<StackProps, "onSelect"> & {
   multiselect?: boolean;
 };
 
-export function ListPersons({
+export function ListClients({
   clientIds,
   selected = [],
   onSelect,

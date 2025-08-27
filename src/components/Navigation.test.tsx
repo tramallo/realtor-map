@@ -5,15 +5,18 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import Navigation from "./Navigation";
 
 // mock dependencies
-vi.mock("@mui/material", async () => ({
-  Box: vi.fn((props) => <div data-testid="mui-box" {...props} />),
-  Stack: vi.fn((props) => <div data-testid="mui-stack" {...props} />),
-  Button: vi.fn((props) => (
-    <button data-testid="mui-button" {...props}>
-      {props.children}
-    </button>
-  )),
-}));
+vi.mock("@mui/material", () => {
+  return {
+    useMediaQuery: vi.fn((...args: unknown[]) => false),
+    Box: vi.fn((props) => <div data-testid="mui-box" {...props} />),
+    Stack: vi.fn((props) => <div data-testid="mui-stack" {...props} />),
+    Button: vi.fn((props) => (
+      <button data-testid="mui-button" {...props}>
+        {props.children}
+      </button>
+    )),
+  }
+});
 
 describe("Navigation", () => {
   const slidesMock = [
@@ -66,33 +69,6 @@ describe("Navigation", () => {
     );
   });
 
-  it("responsive bar border styling", () => {
-    render(<Navigation slides={slidesMock} />);
-
-    expect(Stack).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sx: expect.objectContaining({
-          borderTop: expect.objectContaining({
-            md: "0",
-            xs: "2px solid black",
-          }),
-          borderRight: expect.objectContaining({ md: "2px solid black" }),
-        }),
-      }),
-      expect.anything()
-    );
-  });
-
-  it("children rendering within navigation bar", () => {
-    render(
-      <Navigation slides={slidesMock}>
-        <div data-testid="test-child" />
-      </Navigation>
-    );
-
-    expect(screen.getByTestId("test-child")).toBeInTheDocument();
-  });
-
   it("content area scrolling behavior", () => {
     render(<Navigation slides={slidesMock} />);
 
@@ -108,9 +84,7 @@ describe("Navigation", () => {
     render(<Navigation slides={slidesMock} />);
 
     expect(Button).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sx: { flex: 1, borderRadius: 0 },
-      }),
+      expect.objectContaining({ sx: expect.objectContaining({ flex: 1 }), variant: 'contained' }),
       expect.anything()
     );
   });

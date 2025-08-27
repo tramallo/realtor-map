@@ -53,7 +53,7 @@ export default function RealtorField({
         readOnly={readOnly}
         errorMessage={errorMessage}
         onActionButtonClick={
-          !readOnly ? () => setSelectRealtorModalOpen(true) : undefined
+          readOnly != true ? () => setSelectRealtorModalOpen(true) : undefined
         }
         components={selected.map((realtorId: Realtor["id"], index: number) => (
           <RealtorChip
