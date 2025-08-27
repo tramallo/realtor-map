@@ -7,7 +7,7 @@ import Navigation from "./Navigation";
 // mock dependencies
 vi.mock("@mui/material", () => {
   return {
-    useMediaQuery: vi.fn((...args: unknown[]) => false),
+    useMediaQuery: vi.fn((..._args: unknown[]) => false),
     Box: vi.fn((props) => <div data-testid="mui-box" {...props} />),
     Stack: vi.fn((props) => <div data-testid="mui-stack" {...props} />),
     Button: vi.fn((props) => (
