@@ -7,11 +7,11 @@ assignees: ''
 
 ---
 
-**Problem:
+**Problem**:
 Describe the problem this new feature solves
 
-Description:
+**Description**:
 Describe the behaviour of the new feature and its workflow
 
-Additional notes:
+**Additional notes**:
 Add considerations and related notes

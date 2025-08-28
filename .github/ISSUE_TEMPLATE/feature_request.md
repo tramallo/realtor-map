@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-***Feature:*
+**Feature:**
 Describe where/how is located the feature this improvement modifies
 
 **Description:**
